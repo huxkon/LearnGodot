@@ -17,13 +17,14 @@
 1. `src/data/content.js`
 2. `src/data/lesson-01-guided.js`
 3. `src/data/lesson-02-guided.js`
-4. `src/js/ui-copy.js`
-5. `src/js/data.js`
-6. `src/js/storage.js`
-7. `src/js/router.js`
-8. `src/js/components.js`
-9. `src/js/views.js`
-10. `src/js/app.js`
+4. `src/data/lesson-03-guided.js`
+5. `src/js/ui-copy.js`
+6. `src/js/data.js`
+7. `src/js/storage.js`
+8. `src/js/router.js`
+9. `src/js/components.js`
+10. `src/js/views.js`
+11. `src/js/app.js`
 
 Bu sıra `defer` özellikli klasik script etiketleriyle korunur. `fetch`, `import`, `export` veya bundler kullanılmaz.
 

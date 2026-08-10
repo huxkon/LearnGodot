@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-1. ve 2. dersin guided quick-term sistemi canonical kavram adı ile cümledeki çekimli inline label'ı ayıracak biçimde düzeltildi. Recognize kartlarının bağlamsal yapısı korunuyor; Ders 3–14 klasik sunumu koruyor. Güncel odak gerçek tarayıcı QA'sı ve kullanıcı onayı sonrasında dersleri tek tek dönüştürmektir.
+1–3. dersler ortak renderer ve canonical quick-term sistemiyle guided learning deneyimidir. Lesson 3, Node–Scene–SceneTree yapısını on core konuda kaynak sırasıyla öğretir; on recognize terimin tamamı ilgili core bağlamına birer kez yerleştirildi. Ders 4–14 klasik sunumu koruyor. Güncel odak gerçek tarayıcı QA'sı ve kullanıcı onayı sonrasında dersleri yalnızca verilen kapsamla tek tek dönüştürmektir.
 
 ## Verified Source Facts
 
@@ -25,7 +25,8 @@
 - Quizde yanlış/yeniden çalışma seçilen sorular Review ekranında, manuel işaretlenen terimlerden ayrı olarak gösteriliyor.
 - 1. dersin kaynak sırası pedagojik olarak korundu: Game Engine → Editor → Project → Asset → API → Library/Framework/Plugin → Build/Export → Runtime.
 - 2. dersin guided sırası: Variable → Constant → Data Type → Dynamic/Static Typing → Function/Method → Parameter/Argument → Return Value → Scope → Conditional → Array/Dictionary → Loop → Class/Object/Instance. Collection, loop'un doğal ön koşulu olduğu için kaynak liste sunumunda loop'tan önce gösterilir.
-- Guided içerik ders bazlı `src/data/lesson-01-guided.js` ve `src/data/lesson-02-guided.js` içinde tutuluyor; ana database/source dosyaları değiştirilmedi.
+- 3. dersin kaynak sırası pedagojik olarak korundu: Node → Scene → SceneTree → Parent/Child → NodePath/get_node → PackedScene/instantiate() → _ready() → queue_free() → Group → Autoload.
+- Guided içerik ders bazlı `src/data/lesson-01-guided.js`, `src/data/lesson-02-guided.js` ve `src/data/lesson-03-guided.js` içinde tutuluyor; ana database/source dosyaları değiştirilmedi.
 - Ön koşullar yalnızca gerektiğinde gösteriliyor; recognize terimler ilgili core konulara dağıtıldı.
 - Ortak recognize kartları kısa tanım, core bağlantısı, yerleştirme nedeni ve kavram ayrımı içeriyor. 1. dersteki `pipeline` yalnızca Asset altında, `platform` yalnızca Build/Export altında gösteriliyor; Runtime'a zayıf tekrar eklenmiyor.
 - Project → Repository ayrımı Godot project dosyaları ile Git değişiklik geçmişini ayrı katmanlar olarak açıklar.
@@ -46,11 +47,13 @@
 - README, içerik senkronizasyon/doğrulama scriptleri ve opsiyonel yerel sunucu.
 - `index.html` dosyasına çift tıklayarak çalışma; sunucu veya kurulum gerektirmeme.
 - 1. ve 2. ders landing ekranları, toplam yirmi ayrı guided konu rotası, inline terim dialogları, zihinsel modeller, Godot bağlamları, örnekler, yaygın hatalar, mini sorular ve net önceki/sonraki eylemleri.
+- 3. ders landing ekranı ve on guided konu rotası; 15 curated canonical quick-term, altı kod örneği, bağlamsal recognize kartları, kavram köprüleri ve dört parçalı ders sonu zihinsel haritası.
 
 ## Next Steps
 
 1. Gerçek tarayıcıda file:// açılış, 1. ve 2. ders başla/devam et, önceki/sonraki, cevap açma, inline dialog, son konu özeti ve LocalStorage yenileme akışlarını elle doğrula.
 2. Variable ekranında `adıdır` inline label'ının modalda `Identifier (Tanımlayıcı)` başlığını; canonical listenin duplicate ve çekimli label içermediğini gerçek tarayıcıda kontrol et.
 3. Mobil genişlikte quick-term modalını, zengin recognize kartlarını, bridge akışlarını, sticky guided navigasyonu ve ders özetini görsel olarak kontrol et.
-4. Kullanıcı yeni bir ders kapsamı verdiğinde yalnızca o dersin source core sırasını, ön koşullarını, recognize dağılımını ve bağlam çakışmalarını analiz edip ayrı guide verisi ekle; quick-term'leri explicit curate et.
-5. Ders 3–14'ü topluca veya kullanıcı onayı olmadan guided yapıya dönüştürme.
+4. Gerçek tarayıcıda Lesson 3 landing → topic → quick-term → recognize → mini soru → önceki/sonraki → summary → completion → refresh akışını doğrula.
+5. Kullanıcı yeni ders kapsamı verdiğinde yalnızca o dersin source core sırasını, ön koşullarını, recognize dağılımını ve bağlam çakışmalarını analiz edip ayrı guide verisi ekle.
+6. Ders 4–14'ü topluca veya kullanıcı onayı olmadan guided yapıya dönüştürme.

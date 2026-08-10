@@ -14,7 +14,7 @@ Godot + GDScript odaklı, Türkçe bir developer education web uygulaması.
 - Tema, responsive tasarım, klavye kullanımı ve erişilebilirlik desteklenir.
 - Uygulama yalnızca HTML, CSS ve Vanilla JavaScript kullanır; `index.html` çift tıklanarak sunucusuz çalışır.
 - Framework, TypeScript, npm paketi, bundler, build sistemi, backend ve server-side database kullanılmaz.
-- 1. ve 2. ders guided learning deneyimidir; 1. ders ekosistemin sekiz core kavramını, 2. ders kodun on iki temel yapı taşını sırayla öğretir. Ders 3–14 mevcut sunumunu korur.
+- 1–3. dersler guided learning deneyimidir; 1. ders ekosistemin sekiz core kavramını, 2. ders kodun on iki temel yapı taşını, 3. ders Node–Scene–SceneTree sisteminin on core kavramını sırayla öğretir. Ders 4–14 mevcut sunumunu korur.
 - Guided derste her core terim ayrı tamamlanır; ders tamamlanması terimleri topluca öğrenildi saymaz.
 
 ## Content Rules

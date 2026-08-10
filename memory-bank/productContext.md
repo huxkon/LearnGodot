@@ -13,7 +13,7 @@ Yeni başlayanların Godot, GDScript ve genel oyun geliştirme terimlerini bir k
 - Zorlandığı terimleri tekrar listesine, önemli bulduklarını favorilere ekler.
 - Global arama ile klavyeden hızlıca herhangi bir terime geçer.
 - Kullanıcı kurulum veya yerel sunucu hazırlamadan `index.html` dosyasını doğrudan açabilir.
-- Kullanıcı guided 1. ve 2. derste hangi konuyu seçeceğini düşünmeden “Başla → Sonraki Konu → Dersi Tamamla” akışını izler.
+- Kullanıcı guided 1–3. derslerde hangi konuyu seçeceğini düşünmeden “Başla → Sonraki Konu → Dersi Tamamla” akışını izler.
 - Bilinmeyen teknik kelimeler, mevcut konudan ayrılmadan inline açıklama penceresinde okunur.
 - Cümlede “adıdır” veya “değeri” gibi çekimli bir parça tıklansa bile modal ve “Bilmediğim Terimler” listesi `Identifier (Tanımlayıcı)` veya `Value (Değer)` gibi canonical kavram adını gösterir.
 - “Bilmediğim Terimler” yalnızca topic için elle seçilmiş gerekli teknik kavramları, duplicate oluşturmadan listeler.

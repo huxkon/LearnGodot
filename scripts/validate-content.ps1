@@ -42,7 +42,7 @@ if ($first50.term_ids.Count -ne 50) { $errors.Add("İlk 50 yolu 50 terim içermi
 if ($sourceText -cne $embeddedJson) { $errors.Add("content.js içindeki eğitim verisi kaynak content.database.json ile birebir aynı değil.") }
 
 $requiredFiles = @(
-    "index.html", "src/styles.css", "src/data/content.js", "src/data/lesson-01-guided.js", "src/data/lesson-02-guided.js", "src/js/app.js", "src/js/data.js",
+    "index.html", "src/styles.css", "src/data/content.js", "src/data/lesson-01-guided.js", "src/data/lesson-02-guided.js", "src/data/lesson-03-guided.js", "src/js/app.js", "src/js/data.js",
     "src/js/storage.js", "src/js/router.js", "src/js/ui-copy.js", "src/js/views.js", "src/js/components.js"
 )
 foreach ($file in $requiredFiles) {
@@ -54,7 +54,7 @@ if ($indexHtml -match 'type\s*=\s*["'']module["'']') { $errors.Add("index.html h
 if ($indexHtml -notmatch 'src/data/content\.js') { $errors.Add("index.html content.js verisini yüklemiyor.") }
 
 $expectedScriptOrder = @(
-    "src/data/content.js", "src/data/lesson-01-guided.js", "src/data/lesson-02-guided.js", "src/js/ui-copy.js", "src/js/data.js", "src/js/storage.js",
+    "src/data/content.js", "src/data/lesson-01-guided.js", "src/data/lesson-02-guided.js", "src/data/lesson-03-guided.js", "src/js/ui-copy.js", "src/js/data.js", "src/js/storage.js",
     "src/js/router.js", "src/js/components.js", "src/js/views.js", "src/js/app.js"
 )
 $actualScriptOrder = @([regex]::Matches($indexHtml, '<script\s+defer\s+src="([^"]+)"\s*></script>') | ForEach-Object { $_.Groups[1].Value })
@@ -67,7 +67,8 @@ if ($fetchUsage) { $errors.Add("Doğrudan file:// çalışmasını bozabilecek f
 
 $guidedLessons = @(
     @{ Id = "lesson-01"; File = "src/data/lesson-01-guided.js" },
-    @{ Id = "lesson-02"; File = "src/data/lesson-02-guided.js" }
+    @{ Id = "lesson-02"; File = "src/data/lesson-02-guided.js" },
+    @{ Id = "lesson-03"; File = "src/data/lesson-03-guided.js" }
 )
 foreach ($guidedLesson in $guidedLessons) {
     $lesson = $database.lessons | Where-Object id -eq $guidedLesson.Id

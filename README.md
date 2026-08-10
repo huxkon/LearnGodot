@@ -6,7 +6,7 @@ Godot, GDScript ve oyun geliştirme terminolojisini Türkçe öğrenmek için ha
 
 - Gerçek içerik verisinden üretilen Dashboard ve ilerleme yüzdeleri
 - 14 derslik sıralı öğrenme yolu
-- 1. ve 2. ders için ortak renderer kullanan guided çalışma akışı, bağlamsal tanıma kartları, inline terim açıklamaları ve konu bazlı ilerleme
+- 1–3. dersler için ortak renderer kullanan guided çalışma akışı, bağlamsal tanıma kartları, inline terim açıklamaları ve konu bazlı ilerleme
 - 343 terimlik aranabilir ve filtrelenebilir A–Z sözlük
 - Tanım, bağlam, hatırlama ipucu, GDScript örneği ve ilişkili kavramlarla terim detayları
 - 42 açık hatırlama sorusu ve öz değerlendirme
@@ -44,6 +44,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\validate-content.ps1
 │   ├── data/content.js                # JSON'un doğrudan tarayıcıda yüklenen, birebir türetilmiş hali
 │   ├── data/lesson-01-guided.js       # 1. dersin öğretici akış verisi
 │   ├── data/lesson-02-guided.js       # 2. dersin öğretici akış verisi
+│   ├── data/lesson-03-guided.js       # 3. dersin öğretici akış verisi
 │   ├── js/
 │   │   ├── app.js                     # Başlatma, olaylar ve UI davranışları
 │   │   ├── components.js              # Tekrar kullanılan arayüz parçaları
@@ -74,13 +75,13 @@ window.GODOT_LEARN_DATA = { /* kaynak JSON verisi */ };
 - `learning_paths`: İlk 50, temel kurs ve tam sözlük yolları
 - `categories`: Ders ve filtre kategorileri
 
-`lesson-01-guided.js` ve `lesson-02-guided.js`, ana database'i değiştirmeden ilk iki dersin öğretim biçimini zenginleştirir. Her core terim için 30 saniyelik açıklama, zihinsel model, ihtiyaç, Godot bağlamı, örnek, inline kısa terimler, yaygın hata ve mini kontrol sorusu içerir. Tanıma terimleri ilgili temel kavramın yanında “Kısaca / Bu konuyla bağlantısı / Neden burada?” yapısıyla gösterilir. Zor kavram geçişlerinde “Buraya nasıl geldik?” köprüleri, son konuda da kavramların ilişkisini özetleyen bir bölüm bulunur. Ders 3–14 mevcut database sunumunu kullanmaya devam eder.
+`lesson-01-guided.js`, `lesson-02-guided.js` ve `lesson-03-guided.js`, ana database'i değiştirmeden ilk üç dersin öğretim biçimini zenginleştirir. Her core terim için 30 saniyelik açıklama, zihinsel model, ihtiyaç, Godot bağlamı, örnek, inline kısa terimler, yaygın hata ve mini kontrol sorusu içerir. Tanıma terimleri ilgili temel kavramın yanında “Kısaca / Bu konuyla bağlantısı / Neden burada?” yapısıyla gösterilir. Zor kavram geçişlerinde “Buraya nasıl geldik?” köprüleri, son konuda da kavramların ilişkisini özetleyen bir bölüm bulunur. Ders 4–14 mevcut database sunumunu kullanmaya devam eder.
 
 Guided quick-term sistemi surface metin ile canonical kavram adını ayırır. Ders düzeyindeki `quickTerms` kataloğunda her kayıt `canonicalTitle`, `shortExplanation` ve isteğe bağlı `example` / `context` alanlarını taşır. Bir topic yalnızca gerçekten gerekli kavramları `quickTermIds` içinde açıkça seçer. `[[identifier|adıdır]]` işaretindeki `adıdır` yalnızca cümlede görünen ve tıklanan inline label'dır; liste ve modal başlığı katalogdaki `Identifier (Tanımlayıcı)` değerini kullanır. Aynı ID farklı çekimlerle işaretlense bile canonical listede bir kez görünür.
 
 ## Guided derslerin ilerleme modeli
 
-- `/learn/lesson-01` ve `/learn/lesson-02` ders planını ve tek bir belirgin başlama/devam etme eylemini gösterir.
+- `/learn/lesson-01`, `/learn/lesson-02` ve `/learn/lesson-03` ders planını ve tek bir belirgin başlama/devam etme eylemini gösterir.
 - Her core kavram `/learn/:lessonId/:termId` rotasında ayrı bir çalışma ekranıdır.
 - “Konuyu tamamla / Sonraki Konu” düğmesi yalnızca açık terimi `learnedTermIds` içine ekler.
 - Son konuda “Dersi Tamamla” bütün konuların tek tek tamamlandığını kontrol eder ve yalnızca `completedLessonIds` değerini günceller.

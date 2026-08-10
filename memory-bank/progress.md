@@ -49,10 +49,20 @@
 - Duplicate önleme, katalog alanları, explicit seçim, marker bağlantısı ve eski `target.firstChild` davranışı doğrulama scriptine regresyon kontrolleri olarak eklendi.
 - Son denetimde Lesson 1 ve Lesson 2 için ayrı ayrı 14 curated ID, 14 unique ID ve 14 inline marker doğrulandı. Kaynak/runtime veri eşitliği korundu ve değişen web assetleri HTTP üzerinden 200/doğru MIME ile yüklendi.
 - Contextual recognize kartlarının renderer ve veri davranışı geri alınmadı veya değiştirilmedi.
+- Yalnızca Lesson 3 guided yapıya dönüştürüldü; Lesson 1–2 eğitim verileri ile Lesson 4–14 sunumu değiştirilmedi.
+- Lesson 3 core sırası kaynakla aynı tutuldu: Node → Scene → SceneTree → Parent/Child → NodePath/get_node → PackedScene/instantiate() → _ready() → queue_free() → Group → Autoload.
+- Lesson 3 için 10/10 core konu; 30 saniyelik anlatım, zihinsel model, ihtiyaç, Godot bağlamı, somut örnek, gerçek yaygın hata ve senaryo tabanlı mini soruyla tamamlandı.
+- Lesson 3 recognize dağılımı: Scene (Root Node, Main Scene, Owner), SceneTree (add_child), Parent/Child (remove_child, reparent), NodePath/get_node (Unique Node), _ready() (Lifecycle, Notification, Signal). 10/10 terim tam bir kez bağlamsal karta yerleştirildi.
+- Lesson 3'te 15 curated canonical quick-term kullanıldı; inline surface label ile popup/list başlığı ayrı tutuldu ve kırık marker bulunmadı.
+- NodePath, PackedScene, _ready(), queue_free(), Group ve Autoload konularında amacı olan kısa GDScript örnekleri ve satır açıklamaları eklendi; salt görsel dolgu için kod eklenmedi.
+- Lesson 3 sonuna Node → Scene, PackedScene → SceneTree, NodePath → lifecycle ve Group → Autoload ilişkilerini yeni bilgi eklemeden birleştiren dört parçalı ders özeti eklendi.
+- `index.html`, README ve doğrulama scripti üçüncü guided veri dosyasını kapsayacak biçimde güncellendi; ortak renderer/storage mimarisi değiştirilmedi.
+- Genişletilmiş doğrulama başarılı: 343 terim, 14 ders, 42 soru, 1–3. ders guided alanları, recognize tekilliği, canonical quick-term bağları ve kaynak/runtime metin eşitliği doğrulandı.
+- HTTP smoke testi başarılı: index, CSS, ana veri, üç guided veri dosyası, views ve app dosyaları 200/doğru MIME ile yüklendi.
 
 ## Remaining / Optional QA
 
-- Ortamda Node.js veya desteklenen bir headless browser olmadığı için gerçek DOM tıklama/LocalStorage yenileme ve görsel responsive testi otomatik çalışmadı. Statik rota/aksiyon bağlantıları ile HTTP yüklemeleri doğrulandı; gerçek tarayıcı smoke testi önerilir.
+- Ortamda Node.js veya desteklenen bir headless browser olmadığı için Lesson 3 dahil gerçek DOM tıklama/LocalStorage yenileme ve görsel responsive testi otomatik çalışmadı. Statik rota/aksiyon/storage bağlantıları ile HTTP yüklemeleri doğrulandı; gerçek tarayıcı smoke testi gerekir.
 - Dağıtım bu MVP görevinin kapsamında değildi.
 
 ## Latest Review
@@ -61,6 +71,7 @@
 - 1. ve 2. ders quick-term sistemi canonical/surface ayrımı ve explicit curated topic listeleriyle düzeltildi.
 - Contextual recognize kartları aynı modelle çalışmaya devam ediyor.
 - Kaynak JSON değişmedi. Scope/Loop context override'ları ve LocalStorage anahtarları korunuyor.
+- Lesson 3 ortak guided registry'ye eklendi; core kaynak sırası korundu, recognize terimler pedagojik bağlarına göre dağıtıldı ve Lesson 4–14 klasik kaldı.
 
 ## Known Data Note
 
