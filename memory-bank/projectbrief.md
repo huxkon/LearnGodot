@@ -14,6 +14,8 @@ Godot + GDScript odaklı, Türkçe bir developer education web uygulaması.
 - Tema, responsive tasarım, klavye kullanımı ve erişilebilirlik desteklenir.
 - Uygulama yalnızca HTML, CSS ve Vanilla JavaScript kullanır; `index.html` çift tıklanarak sunucusuz çalışır.
 - Framework, TypeScript, npm paketi, bundler, build sistemi, backend ve server-side database kullanılmaz.
+- 1. ders, hiçbir ön bilgi varsaymadan sekiz core kavramı sırayla öğreten guided learning deneyimidir; diğer 13 ders mevcut sunumunu korur.
+- Guided derste her core terim ayrı tamamlanır; ders tamamlanması terimleri topluca öğrenildi saymaz.
 
 ## Content Rules
 
@@ -22,6 +24,8 @@ Godot + GDScript odaklı, Türkçe bir developer education web uygulaması.
 - Arama `name`, `aliases` ve `definition` alanlarını kapsar.
 - Kod örnekleri ve ilgili terimler veri ilişkilerinden üretilir.
 - İlerleme oranları veri içindeki gerçek listelerden hesaplanır.
+- Guided 1. dersin genişletilmiş öğretim metni ana database'i değiştirmeden ayrı bir uygulama içerik katmanında tutulur.
+- Aynı ID altında karışmış Scope ve Loop anlamları kaynak dosya değiştirilmeden ders bağlamına göre ayrılır.
 
 ## Acceptance Summary
 

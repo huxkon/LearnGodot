@@ -93,7 +93,7 @@ const navItems = [
 ];
 
 function appShell(route, content) {
-  const activeName = route.name === "lesson" ? "learn" : route.name === "term" ? "terms" : route.name;
+  const activeName = route.name === "lesson" || route.name === "lesson-topic" ? "learn" : route.name === "term" ? "terms" : route.name;
   return `<div class="app-shell">
     <aside class="sidebar" id="sidebar" aria-label="Ana navigasyon">
       <a class="brand" href="#/dashboard"><span class="brand-mark">G</span><span><strong>${COPY.appName}</strong><small>Godot + GDScript</small></span></a>

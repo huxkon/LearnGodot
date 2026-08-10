@@ -13,6 +13,9 @@ Yeni başlayanların Godot, GDScript ve genel oyun geliştirme terimlerini bir k
 - Zorlandığı terimleri tekrar listesine, önemli bulduklarını favorilere ekler.
 - Global arama ile klavyeden hızlıca herhangi bir terime geçer.
 - Kullanıcı kurulum veya yerel sunucu hazırlamadan `index.html` dosyasını doğrudan açabilir.
+- Kullanıcı 1. derste hangi konuyu seçeceğini düşünmeden “Başla → Sonraki Konu → Dersi Tamamla” akışını izler.
+- Bilinmeyen teknik kelimeler, mevcut konudan ayrılmadan inline açıklama penceresinde okunur.
+- Her konu kısa açıklama, zihinsel model, ihtiyaç, Godot bağlamı, örnek, yaygın hata ve mini soruyla çalışılır.
 
 ## Personal Use Principle
 

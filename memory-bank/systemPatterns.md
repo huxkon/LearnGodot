@@ -15,19 +15,20 @@
 ## Script Load Order
 
 1. `src/data/content.js`
-2. `src/js/ui-copy.js`
-3. `src/js/data.js`
-4. `src/js/storage.js`
-5. `src/js/router.js`
-6. `src/js/components.js`
-7. `src/js/views.js`
-8. `src/js/app.js`
+2. `src/data/lesson-01-guided.js`
+3. `src/js/ui-copy.js`
+4. `src/js/data.js`
+5. `src/js/storage.js`
+6. `src/js/router.js`
+7. `src/js/components.js`
+8. `src/js/views.js`
+9. `src/js/app.js`
 
 Bu sıra `defer` özellikli klasik script etiketleriyle korunur. `fetch`, `import`, `export` veya bundler kullanılmaz.
 
 ## State Pattern
 
-Kalıcı kullanıcı durumu şu anahtarlarla saklanır: `completedLessonIds`, `learnedTermIds`, `favoriteTermIds`, `reviewTermIds`, `quizResults`, `lastVisitedLessonId`. Tema tercihi `godotTheme` anahtarıyla ayrıca saklanır. Kullanıcı aksiyonları storage katmanını güncelledikten sonra ilgili görünümü yeniden render eder.
+Kalıcı kullanıcı durumu şu anahtarlarla saklanır: `completedLessonIds`, `learnedTermIds`, `favoriteTermIds`, `reviewTermIds`, `quizResults`, `lastVisitedLessonId`. Tema tercihi `godotTheme` anahtarıyla ayrıca saklanır. `completeTerm` yalnızca tek terimi, `completeLesson` yalnızca ders durumunu değiştirir; bu iki ilerleme birbirinden bağımsızdır. Kullanıcı aksiyonları storage katmanını güncelledikten sonra ilgili görünümü yeniden render eder.
 
 ## Interaction Patterns
 
@@ -36,6 +37,17 @@ Kalıcı kullanıcı durumu şu anahtarlarla saklanır: `completedLessonIds`, `l
 - Mobil navigasyon CSS sınıfıyla açılan drawer ve scrim yapısını kullanır.
 - Tema CSS custom properties üzerinden değiştirilir ve sistem tercihi ilk varsayılan olarak kabul edilir.
 - Quiz yanıtları kullanıcı isteyene kadar gizlidir; öz değerlendirme `correct` veya `review` olarak saklanır.
+- `/learn/lesson-01` guided ders planıdır; `/learn/lesson-01/:termId` tek konu çalışma ekranıdır.
+- 1. dersin “Sonraki Konu” eylemi açık terimi tamamlar ve rotadaki bir sonraki terime gider. Son eylem bütün sekiz terimi kontrol ettikten sonra dersi tamamlar.
+- Guided metindeki `[[quickId|etiket]]` işaretleri sayfadan ayrılmadan native dialog açan inline terim düğmelerine dönüşür.
+- 1. dersteki recognize terimler uzun konu olmaz; ilgili core ekranlarında “Bunu duyarsan tanı” kutusu olarak görünür.
+
+## Context Overrides
+
+- Kaynak JSON immutable tutulur.
+- `src/js/data.js`, `scope` için lesson-02'de programlama kapsamı ve lesson-14'te proje kapsamı gösterir.
+- Aynı katman `loop` için lesson-02'de programlama döngüsü ve lesson-11'de ses döngüsü gösterir.
+- Genel sözlük/terim detayında iki anlam birlikte ve açık bir bağlam ayrımıyla sunulur.
 
 ## Content Relationships
 

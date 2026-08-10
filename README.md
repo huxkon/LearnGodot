@@ -6,6 +6,7 @@ Godot, GDScript ve oyun geliştirme terminolojisini Türkçe öğrenmek için ha
 
 - Gerçek içerik verisinden üretilen Dashboard ve ilerleme yüzdeleri
 - 14 derslik sıralı öğrenme yolu
+- 1. ders için sekiz konuluk guided çalışma akışı, inline terim açıklamaları ve konu bazlı ilerleme
 - 343 terimlik aranabilir ve filtrelenebilir A–Z sözlük
 - Tanım, bağlam, hatırlama ipucu, GDScript örneği ve ilişkili kavramlarla terim detayları
 - 42 açık hatırlama sorusu ve öz değerlendirme
@@ -41,6 +42,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\validate-content.ps1
 ├── index.html                         # Uygulama girişi
 ├── src/
 │   ├── data/content.js                # JSON'un doğrudan tarayıcıda yüklenen, birebir türetilmiş hali
+│   ├── data/lesson-01-guided.js       # Yalnızca 1. dersin öğretici akış katmanı
 │   ├── js/
 │   │   ├── app.js                     # Başlatma, olaylar ve UI davranışları
 │   │   ├── components.js              # Tekrar kullanılan arayüz parçaları
@@ -70,6 +72,17 @@ window.GODOT_LEARN_DATA = { /* kaynak JSON verisi */ };
 - `quizzes`: Derslere bağlı açık hatırlama soruları
 - `learning_paths`: İlk 50, temel kurs ve tam sözlük yolları
 - `categories`: Ders ve filtre kategorileri
+
+`lesson-01-guided.js`, ana database'i değiştirmeden yalnızca ilk dersin öğretim biçimini zenginleştirir. Sekiz core terim için 30 saniyelik açıklama, zihinsel model, ihtiyaç, Godot bağlamı, örnek, inline kısa terimler, yaygın hata ve mini kontrol sorusu içerir. Diğer 13 ders mevcut database sunumunu kullanmaya devam eder.
+
+## 1. dersin guided ilerleme modeli
+
+- `/learn/lesson-01` ders planını ve tek bir belirgin başlama/devam etme eylemini gösterir.
+- Her core kavram `/learn/lesson-01/:termId` rotasında ayrı bir çalışma ekranıdır.
+- “Konuyu tamamla / Sonraki Konu” düğmesi yalnızca açık terimi `learnedTermIds` içine ekler.
+- Son konuda “Dersi Tamamla” bütün konuların tek tek tamamlandığını kontrol eder ve yalnızca `completedLessonIds` değerini günceller.
+- Ders tamamlanması artık terimleri topluca öğrenildi saymaz; iki ilerleme türü birbirinden bağımsızdır.
+- Scope ve Loop terimleri kaynak dosya değiştirilmeden ders bağlamına göre programlama/proje yönetimi ve programlama/audio anlamlarına ayrılır.
 
 ## Yeni terim ekleme
 

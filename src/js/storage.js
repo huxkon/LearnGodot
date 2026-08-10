@@ -62,9 +62,10 @@
 
     completeLesson(lesson, completed = true) {
       this.toggle(STORAGE_KEYS.completedLessonIds, lesson.id, completed);
-      const learned = new Set(this.learnedTermIds);
-      for (const id of lesson.core_term_ids) completed ? learned.add(id) : learned.delete(id);
-      write(STORAGE_KEYS.learnedTermIds, [...learned]);
+    },
+
+    completeTerm(termId, completed = true) {
+      return this.toggle(STORAGE_KEYS.learnedTermIds, termId, completed);
     },
 
     setQuizResult(questionId, status) {

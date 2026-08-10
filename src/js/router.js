@@ -6,6 +6,7 @@
     { name: "dashboard", pattern: /^\/dashboard\/?$/, title: "Dashboard" },
     { name: "learn", pattern: /^\/learn\/?$/, title: "Öğren" },
     { name: "lesson", pattern: /^\/learn\/([^/]+)\/?$/, title: "Ders" },
+    { name: "lesson-topic", pattern: /^\/learn\/([^/]+)\/([^/]+)\/?$/, title: "Konu" },
     { name: "terms", pattern: /^\/terms\/?$/, title: "Terimler" },
     { name: "term", pattern: /^\/terms\/([^/]+)\/?$/, title: "Terim" },
     { name: "quiz", pattern: /^\/quiz\/?$/, title: "Quiz" },
@@ -18,7 +19,7 @@
     const [pathname, query = ""] = raw.split("?");
     for (const route of routes) {
       const match = pathname.match(route.pattern);
-      if (match) return { ...route, param: match[1], params: new URLSearchParams(query), pathname };
+      if (match) return { ...route, param: match[1], subparam: match[2], params: new URLSearchParams(query), pathname };
     }
     return { name: "not-found", title: "Sayfa bulunamadı", pathname };
   }

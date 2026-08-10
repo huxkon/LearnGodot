@@ -1,7 +1,7 @@
 (function initApplication(namespace) {
 "use strict";
 
-const { searchTerms, getLesson } = namespace.data;
+const { searchTerms, getLesson, getTermById } = namespace.data;
 const { appShell, icon, searchResults, toast } = namespace.components;
 const { getRoute, navigate } = namespace.router;
 const { progress, STORAGE_KEYS } = namespace.storage;
@@ -133,6 +133,41 @@ document.addEventListener("click", async (event) => {
     target.hidden = true;
     answer.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
+  if (action === "reveal-guided-answer") {
+    const answer = target.closest(".mini-check").querySelector(".mini-check__answer");
+    answer.hidden = false;
+    target.hidden = true;
+    answer.focus?.();
+  }
+  if (action === "inline-term") {
+    const dialog = document.querySelector(".quick-term-dialog");
+    const quickId = target.dataset.quickId;
+    const fallbackTerm = getTermById(quickId);
+    const definition = window.GODOT_LESSON_01_GUIDE.quickTerms[quickId] ?? fallbackTerm?.short_definition;
+    dialog.querySelector("#quick-term-title").textContent = target.firstChild?.textContent?.trim() || fallbackTerm?.name || "Kısa açıklama";
+    dialog.querySelector(".quick-term-definition").textContent = definition || "Bu terim için kısa açıklama bulunamadı.";
+    if (!dialog.open) dialog.showModal();
+  }
+  if (action === "close-inline-term") {
+    target.closest("dialog")?.close();
+  }
+  if (action === "guided-next") {
+    progress.completeTerm(target.dataset.termId, true);
+    navigate(`/learn/lesson-01/${target.dataset.nextId}`);
+  }
+  if (action === "guided-complete-lesson") {
+    progress.completeTerm(target.dataset.termId, true);
+    const guide = window.GODOT_LESSON_01_GUIDE;
+    const firstIncomplete = guide.order.find((id) => !progress.learnedTermIds.includes(id));
+    if (firstIncomplete) {
+      navigate(`/learn/lesson-01/${firstIncomplete}`);
+      setTimeout(() => toast("Dersi tamamlamadan önce kalan konuyu çalış."), 80);
+    } else {
+      progress.completeLesson(getLesson(target.dataset.lessonId), true);
+      navigate(`/learn/${target.dataset.lessonId}`);
+      setTimeout(() => toast("1. ders tamamlandı."), 80);
+    }
+  }
   if (action === "rate-quiz") {
     progress.setQuizResult(target.dataset.questionId, target.dataset.status);
     target.parentElement.querySelectorAll("button").forEach((button) => button.classList.toggle("is-selected", button === target));
@@ -183,6 +218,8 @@ document.addEventListener("click", (event) => {
   const dialog = event.target.closest(".search-dialog");
   if (event.target === dialog) dialog.close();
   if (event.target.closest(".search-result")) dialog?.close();
+  const quickDialog = event.target.closest(".quick-term-dialog");
+  if (event.target === quickDialog) quickDialog.close();
 });
 
 window.addEventListener("hashchange", () => render({ focus: true }));

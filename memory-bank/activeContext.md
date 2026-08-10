@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-Frameworksüz ve doğrudan `index.html` ile açılabilen çalışan MVP tamamlandı. Güncel odak, gerekirse gerçek tarayıcı üzerinde görsel/etkileşim QA ve kullanıcı geri bildirimine göre küçük iyileştirmelerdir.
+1. dersin guided learning dönüşümü tamamlandı ve kullanıcı tarafından kalan dersler için referans uygulama olarak belirlendi. Diğer 13 ders ile genel görsel sistem henüz değiştirilmedi. Güncel odak, mevcut kalıbı koruyarak kalan derslere nasıl ölçekleneceğinin planlanmasıdır.
 
 ## Verified Source Facts
 
@@ -23,6 +23,11 @@ Frameworksüz ve doğrudan `index.html` ile açılabilen çalışan MVP tamamlan
 - Harici font veya runtime bağımlılığı eklenmedi; sistem fontları kullanıldı.
 - `core` ve `recognize` sunumları ayrıldı; bütün içerik ve ilişkiler data layer üzerinden çözülüyor.
 - Quizde yanlış/yeniden çalışma seçilen sorular Review ekranında, manuel işaretlenen terimlerden ayrı olarak gösteriliyor.
+- 1. dersin kaynak sırası pedagojik olarak korundu: Game Engine → Editor → Project → Asset → API → Library/Framework/Plugin → Build/Export → Runtime.
+- Guided içerik `src/data/lesson-01-guided.js` içinde tutuluyor; ana database/source dosyaları değiştirilmedi.
+- Ön koşullar yalnızca gerektiğinde gösteriliyor; recognize terimler ilgili core konulara dağıtıldı.
+- Ders tamamlanması ile terim tamamlanması storage katmanında ayrıldı.
+- Scope ve Loop kavramlarının karışmış anlamları lesson context override ile düzeltildi.
 
 ## Implemented Features
 
@@ -34,9 +39,11 @@ Frameworksüz ve doğrudan `index.html` ile açılabilen çalışan MVP tamamlan
 - LocalStorage kalıcılığı, açık/koyu tema, responsive sidebar drawer ve reduced-motion desteği.
 - README, içerik senkronizasyon/doğrulama scriptleri ve opsiyonel yerel sunucu.
 - `index.html` dosyasına çift tıklayarak çalışma; sunucu veya kurulum gerektirmeme.
+- 1. ders landing ekranı, sekiz ayrı guided konu rotası, inline terim dialogları, zihinsel modeller, Godot bağlamları, örnekler, yaygın hatalar, mini sorular ve net önceki/sonraki eylemleri.
 
 ## Next Steps
 
-1. Desteklenen gerçek bir tarayıcıda desktop/mobile görsel smoke testi yap.
-2. İstenirse kalıcı statik hosta deploy et.
-3. Yeni içerik eklenirse kaynak birleşik JSON'u güncelle, `scripts/sync-content.ps1` ve ardından doğrulama scriptini çalıştır.
+1. Her kalan ders için source core sırasını, gerçek ön koşulları, recognize dağılımını ve bağlam çakışmalarını ders bazında analiz et.
+2. 1. dersin sekiz bölümlü guided konu şemasını ve mevcut görsel bileşenlerini koruyarak renderer/route tarafını lesson ID'den çalışan ortak yapıya genelleştir; ders başına yalnızca içerik verisi ekle.
+3. Dersleri tek tek dönüştür ve her ders sonunda ID kapsamı, ilerleme ayrımı, inline terimler, önceki/sonraki akışı, mobil görünüm ve kaynak değişmezliğini doğrula.
+4. Uygulama değişikliğine başlamadan önce kullanıcıdan sonraki uygulama kapsamını al; bu inceleme task'ında kod değiştirilmedi.

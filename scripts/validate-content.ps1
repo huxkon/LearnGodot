@@ -42,7 +42,7 @@ if ($first50.term_ids.Count -ne 50) { $errors.Add("İlk 50 yolu 50 terim içermi
 if ($sourceText -cne $embeddedJson) { $errors.Add("content.js içindeki eğitim verisi kaynak content.database.json ile birebir aynı değil.") }
 
 $requiredFiles = @(
-    "index.html", "src/styles.css", "src/data/content.js", "src/js/app.js", "src/js/data.js",
+    "index.html", "src/styles.css", "src/data/content.js", "src/data/lesson-01-guided.js", "src/js/app.js", "src/js/data.js",
     "src/js/storage.js", "src/js/router.js", "src/js/ui-copy.js", "src/js/views.js", "src/js/components.js"
 )
 foreach ($file in $requiredFiles) {
@@ -54,7 +54,7 @@ if ($indexHtml -match 'type\s*=\s*["'']module["'']') { $errors.Add("index.html h
 if ($indexHtml -notmatch 'src/data/content\.js') { $errors.Add("index.html content.js verisini yüklemiyor.") }
 
 $expectedScriptOrder = @(
-    "src/data/content.js", "src/js/ui-copy.js", "src/js/data.js", "src/js/storage.js",
+    "src/data/content.js", "src/data/lesson-01-guided.js", "src/js/ui-copy.js", "src/js/data.js", "src/js/storage.js",
     "src/js/router.js", "src/js/components.js", "src/js/views.js", "src/js/app.js"
 )
 $actualScriptOrder = @([regex]::Matches($indexHtml, '<script\s+defer\s+src="([^"]+)"\s*></script>') | ForEach-Object { $_.Groups[1].Value })
@@ -64,6 +64,27 @@ $moduleSyntax = Get-ChildItem (Join-Path $projectRoot "src/js") -Filter *.js | S
 if ($moduleSyntax) { $errors.Add("Klasik script dosyalarında import/export kalıntısı bulundu.") }
 $fetchUsage = Get-ChildItem (Join-Path $projectRoot "src/js") -Filter *.js | Select-String -Pattern '\bfetch\s*\(' -CaseSensitive
 if ($fetchUsage) { $errors.Add("Doğrudan file:// çalışmasını bozabilecek fetch kullanımı bulundu.") }
+
+$lessonOne = $database.lessons | Where-Object id -eq "lesson-01"
+$guideText = [System.IO.File]::ReadAllText((Join-Path $projectRoot "src/data/lesson-01-guided.js"), [System.Text.Encoding]::UTF8)
+foreach ($termId in @($lessonOne.core_term_ids) + @($lessonOne.recognize_term_ids)) {
+    if (-not $guideText.Contains('"' + $termId + '"')) { $errors.Add("1. ders guided katmanında '$termId' bulunamadı.") }
+}
+foreach ($field in @("fast", "model", "why", "godot", "example", "mistake", "check")) {
+    $fieldCount = ([regex]::Matches($guideText, "\b$field\s*:")).Count
+    if ($fieldCount -lt $lessonOne.core_term_ids.Count) { $errors.Add("1. ders guided '$field' alanı sekiz core terimin tümünde yok.") }
+}
+
+$viewsText = [System.IO.File]::ReadAllText((Join-Path $projectRoot "src/js/views.js"), [System.Text.Encoding]::UTF8)
+$appText = [System.IO.File]::ReadAllText((Join-Path $projectRoot "src/js/app.js"), [System.Text.Encoding]::UTF8)
+foreach ($requiredToken in @("guidedTopicView", "inline-term", "reveal-guided-answer", "guided-next", "guided-complete-lesson")) {
+    if (-not ($viewsText.Contains($requiredToken) -or $appText.Contains($requiredToken))) { $errors.Add("Guided akış bağlantısı eksik: $requiredToken") }
+}
+
+$dataLayerText = [System.IO.File]::ReadAllText((Join-Path $projectRoot "src/js/data.js"), [System.Text.Encoding]::UTF8)
+if (-not $dataLayerText.Contains('"lesson-02"') -or -not $dataLayerText.Contains('"lesson-11"') -or -not $dataLayerText.Contains('"lesson-14"')) {
+    $errors.Add("Scope/Loop için ders bağlamı ayrımları eksik.")
+}
 
 if ($errors.Count) {
     $errors | ForEach-Object { Write-Error $_ }
