@@ -1,30 +1,25 @@
 (function defineLessonOneGuide() {
   "use strict";
 
-  window.GODOT_LESSON_01_GUIDE = {
+  const guide = {
     lessonId: "lesson-01",
     title: "Motor, proje ve oyun geliştirme ekosistemi",
     intro: "Godot'ta bir şey üretmeye başlamadan önce, kullandığın aracın parçalarını birbirinden ayır. Sekiz kısa konuda büyük resmi adım adım kuracağız.",
     quickTerms: {
-      input: "Oyuncunun klavye, fare veya oyun koluyla oyuna verdiği komuttur. Şimdilik 'oyuncudan gelen bilgi' diye düşünmen yeterli.",
-      physics: "Oyundaki hareket, düşme ve çarpışma gibi kuralları hesaplayan sistemdir.",
-      scene: "Godot'ta bir oyun ekranını, karakteri veya tekrar kullanılabilir bir parçayı düzenlediğin yapıdır.",
-      node: "Godot sahnesini oluşturan tek bir görev parçasıdır. Bir node görüntü gösterebilir, ses çalabilir veya başka bir iş yapabilir.",
-      inspector: "Seçtiğin Godot nesnesinin ayarlarını gördüğün ve değiştirdiğin editor panelidir.",
-      script: "Oyuna ne yapacağını anlatan kod dosyasıdır.",
-      project_godot: "Godot projesinin temel ayar dosyasıdır. Godot bu dosyayı gördüğünde klasörün bir proje olduğunu anlar.",
-      resource: "Godot'un veri saklamak için kullandığı dosya veya nesne türüdür. Şimdilik oyunun kullandığı düzenlenebilir veri diye düşünebilirsin.",
-      import: "Dışarıdan gelen görsel veya ses gibi bir dosyayı Godot'un kullanabileceği hale hazırlama işlemidir.",
-      class: "Benzer nesnelerin hangi bilgi ve davranışlara sahip olacağını tarif eden kod kalıbıdır.",
-      method: "Bir nesneye belirli bir işi yaptırmak için çağırdığın kod parçasıdır.",
-      property: "Bir nesnenin hız, renk veya konum gibi sakladığı değerlerden biridir.",
-      function: "Belirli bir işi yapmak üzere adlandırılmış kod parçasıdır.",
-      input_action: "Bir tuşa doğrudan bağlanmak yerine 'jump' gibi anlamlı bir ad verdiğin oyuncu komutudur.",
-      dependency: "Bir sistemin çalışmak için ihtiyaç duyduğu başka paket veya parçadır.",
-      addon: "Godot'a veya projene sonradan eklenen özellik paketidir. Plugin ile aynı bağlamda duyabilirsin.",
-      platform: "Oyunun çalışacağı Windows, Linux, Android, Web veya benzeri hedef ortamdır.",
-      export_preset: "Godot'a oyunu hangi platform için ve hangi ayarlarla hazırlayacağını söyleyen kayıtlı export ayarıdır.",
-      runtime_error: "Oyun çalışırken ortaya çıkan hatadır. Kod yazılırken değil, çalışma sırasında görünür.",
+      input: { canonicalTitle: "Input (Girdi)", shortExplanation: "Oyuncunun klavye, fare veya oyun koluyla oyuna verdiği bilgidir.", example: "Sağ ok tuşuna basılması bir input örneğidir." },
+      physics: { canonicalTitle: "Physics (Fizik)", shortExplanation: "Oyundaki hareket, düşme ve çarpışma kurallarını hesaplayan sistemdir.", example: "Karakterin zemine çarpınca durması fizik sistemiyle hesaplanır." },
+      scene: { canonicalTitle: "Scene (Sahne)", shortExplanation: "Godot'ta bir ekranı, karakteri veya tekrar kullanılabilir oyun parçasını düzenlediğin yapıdır.", example: "Ana menü ve oyuncu karakteri ayrı scene'ler olabilir." },
+      node: { canonicalTitle: "Node (Düğüm)", shortExplanation: "Bir Godot scene'ini oluşturan, belirli bir görevi olan yapı parçasıdır.", example: "Sprite2D görüntü gösteren bir node'dur." },
+      inspector: { canonicalTitle: "Inspector (Denetçi)", shortExplanation: "Seçili Godot nesnesinin ayarlarını görüp değiştirdiğin editor panelidir.", example: "Bir node'un konumunu Inspector üzerinden değiştirebilirsin." },
+      script: { canonicalTitle: "Script (Kod Dosyası)", shortExplanation: "Bir oyun parçasının davranışını kodla tarif eden dosyadır.", example: "player.gd oyuncunun hareket kodunu içerebilir." },
+      project_godot: { canonicalTitle: "project.godot", shortExplanation: "Godot'un bir klasörü project olarak tanımasını sağlayan temel ayar dosyasıdır.", example: "Project adı ve ana sahne gibi ayarlar bu dosyayla ilişkilidir." },
+      import: { canonicalTitle: "Import (İçe Aktarma)", shortExplanation: "Dışarıdan gelen bir içerik dosyasını Godot'un kullanabileceği hale hazırlama işlemidir.", example: "Godot, project'e eklenen PNG dosyasını otomatik import eder." },
+      class: { canonicalTitle: "Class (Sınıf)", shortExplanation: "Benzer nesnelerin taşıyacağı bilgi ve davranışları tarif eden kod yapısıdır.", example: "Node, Godot API'sindeki bir class'tır." },
+      method: { canonicalTitle: "Method (Metot)", shortExplanation: "Bir sistemin belirli bir işi yapması için adıyla çağırdığın kod işlemidir.", example: "Input.is_action_pressed() bir method çağrısıdır." },
+      property: { canonicalTitle: "Property (Özellik)", shortExplanation: "Bir oyun parçası üzerinde saklanan, okunabilen veya değiştirilebilen adlandırılmış değerdir.", example: "Bir node'un position değeri bir property'dir." },
+      input_action: { canonicalTitle: "Input Action (Girdi Eylemi)", shortExplanation: "Bir tuşa doğrudan bağlanmak yerine anlamlı bir ad verilen oyuncu komutudur.", example: "jump bir input action adı olabilir." },
+      export_preset: { canonicalTitle: "Export Preset (Dışa Aktarma Profili)", shortExplanation: "Oyunun hangi hedef için ve hangi ayarlarla export edileceğini saklayan ayar grubudur.", example: "Windows ve Web için ayrı export preset'leri oluşturabilirsin." },
+      runtime_error: { canonicalTitle: "Runtime Error (Çalışma Zamanı Hatası)", shortExplanation: "Oyun çalışırken ortaya çıkan hatadır.", example: "Olmayan bir node'a çalışma sırasında erişmek runtime error oluşturabilir." },
     },
     order: [
       "game-engine",
@@ -39,6 +34,7 @@
     topics: {
       "game-engine": {
         shortTitle: "Oyun Motoru",
+        quickTermIds: ["input", "physics"],
         fast: [
           "Oyun motoru, bir oyun yaparken ortak sistemleri sıfırdan yazmak zorunda kalmamanı sağlayan geliştirme ortamıdır.",
           "Ekrana görüntü çizme, oyuncudan [[input|giriş]] alma, ses çalma ve [[physics|fizik]] hesaplama gibi temel işleri hazır sunar.",
@@ -56,10 +52,17 @@
         },
         mistake: "Godot'u indirmenin hazır bir oyun verdiğini düşünmek. Motor üretim aracıdır; oyunun sahnelerini, kurallarını ve içeriğini yine sen oluşturursun.",
         check: { question: "Oyun motorunun temel görevi nedir?", answer: "Oyunlarda sık gereken görüntü, giriş, fizik, ses ve çıktı alma gibi sistemleri hazır sunarak geliştiricinin her şeyi sıfırdan kurmasını önlemektir." },
-        recognize: ["tool-tooling"],
+        recognize: [{
+          id: "tool-tooling",
+          brief: "Belirli bir üretim işini kolaylaştıran araçlar ve bu araçları kullanma pratiğidir.",
+          connection: "Oyun motoru; sahne düzenleme, hata ayıklama ve dışa aktarma gibi birçok aracı tek ortamda toplar.",
+          whyHere: "Motoru yalnızca oyunu çalıştıran kod olarak değil, bir üretim araçları bütünü olarak tanıman için.",
+          distinction: "Motor geniş bir çalışma sistemi sunar; tek bir tool ise belirli bir işi kolaylaştırır.",
+        }],
       },
       editor: {
         shortTitle: "Editor",
+        quickTermIds: ["scene", "node", "inspector", "script"],
         prerequisites: ["game-engine"],
         fast: [
           "Editor, oyun motoruyla çalıştığın görsel alandır. Godot'u açınca gördüğün ana pencere editordur.",
@@ -76,14 +79,21 @@
         example: { text: "Ekrana bir karakter resmi koymak istediğinde editor içinde bir node seçer, görsel dosyasını ona verip konumunu Inspector'dan değiştirirsin. Bu sırada motor, yaptığın ayarların oyunda nasıl çalışacağını yönetir." },
         mistake: "'Engine' ve 'editor' kelimelerini aynı şey sanmak. Editor gördüğün çalışma yüzeyidir; engine bunun arkasındaki daha geniş çalışma sistemidir.",
         check: { question: "Godot'u açınca gördüğün, sahne düzenlediğin ana çalışma alanına ne denir?", answer: "Editor denir. Editor, Godot motoruyla görsel olarak çalıştığın arayüzdür." },
-        recognize: ["ide-code-editor", "tool-tooling"],
+        recognize: [{
+          id: "ide-code-editor",
+          brief: "Kod yazma, gezinme ve hata bulma işlerini kolaylaştıran geliştirme aracıdır.",
+          connection: "Godot Editor kendi script düzenleyicisini içerir; fakat sahne, Inspector ve asset araçlarıyla bir kod editöründen daha geniştir.",
+          whyHere: "Kursta 'editor' denince bazen kod alanı, bazen bütün Godot arayüzü kastedilebilir; bağlamı ayırt etmen için.",
+          distinction: "IDE/code editor kod üzerinde yoğunlaşır; Godot Editor oyunun görsel yapısını da düzenler.",
+        }],
       },
       project: {
         shortTitle: "Project",
+        quickTermIds: ["project_godot"],
         prerequisites: ["editor"],
         fast: [
           "Project, tek bir oyuna ait dosyaların ve ayarların birlikte tutulduğu bütündür.",
-          "Sahneler, [[script|scriptler]], görseller, sesler ve proje ayarları aynı project içinde yer alır.",
+          "Sahneler, scriptler, görseller, sesler ve proje ayarları aynı project içinde yer alır.",
           "Godot, klasördeki [[project_godot|project.godot]] dosyası sayesinde bunun bir Godot projesi olduğunu anlar.",
         ],
         model: {
@@ -96,10 +106,19 @@
         example: { text: "İki farklı oyun yapıyorsan genellikle iki farklı proje klasörün olur. Birinci oyunun karakter görselleri ve ayarları ikinci oyunun projesine kendiliğinden karışmaz." },
         mistake: "Project klasörünü oyuncuya vereceğin son oyun dosyası sanmak. Project geliştirme kaynaklarını içerir; oyuncuya verilecek çıktı daha sonra Export ile hazırlanır.",
         check: { question: "Bir Godot project'i yalnızca kod dosyalarından mı oluşur?", answer: "Hayır. Sahneler, scriptler, görseller, sesler ve proje ayarları birlikte project'i oluşturur." },
-        recognize: ["repository"],
+        recognize: [{
+          id: "repository",
+          brief: "Bir projenin dosyalarını ve değişiklik geçmişini sürüm kontrolüyle izleyen çalışma alanıdır.",
+          connection: "Godot project oyunun çalışan kaynaklarını içerir; aynı klasör Git ile izlenmeye başladığında ayrıca bir repository olur.",
+          whyHere: "Gerçek projelerde Godot project klasörü çoğu zaman Git repository olarak da kullanılır; iki adın aynı klasör için söylenmesi karışıklık yaratmasın diye.",
+          model: ["Godot project → sahneler, scriptler ve project.godot", "Git repository → bu dosyaların değişiklik geçmişi ve paylaşım düzeni"],
+          example: "project.godot dosyasını silmek Godot project yapısını bozar; .git klasörünü silmek ise oyun dosyalarını değil sürüm geçmişini kaldırır.",
+          distinction: "Project ürünün kaynak bütünüdür; repository bu bütünün değişimlerini izleyen sürüm kontrolü katmanıdır.",
+        }],
       },
       asset: {
         shortTitle: "Asset",
+        quickTermIds: ["import"],
         prerequisites: ["project"],
         fast: [
           "Asset, oyunda kullandığın içerik dosyalarının genel adıdır.",
@@ -116,10 +135,25 @@
         example: { text: "player.png, jump.wav ve menu_font.ttf birbirinden farklı dosya türleridir; fakat üçü de oyunda kullanılan içerik olduğu için asset olarak anılabilir." },
         mistake: "Asset kelimesinin yalnızca görsel anlamına geldiğini düşünmek. Ses, font, model, animasyon ve bazı veri dosyaları da asset olabilir.",
         check: { question: "Bir arka plan müziği dosyası asset sayılır mı?", answer: "Evet. Oyunda kullanılan ses dosyaları da asset kapsamındadır." },
-        recognize: ["import", "pipeline"],
+        bridge: { title: "Buraya nasıl geldik?", steps: ["Project", "İçerik dosyaları", "Asset"], text: "Project bir dosya bütünüdür; bu bütünün içinde oyunun görsel, ses ve model gibi içerik dosyaları asset olarak anılır." },
+        recognize: [{
+          id: "import",
+          brief: "Dışarıdan gelen bir dosyayı Godot'un kullanabileceği biçimde hazırlama işlemidir.",
+          connection: "Bir asset proje klasörüne girdiğinde Godot onu çoğunlukla otomatik olarak import eder.",
+          whyHere: "Asset'i klasöre kopyalamakla motorun onu kullanıma hazırlamasının iki ayrı adım olduğunu görmen için.",
+          distinction: "Asset içerik dosyasıdır; import o dosyaya uygulanan hazırlama işlemidir.",
+        }, {
+          id: "pipeline",
+          brief: "Bir içeriğin üretimden oyunda kullanılmasına kadar geçtiği düzenli adımlar zinciridir.",
+          connection: "Asset oluşturma, projeye ekleme, import etme ve sahnede kullanma adımlarından geçer.",
+          whyHere: "Tek bir dosyaya değil, dosyanın proje içindeki yolculuğuna bakabilmen için.",
+          model: ["Asset'i üret", "Projeye ekle", "Import ayarlarını uygula", "Sahnede kullan"],
+          distinction: "Asset zincirde taşınan içeriktir; pipeline ise izlenen süreçtir.",
+        }],
       },
       api: {
         shortTitle: "API",
+        quickTermIds: ["class", "method", "property", "input_action"],
         prerequisites: ["game-engine"],
         fast: [
           "API, bir sistemden kodla ne isteyebileceğini ve bu isteği nasıl yapacağını belirleyen kullanım yüzeyidir.",
@@ -138,12 +172,19 @@
           code: "if Input.is_action_pressed(\"jump\"):\n    print(\"Zıpla\")",
           lines: [
             "1. satır: Input sistemindeki is_action_pressed metodunu kullanarak jump adlı [[input_action|input action]] durumunu sorar.",
-            "2. satır: Cevap doğruysa print [[function|fonksiyonu]] ile bir mesaj gösterir.",
+            "2. satır: Cevap doğruysa print komutuyla bir mesaj gösterir.",
           ],
         },
         mistake: "API kelimesini yalnızca internet servisleri için kullanıldığını sanmak. Godot motorunun koddan kullandığın yüzeyi de bir API'dir.",
         check: { question: "API sana en temelde neyi söyler?", answer: "Bir sistemi koddan hangi komutlarla ve hangi kurallarla kullanabileceğini söyler." },
-        recognize: ["sdk"],
+        bridge: { title: "Buraya nasıl geldik?", steps: ["Oyun motoru", "Hazır sistemler", "API"], text: "Motor pek çok yetenek sunar; API, kodunun bu yeteneklerden nasıl istekte bulunacağını görünür hale getirir." },
+        recognize: [{
+          id: "sdk",
+          brief: "Belirli bir platform veya servis için sunulan geliştirme araçları, belgeler ve kod paketleri bütünüdür.",
+          connection: "Bir SDK içinde bir veya daha fazla API bulunabilir; API sistemi nasıl çağıracağını, SDK ise geliştirme için gereken daha geniş araç setini sunar.",
+          whyHere: "API ve SDK terimleri dokümantasyonda sık yan yana geçtiği için aralarındaki kapsam farkını erken tanıman için.",
+          distinction: "API iletişim yüzeyidir; SDK API'leri de içerebilen geliştirme kitidir.",
+        }],
       },
       "library-framework-plugin": {
         shortTitle: "Library / Framework / Plugin",
@@ -162,10 +203,29 @@
         example: { text: "Diyalog sistemi yazan küçük bir kod paketini gerektiğinde çağırıyorsan library gibi kullanırsın. Aynı paket Godot Editor'e yeni bir diyalog düzenleme paneli ekliyorsa plugin/add-on olarak da görev yapabilir." },
         mistake: "Library, framework ve plugin kelimelerini tamamen birbirinin yerine kullanmak. Bir paket birden fazla role sahip olabilir; yine de kelimeler farklı kullanım biçimlerini anlatır.",
         check: { question: "Var olan Godot Editor'e yeni bir araç ekleyen paket en çok hangi adla anılır?", answer: "Plugin veya Godot bağlamında add-on olarak anılır." },
-        recognize: ["dependency", "open-source", "license"],
+        recognize: [{
+          id: "dependency",
+          brief: "Projenin çalışmak veya geliştirilmek için ihtiyaç duyduğu dış paket ya da parçadır.",
+          connection: "Projeye eklediğin bir library veya plugin, proje ona ihtiyaç duymaya başladığında dependency haline gelir.",
+          whyHere: "Hazır paket kullanmanın projeye yeni bir ihtiyaç ve bakım sorumluluğu eklediğini fark etmen için.",
+          distinction: "Library/plugin paketin rolünü; dependency ise projenin o pakete ihtiyaç duyma ilişkisini anlatır.",
+        }, {
+          id: "open-source",
+          brief: "Kaynak kodu incelenebilen ve lisansının izin verdiği ölçüde değiştirilebilen yazılım yaklaşımıdır.",
+          connection: "Godot ekosistemindeki birçok library ve plugin açık kaynak olarak paylaşılır.",
+          whyHere: "Bir paketin koduna erişebilmenin onu sınırsızca kullanabileceğin anlamına gelmediğini bilmen için.",
+          distinction: "Open-source kaynak erişimini anlatır; kullanım koşullarını license belirler.",
+        }, {
+          id: "license",
+          brief: "Bir yazılımı veya asset'i hangi koşullarla kullanabileceğini belirleyen hukuki izin metnidir.",
+          connection: "Library, plugin ve asset eklerken lisans koşulları projenin dağıtım biçimini etkileyebilir.",
+          whyHere: "Üçüncü taraf bir paketi projeye almadan önce yalnızca özelliğine değil kullanım iznine de bakman için.",
+          distinction: "Açık kaynak bir paket de lisanslıdır; 'açık' olması koşulsuz olduğu anlamına gelmez.",
+        }],
       },
       "build-export": {
         shortTitle: "Build / Export",
+        quickTermIds: ["export_preset"],
         prerequisites: ["project"],
         fast: [
           "Build veya Export, geliştirdiğin project'i oyuncunun çalıştırabileceği çıktıya hazırlama sürecidir.",
@@ -177,15 +237,23 @@
           steps: ["Project = mutfaktaki tarif ve malzemeler", "Export = hazırlama ve paketleme", "Build çıktısı = oyuncuya verdiğin hazır ürün"],
           conclusion: "Kaynaklarla çalışırsın; dağıtmak için hedef platforma uygun çıktı üretirsin.",
         },
-        why: "Oyuncunun Godot Editor'ü açıp proje dosyalarınla uğraşmaması gerekir. Export, oyunun dosyalarını seçilen [[platform|platformda]] çalışabilecek dağıtım biçimine getirir.",
+        why: "Oyuncunun Godot Editor'ü açıp proje dosyalarınla uğraşmaması gerekir. Export, oyunun dosyalarını seçilen platformda çalışabilecek dağıtım biçimine getirir.",
         godot: ["Project menüsündeki Export ekranını kullanırsın.", "Windows, Web veya Android gibi bir hedef seçersin.", "[[export_preset|Export preset]] içinde hedefe ait ayarları saklarsın.", "Export düğmesiyle dağıtılabilir çıktıyı üretirsin."],
         example: { flow: ["Godot project dosyaları", "Export işlemi", "Windows .exe / Web dosyaları / Android paketi"] },
         mistake: "Save ile Export'u aynı işlem sanmak. Save geliştirme dosyalarındaki değişiklikleri kaydeder; Export oyuncunun çalıştıracağı hedef çıktıyı üretir.",
         check: { question: "Oyunu kaydetmek neden export etmekle aynı değildir?", answer: "Kaydetmek proje kaynaklarını saklar. Export ise bu kaynaklardan hedef platformda çalışacak dağıtılabilir oyun çıktısını üretir." },
-        recognize: ["platform", "pipeline"],
+        bridge: { title: "Buraya nasıl geldik?", steps: ["Project", "Export ayarları", "Dağıtılabilir çıktı"], text: "Editor'de geliştirdiğin project kaynak bütündür; export bu kaynağı oyuncunun hedef cihazında çalışacak çıktıya dönüştürür." },
+        recognize: [{
+          id: "platform",
+          brief: "Oyunun çalışmasının hedeflendiği işletim sistemi, cihaz veya web gibi ortamdır.",
+          connection: "Export sırasında Windows, Android veya Web gibi bir hedef platform seçersin ve çıktı ona göre hazırlanır.",
+          whyHere: "Tek bir project'ten neden farklı export çıktıları üretildiğini anlaman için.",
+          distinction: "Project ortak geliştirme kaynağıdır; platform bu kaynağın çalışacağı hedef ortamdır.",
+        }],
       },
       runtime: {
         shortTitle: "Runtime",
+        quickTermIds: ["runtime_error"],
         prerequisites: ["editor"],
         fast: [
           "Runtime, oyunun gerçekten çalıştığı zamandır ve çalışma ortamını da anlatabilir.",
@@ -202,8 +270,23 @@
         example: { flow: ["Editor'de sahneyi hazırla", "Play'e bas", "Runtime: oyun çalışır", "Oyunu durdur", "Editor'e dön"] },
         mistake: "Oyun çalışırken Inspector'da gördüğün geçici değişikliklerin her zaman proje dosyasına kaydedileceğini düşünmek. Runtime sırasında oluşan birçok değişiklik oyunu durdurunca eski haline döner.",
         check: { question: "Play düğmesine bastıktan sonra oyunun çalıştığı zamana ne denir?", answer: "Runtime denir." },
-        recognize: ["platform"],
+        bridge: { title: "Buraya nasıl geldik?", steps: ["Editor'de hazırla", "Play'e bas", "Runtime'da gözlemle"], text: "Editor hazırlık alanıdır. Play ile motor projeyi çalıştırır; o andan oyun durana kadar runtime içindesindir." },
+        recognize: [],
       },
     },
+    summary: {
+      title: "Bu derste parçalar nasıl birleşiyor?",
+      intro: "Sekiz kavram tek bir üretim akışının farklı parçalarını anlatır:",
+      groups: [
+        { title: "Çalışma ortamı", steps: ["Oyun motoru", "Editor", "Project"], note: "Motor yetenekleri sağlar, editor onları kullanacağın yüzeydir, project ise tek oyununa ait çalışma bütünüdür." },
+        { title: "İçerik ve kod", steps: ["Project", "Asset + script", "Engine API / hazır paketler"], note: "Project assetleri ve kodu bir arada tutar; kod motorla API üzerinden konuşur, gerektiğinde library veya pluginlerden yararlanır." },
+        { title: "Çalışan ürüne geçiş", steps: ["Project", "Build / Export", "Hedef çıktı", "Runtime"], note: "Kaynak project hedef platform için hazırlanır; çıktı çalıştırıldığında runtime başlar." },
+      ],
+      closing: "Bir terim duyduğunda önce onun araç mı, proje içeriği mi, kodla iletişim yüzeyi mi yoksa çalışma aşaması mı olduğunu sor.",
+    },
   };
+
+  window.GODOT_LESSON_GUIDES = window.GODOT_LESSON_GUIDES || {};
+  window.GODOT_LESSON_GUIDES[guide.lessonId] = guide;
+  window.GODOT_LESSON_01_GUIDE = guide;
 })();

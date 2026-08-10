@@ -42,7 +42,7 @@ if ($first50.term_ids.Count -ne 50) { $errors.Add("İlk 50 yolu 50 terim içermi
 if ($sourceText -cne $embeddedJson) { $errors.Add("content.js içindeki eğitim verisi kaynak content.database.json ile birebir aynı değil.") }
 
 $requiredFiles = @(
-    "index.html", "src/styles.css", "src/data/content.js", "src/data/lesson-01-guided.js", "src/js/app.js", "src/js/data.js",
+    "index.html", "src/styles.css", "src/data/content.js", "src/data/lesson-01-guided.js", "src/data/lesson-02-guided.js", "src/js/app.js", "src/js/data.js",
     "src/js/storage.js", "src/js/router.js", "src/js/ui-copy.js", "src/js/views.js", "src/js/components.js"
 )
 foreach ($file in $requiredFiles) {
@@ -54,7 +54,7 @@ if ($indexHtml -match 'type\s*=\s*["'']module["'']') { $errors.Add("index.html h
 if ($indexHtml -notmatch 'src/data/content\.js') { $errors.Add("index.html content.js verisini yüklemiyor.") }
 
 $expectedScriptOrder = @(
-    "src/data/content.js", "src/data/lesson-01-guided.js", "src/js/ui-copy.js", "src/js/data.js", "src/js/storage.js",
+    "src/data/content.js", "src/data/lesson-01-guided.js", "src/data/lesson-02-guided.js", "src/js/ui-copy.js", "src/js/data.js", "src/js/storage.js",
     "src/js/router.js", "src/js/components.js", "src/js/views.js", "src/js/app.js"
 )
 $actualScriptOrder = @([regex]::Matches($indexHtml, '<script\s+defer\s+src="([^"]+)"\s*></script>') | ForEach-Object { $_.Groups[1].Value })
@@ -65,14 +65,54 @@ if ($moduleSyntax) { $errors.Add("Klasik script dosyalarında import/export kal�
 $fetchUsage = Get-ChildItem (Join-Path $projectRoot "src/js") -Filter *.js | Select-String -Pattern '\bfetch\s*\(' -CaseSensitive
 if ($fetchUsage) { $errors.Add("Doğrudan file:// çalışmasını bozabilecek fetch kullanımı bulundu.") }
 
-$lessonOne = $database.lessons | Where-Object id -eq "lesson-01"
-$guideText = [System.IO.File]::ReadAllText((Join-Path $projectRoot "src/data/lesson-01-guided.js"), [System.Text.Encoding]::UTF8)
-foreach ($termId in @($lessonOne.core_term_ids) + @($lessonOne.recognize_term_ids)) {
-    if (-not $guideText.Contains('"' + $termId + '"')) { $errors.Add("1. ders guided katmanında '$termId' bulunamadı.") }
-}
-foreach ($field in @("fast", "model", "why", "godot", "example", "mistake", "check")) {
-    $fieldCount = ([regex]::Matches($guideText, "\b$field\s*:")).Count
-    if ($fieldCount -lt $lessonOne.core_term_ids.Count) { $errors.Add("1. ders guided '$field' alanı sekiz core terimin tümünde yok.") }
+$guidedLessons = @(
+    @{ Id = "lesson-01"; File = "src/data/lesson-01-guided.js" },
+    @{ Id = "lesson-02"; File = "src/data/lesson-02-guided.js" }
+)
+foreach ($guidedLesson in $guidedLessons) {
+    $lesson = $database.lessons | Where-Object id -eq $guidedLesson.Id
+    $guideText = [System.IO.File]::ReadAllText((Join-Path $projectRoot $guidedLesson.File), [System.Text.Encoding]::UTF8)
+    foreach ($termId in @($lesson.core_term_ids) + @($lesson.recognize_term_ids)) {
+        if (-not $guideText.Contains('"' + $termId + '"')) { $errors.Add("$($lesson.number). ders guided katmanında '$termId' bulunamadı.") }
+    }
+    foreach ($termId in $lesson.recognize_term_ids) {
+        $contextCardCount = ([regex]::Matches($guideText, 'id:\s*"' + [regex]::Escape($termId) + '"')).Count
+        if ($contextCardCount -ne 1) { $errors.Add("$($lesson.number). ders '$termId' tanıma terimi tam bir bağlamsal karta yerleşmeli; $contextCardCount kart bulundu.") }
+    }
+    foreach ($field in @("fast", "model", "why", "godot", "example", "mistake", "check")) {
+        $fieldCount = ([regex]::Matches($guideText, "\b$field\s*:")).Count
+        if ($fieldCount -lt $lesson.core_term_ids.Count) { $errors.Add("$($lesson.number). ders guided '$field' alanı tüm core terimlerde yok.") }
+    }
+    if (-not $guideText.Contains("summary:")) { $errors.Add("$($lesson.number). ders kavram ilişkisi özeti içermiyor.") }
+
+    $quickCatalogMatch = [regex]::Match($guideText, 'quickTerms:\s*\{(?<body>.*?)\r?\n\s*\},\s*\r?\n\s*order:', [System.Text.RegularExpressions.RegexOptions]::Singleline)
+    if (-not $quickCatalogMatch.Success) {
+        $errors.Add("$($lesson.number). ders canonical quick-term kataloğu bulunamadı.")
+    } else {
+        $catalogIds = @([regex]::Matches($quickCatalogMatch.Groups['body'].Value, '(?m)^\s{6}([a-z0-9_-]+):\s*\{') | ForEach-Object { $_.Groups[1].Value })
+        $canonicalTitleCount = ([regex]::Matches($quickCatalogMatch.Groups['body'].Value, '\bcanonicalTitle\s*:')).Count
+        $explanationCount = ([regex]::Matches($quickCatalogMatch.Groups['body'].Value, '\bshortExplanation\s*:')).Count
+        if ($canonicalTitleCount -ne $catalogIds.Count -or $explanationCount -ne $catalogIds.Count) {
+            $errors.Add("$($lesson.number). ders quick-term kayıtlarının her birinde canonicalTitle ve shortExplanation bulunmalı.")
+        }
+
+        $quickIdBlocks = @([regex]::Matches($guideText, 'quickTermIds:\s*\[([^\]]*)\]'))
+        $curatedIds = @($quickIdBlocks | ForEach-Object { [regex]::Matches($_.Groups[1].Value, '"([^"]+)"') | ForEach-Object { $_.Groups[1].Value } })
+        foreach ($block in $quickIdBlocks) {
+            $blockIds = @([regex]::Matches($block.Groups[1].Value, '"([^"]+)"') | ForEach-Object { $_.Groups[1].Value })
+            if (@($blockIds | Select-Object -Unique).Count -ne $blockIds.Count) { $errors.Add("$($lesson.number). ders bir topic quickTermIds listesinde duplicate ID var.") }
+        }
+        foreach ($quickId in $curatedIds) {
+            if ($quickId -notin $catalogIds) { $errors.Add("$($lesson.number). ders '$quickId' quick-term ID'si canonical katalogda yok.") }
+        }
+        foreach ($quickId in $catalogIds) {
+            if ($quickId -notin $curatedIds) { $errors.Add("$($lesson.number). ders '$quickId' quick-term kaydı hiçbir topic tarafından seçilmemiş.") }
+        }
+        $markerIds = @([regex]::Matches($guideText, '\[\[([^|\]]+)\|[^\]]+\]\]') | ForEach-Object { $_.Groups[1].Value } | Select-Object -Unique)
+        foreach ($quickId in $markerIds) {
+            if ($quickId -notin $curatedIds) { $errors.Add("$($lesson.number). ders '[[$quickId|...]]' işareti explicit quickTermIds seçimine bağlı değil.") }
+        }
+    }
 }
 
 $viewsText = [System.IO.File]::ReadAllText((Join-Path $projectRoot "src/js/views.js"), [System.Text.Encoding]::UTF8)
@@ -80,6 +120,10 @@ $appText = [System.IO.File]::ReadAllText((Join-Path $projectRoot "src/js/app.js"
 foreach ($requiredToken in @("guidedTopicView", "inline-term", "reveal-guided-answer", "guided-next", "guided-complete-lesson")) {
     if (-not ($viewsText.Contains($requiredToken) -or $appText.Contains($requiredToken))) { $errors.Add("Guided akış bağlantısı eksik: $requiredToken") }
 }
+foreach ($requiredToken in @("canonicalTitle", "shortExplanation", "quickTermIds", "guideQuickReferences(quickTerms)")) {
+    if (-not ($viewsText.Contains($requiredToken) -or $appText.Contains($requiredToken))) { $errors.Add("Canonical quick-term renderer bağlantısı eksik: $requiredToken") }
+}
+if ($appText.Contains("target.firstChild")) { $errors.Add("Quick-term modal başlığı hâlâ inline surface label üzerinden okunuyor.") }
 
 $dataLayerText = [System.IO.File]::ReadAllText((Join-Path $projectRoot "src/js/data.js"), [System.Text.Encoding]::UTF8)
 if (-not $dataLayerText.Contains('"lesson-02"') -or -not $dataLayerText.Contains('"lesson-11"') -or -not $dataLayerText.Contains('"lesson-14"')) {

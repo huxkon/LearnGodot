@@ -142,10 +142,20 @@ document.addEventListener("click", async (event) => {
   if (action === "inline-term") {
     const dialog = document.querySelector(".quick-term-dialog");
     const quickId = target.dataset.quickId;
-    const fallbackTerm = getTermById(quickId);
-    const definition = window.GODOT_LESSON_01_GUIDE.quickTerms[quickId] ?? fallbackTerm?.short_definition;
-    dialog.querySelector("#quick-term-title").textContent = target.firstChild?.textContent?.trim() || fallbackTerm?.name || "Kısa açıklama";
-    dialog.querySelector(".quick-term-definition").textContent = definition || "Bu terim için kısa açıklama bulunamadı.";
+    const route = getRoute();
+    const guide = window.GODOT_LESSON_GUIDES?.[route.param];
+    const topic = guide?.topics?.[route.subparam];
+    const isCurated = topic?.quickTermIds?.includes(quickId);
+    const quickEntry = isCurated ? guide?.quickTerms?.[quickId] : null;
+    if (!dialog || !quickEntry) return;
+    dialog.querySelector("#quick-term-title").textContent = quickEntry.canonicalTitle;
+    dialog.querySelector(".quick-term-definition").textContent = quickEntry.shortExplanation;
+    const exampleElement = dialog.querySelector(".quick-term-example");
+    exampleElement.querySelector("p").textContent = quickEntry.example || "";
+    exampleElement.hidden = !quickEntry.example;
+    const contextElement = dialog.querySelector(".quick-term-context");
+    contextElement.textContent = quickEntry.context || "";
+    contextElement.hidden = !quickEntry.context;
     if (!dialog.open) dialog.showModal();
   }
   if (action === "close-inline-term") {
@@ -153,19 +163,19 @@ document.addEventListener("click", async (event) => {
   }
   if (action === "guided-next") {
     progress.completeTerm(target.dataset.termId, true);
-    navigate(`/learn/lesson-01/${target.dataset.nextId}`);
+    navigate(`/learn/${target.dataset.lessonId}/${target.dataset.nextId}`);
   }
   if (action === "guided-complete-lesson") {
     progress.completeTerm(target.dataset.termId, true);
-    const guide = window.GODOT_LESSON_01_GUIDE;
+    const guide = window.GODOT_LESSON_GUIDES[target.dataset.lessonId];
     const firstIncomplete = guide.order.find((id) => !progress.learnedTermIds.includes(id));
     if (firstIncomplete) {
-      navigate(`/learn/lesson-01/${firstIncomplete}`);
+      navigate(`/learn/${target.dataset.lessonId}/${firstIncomplete}`);
       setTimeout(() => toast("Dersi tamamlamadan önce kalan konuyu çalış."), 80);
     } else {
       progress.completeLesson(getLesson(target.dataset.lessonId), true);
       navigate(`/learn/${target.dataset.lessonId}`);
-      setTimeout(() => toast("1. ders tamamlandı."), 80);
+      setTimeout(() => toast(`${getLesson(target.dataset.lessonId).number}. ders tamamlandı.`), 80);
     }
   }
   if (action === "rate-quiz") {

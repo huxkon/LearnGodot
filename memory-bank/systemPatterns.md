@@ -16,13 +16,14 @@
 
 1. `src/data/content.js`
 2. `src/data/lesson-01-guided.js`
-3. `src/js/ui-copy.js`
-4. `src/js/data.js`
-5. `src/js/storage.js`
-6. `src/js/router.js`
-7. `src/js/components.js`
-8. `src/js/views.js`
-9. `src/js/app.js`
+3. `src/data/lesson-02-guided.js`
+4. `src/js/ui-copy.js`
+5. `src/js/data.js`
+6. `src/js/storage.js`
+7. `src/js/router.js`
+8. `src/js/components.js`
+9. `src/js/views.js`
+10. `src/js/app.js`
 
 Bu sıra `defer` özellikli klasik script etiketleriyle korunur. `fetch`, `import`, `export` veya bundler kullanılmaz.
 
@@ -37,10 +38,15 @@ Kalıcı kullanıcı durumu şu anahtarlarla saklanır: `completedLessonIds`, `l
 - Mobil navigasyon CSS sınıfıyla açılan drawer ve scrim yapısını kullanır.
 - Tema CSS custom properties üzerinden değiştirilir ve sistem tercihi ilk varsayılan olarak kabul edilir.
 - Quiz yanıtları kullanıcı isteyene kadar gizlidir; öz değerlendirme `correct` veya `review` olarak saklanır.
-- `/learn/lesson-01` guided ders planıdır; `/learn/lesson-01/:termId` tek konu çalışma ekranıdır.
-- 1. dersin “Sonraki Konu” eylemi açık terimi tamamlar ve rotadaki bir sonraki terime gider. Son eylem bütün sekiz terimi kontrol ettikten sonra dersi tamamlar.
-- Guided metindeki `[[quickId|etiket]]` işaretleri sayfadan ayrılmadan native dialog açan inline terim düğmelerine dönüşür.
-- 1. dersteki recognize terimler uzun konu olmaz; ilgili core ekranlarında “Bunu duyarsan tanı” kutusu olarak görünür.
+- `window.GODOT_LESSON_GUIDES`, guided içeriği lesson ID ile kaydeden registry'dir. Görünüm ve eylemler ders numarasını hard-code etmeden bu registry üzerinden çalışır.
+- `/learn/:lessonId` kayıtlı bir guided dersin planıdır; `/learn/:lessonId/:termId` tek konu çalışma ekranıdır.
+- “Sonraki Konu” eylemi açık terimi tamamlar ve ilgili guide'ın sıradaki terimine gider. Son eylem guide içindeki tüm core terimleri kontrol ettikten sonra dersi tamamlar.
+- Guided metindeki `[[quickId|inlineLabel]]` işaretinde label yalnızca cümlenin gramerine uyan tıklanabilir surface metindir; modal/list başlığı olarak kullanılmaz.
+- Her guide'ın `quickTerms` kataloğu `{ canonicalTitle, shortExplanation, example?, context? }` kayıtları taşır. Her topic gerekli kavramları explicit `quickTermIds` listesiyle seçer.
+- Renderer “Bilmediğim Terimler” listesini metindeki işaretleri tarayarak değil `quickTermIds` üzerinden üretir. `Set` tabanlı seçim aynı ID'nin duplicate görünmesini engeller.
+- Inline işaret explicit seçili değilse renderer onu düğmeye dönüştürmez; yalnızca normal metin olarak gösterir. Modal da yalnızca açık topic tarafından seçilmiş kayıtları açar.
+- Recognize terimler uzun konu olmaz; ilgili core ekranında ortak kart renderer'ı ile “Kısaca”, “Bu konuyla bağlantısı”, “Neden burada?”, örnek/model ve “Karıştırma” alanlarında görünür.
+- Konu verisindeki opsiyonel `bridge` kavram geçişini, guide düzeyindeki `summary` ise son konuda ders ilişkilerini görünür kılar.
 
 ## Context Overrides
 

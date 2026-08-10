@@ -28,7 +28,7 @@ const {
   termCard,
 } = namespace.components;
 const { COPY } = namespace;
-const lessonOneGuide = window.GODOT_LESSON_01_GUIDE;
+const lessonGuides = window.GODOT_LESSON_GUIDES || {};
 
 const percent = (value, total) => (total ? Math.round((value / total) * 100) : 0);
 const pageHead = (eyebrow, title, description, actions = "") => `<header class="page-head"><div><p class="eyebrow">${escapeHtml(eyebrow)}</p><h1>${escapeHtml(title)}</h1><p>${escapeHtml(description)}</p></div>${actions}</header>`;
@@ -92,8 +92,7 @@ function lessonCard(lesson) {
   </article>`;
 }
 
-function richGuideText(text) {
-  const quickTerms = lessonOneGuide.quickTerms;
+function richGuideText(text, quickTerms = {}) {
   const pattern = /\[\[([^|\]]+)\|([^\]]+)\]\]/g;
   let html = "";
   let cursor = 0;
@@ -101,57 +100,83 @@ function richGuideText(text) {
   while ((match = pattern.exec(text)) !== null) {
     html += escapeHtml(text.slice(cursor, match.index));
     const quickId = match[1];
-    const label = match[2];
-    html += `<button class="inline-term" type="button" data-action="inline-term" data-quick-id="${escapeHtml(quickId)}" aria-label="${escapeHtml(label)} terimini açıkla">${escapeHtml(label)}<span aria-hidden="true">?</span></button>`;
+    const inlineLabel = match[2];
+    const quickTerm = quickTerms[quickId];
+    html += quickTerm
+      ? `<button class="inline-term" type="button" data-action="inline-term" data-quick-id="${escapeHtml(quickId)}" aria-label="${escapeHtml(quickTerm.canonicalTitle)} kavramını açıkla">${escapeHtml(inlineLabel)}<span aria-hidden="true">?</span></button>`
+      : escapeHtml(inlineLabel);
     cursor = match.index + match[0].length;
   }
   return html + escapeHtml(text.slice(cursor));
 }
 
-function guideQuickReferences(topic) {
-  const references = new Map();
-  const pattern = /\[\[([^|\]]+)\|([^\]]+)\]\]/g;
-  const serialized = JSON.stringify(topic);
-  let match;
-  while ((match = pattern.exec(serialized)) !== null) references.set(match[1], match[2]);
-  return [...references].map(([id, label]) => ({ id, label }));
+function getTopicQuickTerms(guide, topic) {
+  const selected = {};
+  [...new Set(topic.quickTermIds ?? [])].forEach((id) => {
+    if (guide.quickTerms?.[id]) selected[id] = guide.quickTerms[id];
+  });
+  return selected;
+}
+
+function guideQuickReferences(quickTerms) {
+  return Object.entries(quickTerms).map(([id, term]) => ({ id, canonicalTitle: term.canonicalTitle }));
 }
 
 function guidedLessonLanding(lesson) {
-  const guide = lessonOneGuide;
+  const guide = lessonGuides[lesson.id];
   const completedIds = new Set(progress.learnedTermIds);
   const completedCount = guide.order.filter((id) => completedIds.has(id)).length;
   const firstIncomplete = guide.order.find((id) => !completedIds.has(id)) ?? guide.order[0];
   const hasStarted = completedCount > 0;
 
   return `<div class="page guided-landing">
-    <nav class="breadcrumbs" aria-label="İçerik yolu"><a href="#/learn">Öğren</a>${icon("chevron", 14)}<span>Ders 01</span></nav>
+    <nav class="breadcrumbs" aria-label="İçerik yolu"><a href="#/learn">Öğren</a>${icon("chevron", 14)}<span>Ders ${String(lesson.number).padStart(2, "0")}</span></nav>
     <header class="guided-landing__hero">
       <div><p class="eyebrow">Guided ders · ${lesson.estimated_minutes} dakika</p><h1>${escapeHtml(lesson.title)}</h1><p>${escapeHtml(guide.intro)}</p><div class="guided-start-actions"><a class="button button--primary button--large" href="#/learn/${lesson.id}/${firstIncomplete}">${hasStarted ? "Kaldığın yerden devam et" : "Derse başla"} ${icon("arrow", 18)}</a>${hasStarted ? `<span>${completedCount} / ${guide.order.length} konu tamamlandı</span>` : `<span>Ön bilgi gerektirmez</span>`}</div></div>
       <aside class="guided-promise"><p class="eyebrow">Bu dersten sonra</p><p>${escapeHtml(lesson.goal)}</p><ul><li>${icon("check", 15)} Her konu tek ekranda</li><li>${icon("check", 15)} Bilinmeyen terimler sayfadan ayrılmadan açıklanır</li><li>${icon("check", 15)} Her adımda tek bir sonraki yön vardır</li></ul></aside>
     </header>
     <section class="guided-outline"><div class="section-heading"><p class="eyebrow">Ders rotası</p><h2>Adım adım büyük resmi kur</h2><p>Konuları sırayla çalış. Bir sonraki konuya geçtiğinde bulunduğun konu ilerlemene kaydedilir.</p></div><ol>${guide.order.map((id, index) => { const topic = guide.topics[id]; const done = completedIds.has(id); const active = id === firstIncomplete; return `<li class="${done ? "is-done" : ""} ${active ? "is-next" : ""}"><span class="outline-index">${done ? icon("check", 16) : String(index + 1).padStart(2, "0")}</span><div><small>${active ? "Sıradaki konu" : done ? "Tamamlandı" : `Konu ${index + 1}`}</small><strong>${escapeHtml(topic.shortTitle)}</strong></div>${active ? `<a href="#/learn/${lesson.id}/${id}" aria-label="${escapeHtml(topic.shortTitle)} konusuna başla">Başla ${icon("arrow", 16)}</a>` : ""}</li>`; }).join("")}</ol></section>
-    <section class="recognize-preview"><div><p class="eyebrow">Ders boyunca</p><h2>“Bunu duyarsan tanı” kutuları</h2><p>On ek terimi uzun derslere çevirmeden, ihtiyaç duyduğun konunun yanında kısa anlamıyla göreceksin.</p></div><div class="recognize-chips">${lesson.recognize_term_ids.map((id) => { const term = getTermForContext(id, lesson.id); return `<span>${escapeHtml(term.name)}</span>`; }).join("")}</div></section>
+    <section class="recognize-preview"><div><p class="eyebrow">Ders boyunca</p><h2>“Bunu duyarsan tanı” kutuları</h2><p>${lesson.recognize_term_ids.length} ek terimi uzun derslere çevirmeden, bağlantılı olduğu konunun yanında kısa anlamı ve ayrımıyla göreceksin.</p></div><div class="recognize-chips">${lesson.recognize_term_ids.map((id) => { const term = getTermForContext(id, lesson.id); return `<span>${escapeHtml(term.name)}</span>`; }).join("")}</div></section>
   </div>`;
 }
 
-function guidedModel(model) {
-  return `<div class="mental-model"><p>${richGuideText(model.intro)}</p><div class="model-flow">${model.steps.map((step, index) => `<div><span>${index + 1}</span><strong>${richGuideText(step)}</strong></div>${index < model.steps.length - 1 ? `<span class="flow-arrow" aria-hidden="true">↓</span>` : ""}`).join("")}</div><p class="model-conclusion">${richGuideText(model.conclusion)}</p></div>`;
+function guidedModel(model, quickTerms) {
+  return `<div class="mental-model"><p>${richGuideText(model.intro, quickTerms)}</p><div class="model-flow">${model.steps.map((step, index) => `<div><span>${index + 1}</span><strong>${richGuideText(step, quickTerms)}</strong></div>${index < model.steps.length - 1 ? `<span class="flow-arrow" aria-hidden="true">↓</span>` : ""}`).join("")}</div><p class="model-conclusion">${richGuideText(model.conclusion, quickTerms)}</p></div>`;
 }
 
-function guidedExample(example) {
+function guidedExample(example, quickTerms) {
   if (!example) return "";
-  const text = example.text ? `<p>${richGuideText(example.text)}</p>` : "";
-  const flow = example.flow ? `<div class="example-flow">${example.flow.map((step, index) => `<span>${richGuideText(step)}</span>${index < example.flow.length - 1 ? `<b aria-hidden="true">→</b>` : ""}`).join("")}</div>` : "";
+  const text = example.text ? `<p>${richGuideText(example.text, quickTerms)}</p>` : "";
+  const flow = example.flow ? `<div class="example-flow">${example.flow.map((step, index) => `<span>${richGuideText(step, quickTerms)}</span>${index < example.flow.length - 1 ? `<b aria-hidden="true">→</b>` : ""}`).join("")}</div>` : "";
   const code = example.code ? codeExample({ language: "gdscript", code: example.code }) : "";
-  const lines = example.lines?.length ? `<ol class="code-lines">${example.lines.map((line) => `<li>${richGuideText(line)}</li>`).join("")}</ol>` : "";
+  const lines = example.lines?.length ? `<ol class="code-lines">${example.lines.map((line) => `<li>${richGuideText(line, quickTerms)}</li>`).join("")}</ol>` : "";
   return `${text}${flow}${code}${lines}`;
 }
 
+function guidedRecognizeCards(entries, lessonId) {
+  return `<div class="recognize-callouts">${entries.map((entry) => {
+    const config = typeof entry === "string" ? { id: entry } : entry;
+    const term = getTermForContext(config.id, lessonId);
+    if (!term) return "";
+    const model = config.model?.length ? `<div class="recognize-model">${config.model.map((step, index) => `<span>${richGuideText(step)}</span>${index < config.model.length - 1 ? `<b aria-hidden="true">↓</b>` : ""}`).join("")}</div>` : "";
+    return `<article><span>Tanı</span><h3>${escapeHtml(term.name)}</h3><dl><div><dt>Kısaca</dt><dd>${richGuideText(config.brief ?? term.short_definition)}</dd></div>${config.connection ? `<div><dt>Bu konuyla bağlantısı</dt><dd>${richGuideText(config.connection)}</dd></div>` : ""}${config.whyHere ? `<div><dt>Neden burada?</dt><dd>${richGuideText(config.whyHere)}</dd></div>` : ""}</dl>${model}${config.example ? `<p class="recognize-example"><strong>Örnek:</strong> ${richGuideText(config.example)}</p>` : ""}${config.distinction ? `<p class="recognize-distinction"><strong>Karıştırma:</strong> ${richGuideText(config.distinction)}</p>` : ""}</article>`;
+  }).join("")}</div>`;
+}
+
+function guidedBridge(bridge) {
+  if (!bridge) return "";
+  return `<section class="guided-bridge"><div><p class="eyebrow">Buraya nasıl geldik?</p><h2>${escapeHtml(bridge.title)}</h2>${bridge.steps?.length ? `<div class="bridge-flow">${bridge.steps.map((step, index) => `<span>${richGuideText(step)}</span>${index < bridge.steps.length - 1 ? `<b aria-hidden="true">↓</b>` : ""}`).join("")}</div>` : ""}<p>${richGuideText(bridge.text)}</p></div></section>`;
+}
+
+function guidedLessonSummary(summary) {
+  if (!summary) return "";
+  return `<section class="lesson-relation-summary"><div class="section-heading"><p class="eyebrow">Ders özeti</p><h2>${escapeHtml(summary.title ?? "Bu derste parçalar nasıl birleşiyor?")}</h2><p>${escapeHtml(summary.intro ?? "")}</p></div><div class="summary-groups">${summary.groups.map((group) => `<article><h3>${escapeHtml(group.title)}</h3><div>${group.steps.map((step, index) => `<span>${richGuideText(step)}</span>${index < group.steps.length - 1 ? `<b aria-hidden="true">↓</b>` : ""}`).join("")}</div>${group.note ? `<p>${richGuideText(group.note)}</p>` : ""}</article>`).join("")}</div>${summary.closing ? `<p class="summary-closing">${richGuideText(summary.closing)}</p>` : ""}</section>`;
+}
+
 function guidedTopicView(lessonId, termId) {
-  if (lessonId !== "lesson-01" || !lessonOneGuide.order.includes(termId)) return notFoundView("Bu guided konu bulunamadı.");
+  const guide = lessonGuides[lessonId];
+  if (!guide || !guide.order.includes(termId)) return notFoundView("Bu guided konu bulunamadı.");
   const lesson = getLesson(lessonId);
-  const guide = lessonOneGuide;
   const topic = guide.topics[termId];
   const term = getTermForContext(termId, lessonId);
   const index = guide.order.indexOf(termId);
@@ -160,34 +185,37 @@ function guidedTopicView(lessonId, termId) {
   const learned = new Set(progress.learnedTermIds);
   const completedCount = guide.order.filter((id) => learned.has(id)).length;
   const prerequisiteTerms = (topic.prerequisites ?? []).map((id) => ({ id, topic: guide.topics[id], learned: learned.has(id) }));
-  const recognizeTerms = (topic.recognize ?? []).map((id) => getTermForContext(id, lessonId)).filter(Boolean);
-  const quickReferences = guideQuickReferences(topic);
+  const recognizeEntries = topic.recognize ?? [];
+  const quickTerms = getTopicQuickTerms(guide, topic);
+  const quickReferences = guideQuickReferences(quickTerms);
   progress.setLastLesson(lessonId);
 
   return `<div class="page guided-topic-page">
     <nav class="guided-topnav"><a href="#/learn/${lessonId}">← Ders planı</a><div><span>Konu ${index + 1} / ${guide.order.length}</span>${progressBar(((index + 1) / guide.order.length) * 100, "Ders içindeki konum")}</div><span>${completedCount} tamamlandı</span></nav>
-    <header class="guided-topic-hero"><div class="topic-number">${String(index + 1).padStart(2, "0")}</div><div><p class="eyebrow">Ders 01 · Temel kavram</p><h1>${escapeHtml(term.name)}</h1><p>${escapeHtml(term.short_definition)}</p></div>${learned.has(termId) ? `<span class="topic-complete-mark">${icon("check", 16)} Tamamlandı</span>` : ""}</header>
+    <header class="guided-topic-hero"><div class="topic-number">${String(index + 1).padStart(2, "0")}</div><div><p class="eyebrow">Ders ${String(lesson.number).padStart(2, "0")} · Temel kavram</p><h1>${escapeHtml(term.name)}</h1><p>${escapeHtml(term.short_definition)}</p></div>${learned.has(termId) ? `<span class="topic-complete-mark">${icon("check", 16)} Tamamlandı</span>` : ""}</header>
     ${prerequisiteTerms.length ? `<aside class="prerequisite-box"><span>${icon("bookmark", 18)}</span><div><strong>Bu konudan önce bilmen iyi olur</strong>${prerequisiteTerms.map((item) => `<a href="#/learn/${lessonId}/${item.id}">${item.learned ? icon("check", 14) : ""}${escapeHtml(item.topic.shortTitle)}</a>`).join("")}</div></aside>` : ""}
+    ${guidedBridge(topic.bridge)}
     <div class="guided-content">
-      <section class="guided-section"><div class="guided-section__label"><span>01</span><p>30 saniyede</p></div><div class="guided-section__body guided-fast">${topic.fast.map((paragraph) => `<p>${richGuideText(paragraph)}</p>`).join("")}</div></section>
-      <section class="guided-section"><div class="guided-section__label"><span>02</span><p>Basit zihinsel model</p></div><div class="guided-section__body">${guidedModel(topic.model)}</div></section>
-      <section class="guided-section"><div class="guided-section__label"><span>03</span><p>Neden buna ihtiyacımız var?</p></div><div class="guided-section__body"><p>${richGuideText(topic.why)}</p></div></section>
-      <section class="guided-section"><div class="guided-section__label"><span>04</span><p>Godot'ta nerede görürüm?</p></div><div class="guided-section__body"><ul class="godot-context-list">${topic.godot.map((item) => `<li>${icon("chevron", 15)}<span>${richGuideText(item)}</span></li>`).join("")}</ul></div></section>
-      <section class="guided-section"><div class="guided-section__label"><span>05</span><p>Örnek</p></div><div class="guided-section__body guided-example">${guidedExample(topic.example)}</div></section>
-      ${quickReferences.length ? `<section class="guided-section"><div class="guided-section__label"><span>06</span><p>Bilmediğim terimler</p></div><div class="guided-section__body"><div class="quick-reference-box"><p>Açıklamadaki altı çizili kelimelere istediğin anda dokunabilirsin. Sayfadan ayrılmadan kısa anlamını görürsün.</p><div>${quickReferences.map((item) => `<button class="inline-term inline-term--chip" type="button" data-action="inline-term" data-quick-id="${escapeHtml(item.id)}">${escapeHtml(item.label)}<span aria-hidden="true">?</span></button>`).join("")}</div></div></div></section>` : ""}
-      ${recognizeTerms.length ? `<section class="guided-section guided-recognize"><div class="guided-section__label"><span>+</span><p>Bunu duyarsan tanı</p></div><div class="guided-section__body"><div class="recognize-callouts">${recognizeTerms.map((item) => `<article><span>Tanı</span><h3>${escapeHtml(item.name)}</h3><p>${escapeHtml(item.short_definition)}</p></article>`).join("")}</div></div></section>` : ""}
-      <section class="guided-section"><div class="guided-section__label"><span>07</span><p>Yaygın hata</p></div><div class="guided-section__body"><div class="common-mistake"><span>!</span><p>${richGuideText(topic.mistake)}</p></div></div></section>
+      <section class="guided-section"><div class="guided-section__label"><span>01</span><p>30 saniyede</p></div><div class="guided-section__body guided-fast">${topic.fast.map((paragraph) => `<p>${richGuideText(paragraph, quickTerms)}</p>`).join("")}</div></section>
+      <section class="guided-section"><div class="guided-section__label"><span>02</span><p>Basit zihinsel model</p></div><div class="guided-section__body">${guidedModel(topic.model, quickTerms)}</div></section>
+      <section class="guided-section"><div class="guided-section__label"><span>03</span><p>Neden buna ihtiyacımız var?</p></div><div class="guided-section__body"><p>${richGuideText(topic.why, quickTerms)}</p></div></section>
+      <section class="guided-section"><div class="guided-section__label"><span>04</span><p>Godot'ta nerede görürüm?</p></div><div class="guided-section__body"><ul class="godot-context-list">${topic.godot.map((item) => `<li>${icon("chevron", 15)}<span>${richGuideText(item, quickTerms)}</span></li>`).join("")}</ul></div></section>
+      <section class="guided-section"><div class="guided-section__label"><span>05</span><p>Örnek</p></div><div class="guided-section__body guided-example">${guidedExample(topic.example, quickTerms)}</div></section>
+      ${quickReferences.length ? `<section class="guided-section"><div class="guided-section__label"><span>06</span><p>Bilmediğim terimler</p></div><div class="guided-section__body"><div class="quick-reference-box"><p>Bu konuyu anlamak için gerekli teknik kavramları burada kısa açıklamalarıyla açabilirsin.</p><div>${quickReferences.map((item) => `<button class="inline-term inline-term--chip" type="button" data-action="inline-term" data-quick-id="${escapeHtml(item.id)}">${escapeHtml(item.canonicalTitle)}<span aria-hidden="true">?</span></button>`).join("")}</div></div></div></section>` : ""}
+      ${recognizeEntries.length ? `<section class="guided-section guided-recognize"><div class="guided-section__label"><span>+</span><p>Bunu duyarsan tanı</p></div><div class="guided-section__body">${guidedRecognizeCards(recognizeEntries, lessonId)}</div></section>` : ""}
+      <section class="guided-section"><div class="guided-section__label"><span>07</span><p>Yaygın hata</p></div><div class="guided-section__body"><div class="common-mistake"><span>!</span><p>${richGuideText(topic.mistake, quickTerms)}</p></div></div></section>
       <section class="guided-section guided-check"><div class="guided-section__label"><span>08</span><p>Kendini kontrol et</p></div><div class="guided-section__body"><div class="mini-check"><p class="eyebrow">Tek cümleyle yanıtla</p><h2>${escapeHtml(topic.check.question)}</h2><button class="button button--secondary" data-action="reveal-guided-answer">Cevabı göster</button><div class="mini-check__answer" hidden><p class="eyebrow">Kısa cevap</p><p>${escapeHtml(topic.check.answer)}</p></div></div></div></section>
     </div>
-    <nav class="guided-navigation" aria-label="Ders konuları arasında gezinme">${previousId ? `<a class="button button--secondary" href="#/learn/${lessonId}/${previousId}">← Önceki Konu<span>${escapeHtml(guide.topics[previousId].shortTitle)}</span></a>` : `<span></span>`}${nextId ? `<button class="button button--primary" data-action="guided-next" data-term-id="${termId}" data-next-id="${nextId}"><span>${learned.has(termId) ? "Sonraki Konu" : "Konuyu tamamla"}</span>${escapeHtml(guide.topics[nextId].shortTitle)} →</button>` : `<button class="button button--primary guided-finish-button" data-action="guided-complete-lesson" data-term-id="${termId}" data-lesson-id="${lessonId}">${icon("check", 18)} Dersi Tamamla</button>`}</nav>
-    <dialog class="quick-term-dialog" aria-labelledby="quick-term-title"><button class="icon-button" data-action="close-inline-term" aria-label="Açıklamayı kapat">${icon("close", 18)}</button><p class="eyebrow">Şimdilik bunu bilmen yeterli</p><h2 id="quick-term-title"></h2><p class="quick-term-definition"></p></dialog>
+    ${!nextId ? guidedLessonSummary(guide.summary) : ""}
+    <nav class="guided-navigation" aria-label="Ders konuları arasında gezinme">${previousId ? `<a class="button button--secondary" href="#/learn/${lessonId}/${previousId}">← Önceki Konu<span>${escapeHtml(guide.topics[previousId].shortTitle)}</span></a>` : `<span></span>`}${nextId ? `<button class="button button--primary" data-action="guided-next" data-lesson-id="${lessonId}" data-term-id="${termId}" data-next-id="${nextId}"><span>${learned.has(termId) ? "Sonraki Konu" : "Konuyu tamamla"}</span>${escapeHtml(guide.topics[nextId].shortTitle)} →</button>` : `<button class="button button--primary guided-finish-button" data-action="guided-complete-lesson" data-term-id="${termId}" data-lesson-id="${lessonId}">${icon("check", 18)} Dersi Tamamla</button>`}</nav>
+    <dialog class="quick-term-dialog" aria-labelledby="quick-term-title"><button class="icon-button" data-action="close-inline-term" aria-label="Açıklamayı kapat">${icon("close", 18)}</button><p class="eyebrow">Şimdilik bunu bilmen yeterli</p><h2 id="quick-term-title"></h2><p class="quick-term-definition"></p><div class="quick-term-example" hidden><strong>Örnek</strong><p></p></div><p class="quick-term-context" hidden></p></dialog>
   </div>`;
 }
 
 function lessonView(id) {
   const lesson = getLesson(id);
   if (!lesson) return notFoundView("Bu ders bulunamadı.");
-  if (id === "lesson-01") return guidedLessonLanding(lesson);
+  if (lessonGuides[id]) return guidedLessonLanding(lesson);
   const { core, recognize } = getLessonTerms(id);
   const complete = progress.completedLessonIds.includes(id);
   const learnedCount = core.filter((term) => progress.learnedTermIds.includes(term.id)).length;
