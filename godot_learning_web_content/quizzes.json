@@ -1,0 +1,422 @@
+[
+  {
+    "id": "quiz-01",
+    "lesson_id": "lesson-01",
+    "questions": [
+      {
+        "id": "q-01-1",
+        "type": "open_recall",
+        "question": "Engine ile editor arasındaki fark nedir?",
+        "answer": "Engine temel çalışma sistemlerini sağlar; editor bu sistemlerle proje oluşturduğun görsel araçtır.",
+        "lesson_id": "lesson-01",
+        "source": "pdf-mini-control"
+      },
+      {
+        "id": "q-01-2",
+        "type": "open_recall",
+        "question": "API kelimesini kendi cümlenle nasıl açıklarsın?",
+        "answer": "Bir sistemin koddan kullanılabilen yüzeyi/kuralları: sınıflar, metodlar, propertyler ve çağrı biçimleri.",
+        "lesson_id": "lesson-01",
+        "source": "pdf-mini-control"
+      },
+      {
+        "id": "q-01-3",
+        "type": "open_recall",
+        "question": "Export neden “Save” ile aynı şey değildir?",
+        "answer": "Save proje kaynaklarını kaydeder; export oyuncuya dağıtılabilecek hedef platform çıktısı üretir.",
+        "lesson_id": "lesson-01",
+        "source": "pdf-mini-control"
+      }
+    ]
+  },
+  {
+    "id": "quiz-02",
+    "lesson_id": "lesson-02",
+    "questions": [
+      {
+        "id": "q-02-1",
+        "type": "open_recall",
+        "question": "Parameter ve argument farkını örnekle açıkla.",
+        "answer": "Parameter fonksiyon tanımındaki isim; argument çağrıdaki gerçek değerdir.",
+        "lesson_id": "lesson-02",
+        "source": "pdf-mini-control"
+      },
+      {
+        "id": "q-02-2",
+        "type": "open_recall",
+        "question": "Array ile Dictionary arasında temel fark nedir?",
+        "answer": "Array sıralı/indexli koleksiyon; Dictionary key-value eşleşmesidir.",
+        "lesson_id": "lesson-02",
+        "source": "pdf-mini-control"
+      },
+      {
+        "id": "q-02-3",
+        "type": "open_recall",
+        "question": "Static typing sana başlangıçta hangi iki faydayı sağlar?",
+        "answer": "Hataları daha erken yakalamaya ve editor autocomplete/önerilerini iyileştirmeye yardım eder.",
+        "lesson_id": "lesson-02",
+        "source": "pdf-mini-control"
+      }
+    ]
+  },
+  {
+    "id": "quiz-03",
+    "lesson_id": "lesson-03",
+    "questions": [
+      {
+        "id": "q-03-1",
+        "type": "open_recall",
+        "question": "Scene yalnızca level anlamına mı gelir?",
+        "answer": "Hayır. Player, UI paneli, mermi, düşman, menü gibi tekrar kullanılabilir node ağaçları da scene olabilir.",
+        "lesson_id": "lesson-03",
+        "source": "pdf-mini-control"
+      },
+      {
+        "id": "q-03-2",
+        "type": "open_recall",
+        "question": "instantiate() ne yapar?",
+        "answer": "PackedScene kaynağından runtime’da yeni bir node ağacı/scene instance oluşturur.",
+        "lesson_id": "lesson-03",
+        "source": "pdf-mini-control"
+      },
+      {
+        "id": "q-03-3",
+        "type": "open_recall",
+        "question": "Autoload için iyi bir kullanım örneği ver.",
+        "answer": "Sahneler arası kalıcı global servisler: GameState, AudioManager, save service gibi.",
+        "lesson_id": "lesson-03",
+        "source": "pdf-mini-control"
+      }
+    ]
+  },
+  {
+    "id": "quiz-04",
+    "lesson_id": "lesson-04",
+    "questions": [
+      {
+        "id": "q-04-1",
+        "type": "open_recall",
+        "question": "delta neyi temsil eder?",
+        "answer": "Son güncelleme adımından bu yana geçen zamanı, genellikle saniye cinsinden.",
+        "lesson_id": "lesson-04",
+        "source": "pdf-mini-control"
+      },
+      {
+        "id": "q-04-2",
+        "type": "open_recall",
+        "question": "Neden Input Map kullanmak iyi fikirdir?",
+        "answer": "Kodun fiziksel tuşa değil anlamsal action’a bağlanmasını sağlar; remap ve gamepad desteğini kolaylaştırır.",
+        "lesson_id": "lesson-04",
+        "source": "pdf-mini-control"
+      },
+      {
+        "id": "q-04-3",
+        "type": "open_recall",
+        "question": "_process ve _physics_process için basit kullanım ayrımı yap.",
+        "answer": "Görsel/frame işleri _process; fizik/movement hesapları çoğunlukla _physics_process.",
+        "lesson_id": "lesson-04",
+        "source": "pdf-mini-control"
+      }
+    ]
+  },
+  {
+    "id": "quiz-05",
+    "lesson_id": "lesson-05",
+    "questions": [
+      {
+        "id": "q-05-1",
+        "type": "open_recall",
+        "question": "Normalize edilmiş vector’ün length’i yaklaşık kaçtır?",
+        "answer": "Sıfır olmayan vector için 1.",
+        "lesson_id": "lesson-05",
+        "source": "pdf-mini-control"
+      },
+      {
+        "id": "q-05-2",
+        "type": "open_recall",
+        "question": "Local position ile global position farkı nedir?",
+        "answer": "Local parent referansına, global dünya/scene referansına göredir.",
+        "lesson_id": "lesson-05",
+        "source": "pdf-mini-control"
+      },
+      {
+        "id": "q-05-3",
+        "type": "open_recall",
+        "question": "Lerp nerede işe yarar?",
+        "answer": "Kamera takibi, UI değer geçişi, hareket/rotation smoothing gibi iki değer arasında yumuşak geçiş gereken yerlerde.",
+        "lesson_id": "lesson-05",
+        "source": "pdf-mini-control"
+      }
+    ]
+  },
+  {
+    "id": "quiz-06",
+    "lesson_id": "lesson-06",
+    "questions": [
+      {
+        "id": "q-06-1",
+        "type": "open_recall",
+        "question": "Area ile StaticBody arasındaki temel fark nedir?",
+        "answer": "Area algılama/trigger için; StaticBody fiziksel sabit engel/çarpışma gövdesi için kullanılır.",
+        "lesson_id": "lesson-06",
+        "source": "pdf-mini-control"
+      },
+      {
+        "id": "q-06-2",
+        "type": "open_recall",
+        "question": "Layer ve mask’i tek cümlede ayır.",
+        "answer": "Layer nesnenin ait olduğu kategori; mask hangi kategorileri kontrol edeceğini söyler.",
+        "lesson_id": "lesson-06",
+        "source": "pdf-mini-control"
+      },
+      {
+        "id": "q-06-3",
+        "type": "open_recall",
+        "question": "RayCast için iki kullanım örneği ver.",
+        "answer": "Zemin kontrolü, görüş hattı, hitscan silah, duvar algılama vb.",
+        "lesson_id": "lesson-06",
+        "source": "pdf-mini-control"
+      }
+    ]
+  },
+  {
+    "id": "quiz-07",
+    "lesson_id": "lesson-07",
+    "questions": [
+      {
+        "id": "q-07-1",
+        "type": "open_recall",
+        "question": "Texture ile Sprite arasındaki fark nedir?",
+        "answer": "Texture görüntü verisi; Sprite bunu sahnede gösteren nesne/node.",
+        "lesson_id": "lesson-07",
+        "source": "pdf-mini-control"
+      },
+      {
+        "id": "q-07-2",
+        "type": "open_recall",
+        "question": "Shader ve material arasındaki ilişkiyi açıkla.",
+        "answer": "Shader çizim algoritması/mantığı; material bu shader’ı ve parametrelerini belirli yüzeyde kullanan kaynak.",
+        "lesson_id": "lesson-07",
+        "source": "pdf-mini-control"
+      },
+      {
+        "id": "q-07-3",
+        "type": "open_recall",
+        "question": "Tween ne zaman AnimationPlayer’dan daha pratik olabilir?",
+        "answer": "Tek/az sayıda değeri kısa süreli easing ile programatik geçirmek gerektiğinde.",
+        "lesson_id": "lesson-07",
+        "source": "pdf-mini-control"
+      }
+    ]
+  },
+  {
+    "id": "quiz-08",
+    "lesson_id": "lesson-08",
+    "questions": [
+      {
+        "id": "q-08-1",
+        "type": "open_recall",
+        "question": "Resolution ile aspect ratio farkını açıkla.",
+        "answer": "Resolution piksel boyutu; aspect ratio genişlik/yükseklik oranı.",
+        "lesson_id": "lesson-08",
+        "source": "pdf-mini-control"
+      },
+      {
+        "id": "q-08-2",
+        "type": "open_recall",
+        "question": "Container kullanmanın ana avantajı nedir?",
+        "answer": "Child UI öğelerinin yerleşim ve boyutunu otomatik yöneterek responsive düzeni kolaylaştırır.",
+        "lesson_id": "lesson-08",
+        "source": "pdf-mini-control"
+      },
+      {
+        "id": "q-08-3",
+        "type": "open_recall",
+        "question": "Theme neden büyük UI projelerinde önemlidir?",
+        "answer": "Ortak görsel kuralları merkezileştirir ve tutarlı/değiştirilebilir tasarım sağlar.",
+        "lesson_id": "lesson-08",
+        "source": "pdf-mini-control"
+      }
+    ]
+  },
+  {
+    "id": "quiz-09",
+    "lesson_id": "lesson-09",
+    "questions": [
+      {
+        "id": "q-09-1",
+        "type": "open_recall",
+        "question": "Resource ile Scene için basit ayrım yap.",
+        "answer": "Resource paylaşılabilir veri/asset; Scene node ağacı ve davranışsal/uzamsal yapı için uygundur.",
+        "lesson_id": "lesson-09",
+        "source": "pdf-mini-control"
+      },
+      {
+        "id": "q-09-2",
+        "type": "open_recall",
+        "question": "Coupling neden önemlidir?",
+        "answer": "Sistemler aşırı bağlıysa birindeki değişiklik diğerlerini kolayca kırar; düşük coupling değişimi/testi kolaylaştırır.",
+        "lesson_id": "lesson-09",
+        "source": "pdf-mini-control"
+      },
+      {
+        "id": "q-09-3",
+        "type": "open_recall",
+        "question": "State machine hangi probleme çözüm getirir?",
+        "answer": "Bir nesnenin farklı durumlarını ve aralarındaki geçiş kurallarını açık biçimde yönetmeye.",
+        "lesson_id": "lesson-09",
+        "source": "pdf-mini-control"
+      }
+    ]
+  },
+  {
+    "id": "quiz-10",
+    "lesson_id": "lesson-10",
+    "questions": [
+      {
+        "id": "q-10-1",
+        "type": "open_recall",
+        "question": "Core loop ile mechanic farkı nedir?",
+        "answer": "Mechanic tekil kural/eylem; core loop oyuncunun tekrar tekrar yaptığı birden çok adımlı ana döngü.",
+        "lesson_id": "lesson-10",
+        "source": "pdf-mini-control"
+      },
+      {
+        "id": "q-10-2",
+        "type": "open_recall",
+        "question": "RNG seed neden faydalıdır?",
+        "answer": "Aynı rastgele diziyi tekrar üreterek test, replay veya deterministik senaryoları kolaylaştırabilir.",
+        "lesson_id": "lesson-10",
+        "source": "pdf-mini-control"
+      },
+      {
+        "id": "q-10-3",
+        "type": "open_recall",
+        "question": "Pathfinding AI’nın tamamı mıdır?",
+        "answer": "Hayır; sadece hedefe rota bulma problemidir. Karar verme ayrı bir AI davranış problemidir.",
+        "lesson_id": "lesson-10",
+        "source": "pdf-mini-control"
+      }
+    ]
+  },
+  {
+    "id": "quiz-11",
+    "lesson_id": "lesson-11",
+    "questions": [
+      {
+        "id": "q-11-1",
+        "type": "open_recall",
+        "question": "RPC neyin kısaltmasıdır ve ne işe yarar?",
+        "answer": "Remote Procedure Call; ağ üzerinden başka peer’da bir işlemi/fonksiyonu tetikleme mekanizmasıdır.",
+        "lesson_id": "lesson-11",
+        "source": "pdf-mini-control"
+      },
+      {
+        "id": "q-11-2",
+        "type": "open_recall",
+        "question": "Latency ile FPS aynı problem midir?",
+        "answer": "Hayır. FPS yerel render/güncelleme hızı; latency ağ gecikmesidir.",
+        "lesson_id": "lesson-11",
+        "source": "pdf-mini-control"
+      },
+      {
+        "id": "q-11-3",
+        "type": "open_recall",
+        "question": "Authority neden önemlidir?",
+        "answer": "Bir oyun durumunda hangi tarafın doğru/kontrol sahibi olduğunu belirleyerek tutarlılık ve güvenliği yönetir.",
+        "lesson_id": "lesson-11",
+        "source": "pdf-mini-control"
+      }
+    ]
+  },
+  {
+    "id": "quiz-12",
+    "lesson_id": "lesson-12",
+    "questions": [
+      {
+        "id": "q-12-1",
+        "type": "open_recall",
+        "question": "Logic error neden syntax error’dan farklıdır?",
+        "answer": "Kod geçerli şekilde çalışır ama tasarlanan sonucun dışında davranır.",
+        "lesson_id": "lesson-12",
+        "source": "pdf-mini-control"
+      },
+      {
+        "id": "q-12-2",
+        "type": "open_recall",
+        "question": "Profiler kullanmanın ana amacı nedir?",
+        "answer": "Gerçek performans maliyetini ve bottleneck’i ölçmek.",
+        "lesson_id": "lesson-12",
+        "source": "pdf-mini-control"
+      },
+      {
+        "id": "q-12-3",
+        "type": "open_recall",
+        "question": "Stack trace sana ne anlatır?",
+        "answer": "Hata noktasına hangi fonksiyon çağrı zinciriyle gelindiğini.",
+        "lesson_id": "lesson-12",
+        "source": "pdf-mini-control"
+      }
+    ]
+  },
+  {
+    "id": "quiz-13",
+    "lesson_id": "lesson-13",
+    "questions": [
+      {
+        "id": "q-13-1",
+        "type": "open_recall",
+        "question": "Commit nedir?",
+        "answer": "Belirli bir değişiklik grubunun version control geçmişindeki kayıt noktasıdır.",
+        "lesson_id": "lesson-13",
+        "source": "pdf-mini-control"
+      },
+      {
+        "id": "q-13-2",
+        "type": "open_recall",
+        "question": "Version control ile backup aynı şey midir?",
+        "answer": "Hayır. Version control değişiklik geçmişi ve işbirliği sağlar; backup veri kaybına karşı ayrı kopyadır.",
+        "lesson_id": "lesson-13",
+        "source": "pdf-mini-control"
+      },
+      {
+        "id": "q-13-3",
+        "type": "open_recall",
+        "question": "Debug ve release build arasında genel fark nedir?",
+        "answer": "Debug geliştirme/hata ayıklama odaklı; release dağıtım ve optimize edilmiş çalışma odaklıdır.",
+        "lesson_id": "lesson-13",
+        "source": "pdf-mini-control"
+      }
+    ]
+  },
+  {
+    "id": "quiz-14",
+    "lesson_id": "lesson-14",
+    "questions": [
+      {
+        "id": "q-14-1",
+        "type": "open_recall",
+        "question": "Prototype ile vertical slice arasındaki fark nedir?",
+        "answer": "Prototype fikri hızlı test eder; vertical slice küçük ama hedef üretim kalitesini uçtan uca temsil etmeye çalışır.",
+        "lesson_id": "lesson-14",
+        "source": "pdf-mini-control"
+      },
+      {
+        "id": "q-14-2",
+        "type": "open_recall",
+        "question": "Scope creep ne demektir?",
+        "answer": "Planlanan iş kapsamının kontrolsüz biçimde büyümesi.",
+        "lesson_id": "lesson-14",
+        "source": "pdf-mini-control"
+      },
+      {
+        "id": "q-14-3",
+        "type": "open_recall",
+        "question": "UI ve UX aynı şey midir?",
+        "answer": "Hayır. UI arayüz; UX kullanıcının ürünle yaşadığı genel deneyimdir.",
+        "lesson_id": "lesson-14",
+        "source": "pdf-mini-control"
+      }
+    ]
+  }
+]

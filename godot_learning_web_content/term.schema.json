@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GodotLearningTerm",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "definition",
+    "short_definition",
+    "tier",
+    "lesson_ids",
+    "category_ids"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "aliases": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "definition": {
+      "type": "string"
+    },
+    "short_definition": {
+      "type": "string"
+    },
+    "tier": {
+      "enum": [
+        "core",
+        "recognize"
+      ]
+    },
+    "priority": {
+      "enum": [
+        "TEMEL",
+        "TANI"
+      ]
+    },
+    "lesson_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "category_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "where_heard": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "memory_hook": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "code_example": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "related_term_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "previous_core_term_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "next_core_term_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

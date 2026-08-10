@@ -1,0 +1,42 @@
+# Active Context
+
+## Current Focus
+
+Frameworksüz ve doğrudan `index.html` ile açılabilen çalışan MVP tamamlandı. Güncel odak, gerekirse gerçek tarayıcı üzerinde görsel/etkileşim QA ve kullanıcı geri bildirimine göre küçük iyileştirmelerdir.
+
+## Verified Source Facts
+
+- Veri dosyasında 343 terim, 14 ders, 14 quiz grubu ve toplam 42 açık hatırlama sorusu var.
+- Gerçek tier sayımı 125 `core`, 218 `recognize`; metadata 126 core diyor. Arayüz hesaplarında gerçek diziler kullanılmalı.
+- 14 kategori ve üç öğrenme yolu var; `first-50` yolu tam 50 terim içeriyor.
+- 18 terimde kod örneği bulunuyor.
+- İlgili terim ve ders terim referanslarında eksik ID bulunmadı.
+- Derslerde toplam 312 terim referansı, 309 benzersiz terim var; bazı terimler birden fazla derste geçiyor.
+
+## Implementation Decisions
+
+- Yalnızca HTML, CSS ve klasik Vanilla JavaScript kullanan SPA kuruldu.
+- Statik host uyumluluğu için hash router kullanıldı.
+- `file://` kısıtlarını önlemek için `fetch` ve ES module kaldırıldı.
+- İçerik değiştirilmeden kaynak JSON `window.GODOT_LEARN_DATA` atamasıyla `src/data/content.js` içine sarıldı; metin eşitliği doğrulandı.
+- Modüller `window.GodotApp` namespace'i kullanan sıralı klasik scriptlere dönüştürüldü.
+- Harici font veya runtime bağımlılığı eklenmedi; sistem fontları kullanıldı.
+- `core` ve `recognize` sunumları ayrıldı; bütün içerik ve ilişkiler data layer üzerinden çözülüyor.
+- Quizde yanlış/yeniden çalışma seçilen sorular Review ekranında, manuel işaretlenen terimlerden ayrı olarak gösteriliyor.
+
+## Implemented Features
+
+- Dashboard: devam edilen ders, ders/temel terim/İlk 50 ilerlemesi, tekrar kuyruğu.
+- Learn ve Lesson Detail: 14 ders, temel/tanıma terimleri, öğrenildi ve ders tamamlandı durumları.
+- Glossary ve Term Detail: arama, harf/seviye/kategori filtreleri, alias, kod, ilişkiler ve temel terim navigasyonu.
+- Quiz, Review ve Favorites akışları.
+- Ctrl/Cmd+K global arama ve klavye navigasyonu.
+- LocalStorage kalıcılığı, açık/koyu tema, responsive sidebar drawer ve reduced-motion desteği.
+- README, içerik senkronizasyon/doğrulama scriptleri ve opsiyonel yerel sunucu.
+- `index.html` dosyasına çift tıklayarak çalışma; sunucu veya kurulum gerektirmeme.
+
+## Next Steps
+
+1. Desteklenen gerçek bir tarayıcıda desktop/mobile görsel smoke testi yap.
+2. İstenirse kalıcı statik hosta deploy et.
+3. Yeni içerik eklenirse kaynak birleşik JSON'u güncelle, `scripts/sync-content.ps1` ve ardından doğrulama scriptini çalıştır.

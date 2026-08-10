@@ -1,0 +1,20 @@
+{
+  "project": "Godot + GDScript Öğrenme Platformu",
+  "language": "tr",
+  "source_document": "Yeni Başlayanlar İçin Terimler El Kitabı - Godot + GDScript",
+  "source_focus": "Godot 4.x + genel oyun geliştirme terminolojisi",
+  "generated_from_pdf_text": true,
+  "counts": {
+    "terms": 343,
+    "core_terms": 126,
+    "lessons": 14,
+    "source_quiz_questions": 42,
+    "first_50_terms": 50
+  },
+  "content_principles": [
+    "Terim önce doğru kategoriye yerleştirilir.",
+    "TEMEL terimler aktif öğrenme, diğerleri önce tanıma düzeyindedir.",
+    "PDF metni ana kaynak; web arayüzü metni sayfa sayfa kopyalamak yerine etkileşimli sunar."
+  ],
+  "unresolved_first_50": []
+}
