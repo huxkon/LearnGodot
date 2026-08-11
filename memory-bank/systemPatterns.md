@@ -49,6 +49,7 @@
 - Quick-term katalog canonical title taşır; `[[id|label]]` içindeki label yalnız cümle grameridir.
 - Recognize kartı tanım yanında core bağlantısı, yerleştirme nedeni ve karıştırma ayrımı sağlar.
 - Opsiyonel bridge geçişi, summary ders ilişkisini açıklar.
+- Guided `prerequisites` yalnız aynı guide içindeki topic ID'lerine referans verir; önceki ders bağlantıları bridge veya context metninde kurulur.
 
 ## Accessibility
 

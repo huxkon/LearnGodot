@@ -847,7 +847,7 @@
         "collision-layer-mask"
       ],
       "previous_core_term_id": "staticbody",
-      "next_core_term_id": "velocity-acceleration"
+      "next_core_term_id": "collision-layer-mask"
     },
     {
       "id": "array-dictionary",
@@ -2344,7 +2344,7 @@
         "collisionshape2d-3d",
         "characterbody"
       ],
-      "previous_core_term_id": "distance-direction",
+      "previous_core_term_id": "velocity-acceleration",
       "next_core_term_id": "collisionshape2d-3d"
     },
     {
@@ -2380,7 +2380,7 @@
         "velocity-acceleration",
         "raycast-shapecast"
       ],
-      "previous_core_term_id": "velocity-acceleration",
+      "previous_core_term_id": "area",
       "next_core_term_id": "raycast-shapecast"
     },
     {
@@ -3584,7 +3584,7 @@
         "interpolation-lerp"
       ],
       "previous_core_term_id": "interpolation-lerp",
-      "next_core_term_id": "collision"
+      "next_core_term_id": "velocity-acceleration"
     },
     {
       "id": "dot-product",
@@ -11268,8 +11268,8 @@
         "collision-layer-mask",
         "raycast-shapecast"
       ],
-      "previous_core_term_id": "area",
-      "next_core_term_id": "collision-layer-mask"
+      "previous_core_term_id": "distance-direction",
+      "next_core_term_id": "collision"
     },
     {
       "id": "version-control",
@@ -11773,13 +11773,13 @@
       "description": "CharacterBody2D gördüğünde ne ailesine ait olduğunu bil.",
       "goal": "Bu bölüm bittiğinde 9 ana terimi açıklayabilecek ve 11 ek terimi duyduğunda tanıyabileceksin.",
       "core_term_ids": [
+        "velocity-acceleration",
         "collision",
         "collisionshape2d-3d",
         "characterbody",
         "rigidbody",
         "staticbody",
         "area",
-        "velocity-acceleration",
         "collision-layer-mask",
         "raycast-shapecast"
       ],
@@ -12645,13 +12645,13 @@
           "transform",
           "interpolation-lerp",
           "distance-direction",
+          "velocity-acceleration",
           "collision",
           "collisionshape2d-3d",
           "characterbody",
           "rigidbody",
           "staticbody",
           "area",
-          "velocity-acceleration",
           "collision-layer-mask",
           "raycast-shapecast",
           "sprite-texture",

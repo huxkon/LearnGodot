@@ -74,7 +74,7 @@
         completedLower: "tamamlandı",
         nextLesson: "Sıradaki ders",
         nextTopic: "Sıradaki konu",
-        noPrerequisite: "Ön bilgi gerektirmez",
+        noPrerequisite: "Sırayla ilerlemen önerilir",
         favorite: "Favori",
         favorited: "Favoride",
         inReview: "Tekrarda",

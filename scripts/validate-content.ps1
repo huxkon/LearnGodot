@@ -312,6 +312,20 @@ foreach ($guideFile in $guidedFiles) {
     if (@($orderIds | Group-Object | Where-Object Count -gt 1).Count) { $errors.Add("$lessonId guided order duplicate topic içeriyor.") }
     if ((@($orderIds) -join "|") -cne (@($lesson.core_term_ids) -join "|")) { $errors.Add("$lessonId guided order source core_term_ids sırasıyla birebir eşleşmiyor.") }
 
+    $topicsMatch = [regex]::Match($guideText, 'topics:\s*\{(?<body>.*?)\r?\n\s{4}\},\s*\r?\n\s{4}summary:', [System.Text.RegularExpressions.RegexOptions]::Singleline)
+    $topicKeys = @([regex]::Matches($topicsMatch.Groups['body'].Value, '(?m)^\s{6}(?:"(?<quoted>[^"]+)"|(?<bare>[A-Za-z0-9_-]+)):\s*\{') | ForEach-Object {
+        if ($_.Groups['quoted'].Success) { $_.Groups['quoted'].Value } else { $_.Groups['bare'].Value }
+    })
+    if ((@($topicKeys) -join "|") -cne (@($orderIds) -join "|")) { $errors.Add("$lessonId guide.topics anahtarları guided order ile birebir ve aynı sırada eşleşmiyor.") }
+    $prerequisiteBlocks = @([regex]::Matches($topicsMatch.Groups['body'].Value, 'prerequisites:\s*\[([^\]]*)\]'))
+    foreach ($block in $prerequisiteBlocks) {
+        $prerequisiteIds = @([regex]::Matches($block.Groups[1].Value, '"([^"]+)"') | ForEach-Object { $_.Groups[1].Value })
+        if (@($prerequisiteIds | Group-Object | Where-Object Count -gt 1).Count) { $errors.Add("$lessonId topic prerequisites duplicate ID içeriyor.") }
+        foreach ($prerequisiteId in $prerequisiteIds) {
+            if ($prerequisiteId -notin $topicKeys) { $errors.Add("$lessonId prerequisite '$prerequisiteId' aynı guide içinde topic olarak bulunmuyor; guided renderer guide.topics lookup'ı yapamaz.") }
+        }
+    }
+
     $cardIds = @([regex]::Matches($guideText, 'id:\s*"([^"]+)"') | ForEach-Object { $_.Groups[1].Value })
     if ((@($cardIds | Sort-Object) -join "|") -cne (@($lesson.recognize_term_ids | Sort-Object) -join "|")) { $errors.Add("$lessonId recognize kart kapsamı source recognize kümesiyle eşleşmiyor.") }
     foreach ($termId in $lesson.recognize_term_ids) {

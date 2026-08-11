@@ -187,13 +187,13 @@
     "description": "CharacterBody2D gördüğünde ne ailesine ait olduğunu bil.",
     "goal": "Bu bölüm bittiğinde 9 ana terimi açıklayabilecek ve 11 ek terimi duyduğunda tanıyabileceksin.",
     "core_term_ids": [
+      "velocity-acceleration",
       "collision",
       "collisionshape2d-3d",
       "characterbody",
       "rigidbody",
       "staticbody",
       "area",
-      "velocity-acceleration",
       "collision-layer-mask",
       "raycast-shapecast"
     ],
