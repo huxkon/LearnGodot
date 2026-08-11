@@ -4,7 +4,7 @@
   const guide = {
     lessonId: "lesson-03",
     title: "Godot’un kalbi: Node, Scene ve SceneTree",
-    intro: "Godot'ta oyun parçalarını nasıl kurduğunu, birbirine bağladığını ve çalışırken yönettiğini on adımda göreceğiz.",
+    intro: "Godot'ta oyun parçalarını nasıl kurduğunu, kodla davranış eklediğini, birbirine bağladığını ve çalışırken yönettiğini on bir adımda göreceğiz.",
     quickTerms: {
       responsibility: { canonicalTitle: "Responsibility (Sorumluluk)", shortExplanation: "Bir kod veya oyun parçasının yapmakla yükümlü olduğu belirli iştir.", example: "Sprite2D'nin sorumluluğu bir görseli göstermektir." },
       node_type: { canonicalTitle: "Node Type (Node Türü)", shortExplanation: "Bir node'un hangi yeteneklerle başladığını belirleyen sınıftır.", example: "Timer zamanlama için kullanılan bir node türüdür." },
@@ -22,7 +22,7 @@
       global_state: { canonicalTitle: "Global State (Global Durum)", shortExplanation: "Tek bir scene'e değil, oyunun tamamına ait ve scene geçişlerinde korunacak bilgidir.", example: "Toplam skor global state olabilir." },
       singleton: { canonicalTitle: "Singleton (Tekil Nesne)", shortExplanation: "Uygulama boyunca tek bir paylaşılan örneği kullanılan yapıdır.", example: "Autoload GameState'e her scene aynı adla ulaşır." },
     },
-    order: ["node", "scene", "scenetree", "parent-child", "nodepath-get_node", "packedscene-instantiate", "_ready", "queue_free", "group", "autoload"],
+    order: ["node", "script", "scene", "scenetree", "parent-child", "nodepath-get_node", "packedscene-instantiate", "_ready", "queue_free", "group", "autoload"],
     topics: {
       node: {
         shortTitle: "Node", quickTermIds: ["responsibility", "node_type"],
@@ -33,6 +33,17 @@
         example: { text: "Bir oyuncuda CharacterBody2D hareketi, Sprite2D görüntüyü, CollisionShape2D çarpışmayı üstlenebilir. Birlikte tek oyuncu gibi davranırlar." },
         mistake: "Her işi tek bir node ve script içine doldurmak. Belirgin sorumlulukları ayırmak yapıyı anlamayı kolaylaştırır.",
         check: { question: "Oyuncunun görüntüsü ile çarpışma alanı neden ayrı node'lar olabilir?", answer: "Farklı sorumlulukları vardır; biri görüntüyü, diğeri çarpışmayı yönetir." }, recognize: [],
+      },
+      script: {
+        shortTitle: "Script", quickTermIds: [], prerequisites: ["node"],
+        fast: ["Script, bir Node'a veri ve davranış ekleyen kod dosyasıdır.", "Godot'ta GDScript dosyaları genellikle `.gd` uzantılıdır ve bir node'a attach edilir.", "Node oyun parçasıdır; ona bağlı script, o parçanın ne hatırladığını ve ne yaptığını tarif eder."],
+        model: { intro: "Uzaktan kumandalı bir oyuncak araba düşün:", steps: ["Node = fiziksel araba", "Script = hareket kuralları", "Variable ve function = script içindeki veri ve davranış"], conclusion: "Script tek başına scene değildir; belirli bir node'un davranış katmanıdır." },
+        why: "Hazır node türleri birçok yetenek sunar, fakat kendi oyununun can, skor ve hareket kurallarını da tanımlaman gerekir. Script bu özel davranışı node'a ekler.",
+        godot: ["Scene panelinde bir node seçip Attach Script düğmesiyle `.gd` dosyası bağlayabilirsin.", "Inspector'daki script property’si node'a bağlı dosyayı gösterir.", "Script'in `extends` satırı hangi node türünün yeteneklerini temel aldığını belirtir."],
+        example: { text: "Bir Node'a bağlanan script, skor bilgisini saklayıp değiştiren davranış ekleyebilir.", code: "extends Node\n\nvar score: int = 0\n\nfunc add_score(points: int) -> void:\n    score += points", lines: ["1. satır: Script'in Node yeteneklerini temel aldığını söyler.", "3. satır: Node'a ait skor bilgisini saklar.", "5–6. satır: Skoru değiştiren davranışı tanımlar."] },
+        mistake: "Script ile Scene'i aynı şey sanmak. Script kod ve davranıştır; Scene ise script bağlanmış node'lar dahil bütün node ağacını ve ayarlarını saklar.",
+        check: { question: "Bir Player scene'i ile player.gd script'i arasındaki fark nedir?", answer: "Player scene node ağacını ve ayarlarını; player.gd ise bağlandığı node'un veri ve davranışını tarif eder." },
+        bridge: { title: "Oyun parçası nasıl davranış kazanır?", steps: ["Node", "Script attach et", "Veri + davranış"], text: "Node temel oyun parçasıdır. Script bu parçaya oyuna özel değerleri ve kuralları ekler; ardından node'lar Scene içinde birleşir." }, recognize: [],
       },
       scene: {
         shortTitle: "Scene", quickTermIds: ["hierarchy", "scene_file"], prerequisites: ["node"],
@@ -112,7 +123,6 @@
         recognize: [
           { id: "lifecycle", brief: "Node'un oluşma, ağaca girme, hazır olma, işlenme ve yok edilme aşamalarıdır.", connection: "_ready() bu yaşam döngüsünün bir aşamasıdır.", whyHere: "Callback'lerin neden belirli sırada çağrıldığını anlaman için.", model: ["Oluştur", "Ağaca ekle", "Hazır ol", "İşle", "Kaldır"], distinction: "Lifecycle bütün akıştır; _ready() tek callback'tir." },
           { id: "notification", brief: "Godot Object ve Node'larının yaşam döngüsü olaylarını ileten düşük seviyeli sistemdir.", connection: "Ağaca girme ve hazır olma aşamaları notification'larla temsil edilir.", whyHere: "NOTIFICATION_READY gibi adların _ready() ile aynı alana ait olduğunu tanıman için.", distinction: "_ready() doğrudan callback'tir; notification daha genel ve düşük seviyelidir." },
-          { id: "signal", brief: "Bir Object'in bir olay olduğunu dinleyenlere bildirmesini sağlayan mesaj mekanizmasıdır.", connection: "Node hazır olunca button.pressed gibi signal'ları callback'lere bağlamak yaygındır.", whyHere: "_ready() içinde connect() gördüğünde amacını tanıman için.", distinction: "_ready() motor callback'idir; signal object'lerin olayları duyurma yoludur." },
         ],
       },
       queue_free: {
@@ -152,7 +162,7 @@
       title: "Bu derste parçalar nasıl birleşiyor?",
       intro: "Godot'taki bir oyun parçasının tariften çalışan sisteme uzanan yolunu izle.",
       groups: [
-        { title: "Yapıyı kur", steps: ["Node", "Parent / Child", "Scene"], note: "Node'lar hiyerarşiyle birleşir; kaydedilen bütün tekrar kullanılabilir scene olur." },
+        { title: "Yapıyı kur", steps: ["Node", "Script = davranış", "Parent / Child", "Scene"], note: "Script node'a veri ve davranış ekler; node'lar hiyerarşiyle birleşince kaydedilebilir scene oluşur." },
         { title: "Oyunda canlandır", steps: ["PackedScene", "instantiate()", "add_child()", "SceneTree"], note: "Kayıtlı tariften instance üretilir ve aktif ağaca eklenir." },
         { title: "Ulaş ve ömrünü yönet", steps: ["NodePath / get_node", "_ready()", "queue_free()"], note: "Referans bulunur, node hazır olduğunda kurulur ve işi bitince kaldırılır." },
         { title: "Daha geniş ilişkiler kur", steps: ["Group", "Autoload"], note: "Group ortak rolleri; Autoload scene'lerden uzun yaşayan global sorumlulukları yönetir." },

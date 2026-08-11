@@ -1,59 +1,32 @@
 # Active Context
 
+## Current State
+
+- Final kullanıcı markası LearnGodot'tur; `window.GodotApp`, route, canonical ID ve LocalStorage anahtarları değişmedi.
+- Uygulama beginner curriculum sunumunu source taxonomy'den ayırır; 14 lesson beş bölümden oluşan kompakt course outline olarak görünür.
+- Lesson ID'leri, route'lar ve LocalStorage progress anahtarları değişmedi.
+- Lesson 1–3 guided; Lesson 4–14 klasik içerik sunumundadır ve bu görevde guided içerik üretilmedi.
+- Canonical veri 346 terim içerir: 128 core, 218 recognize.
+- Lesson 3 core akışında Node'dan sonra `script`, ardından Scene bulunur.
+- Basic `signal` Lesson 4 core metadata'sında input/polling sonrasına konumlandı; ileri event-driven architecture Lesson 9'da ayrıdır.
+- `scope` / `project-scope` ve `loop` / `audio-loop` farklı canonical kayıtlardır.
+- Combined source, split JSON dosyaları ve runtime veri aynı source-of-truth'un doğrulanan temsilleridir.
+- Locale altyapısı `tr` içerik ile aktiftir; `en` içerik tamamlanana kadar kullanıcıya yarım bir dil modu sunulmaz.
+- App/UI metinleri `GODOT_UI_COPY.tr` altında merkezidir; curriculum ve guided eğitim içeriği bu tabloya taşınmaz.
+- Search normalization Türkçe/İngilizce `I/İ/ı/i` ile accent varyasyonlarını ortak fold eder.
+- Course “Sıradaki ders” durumu ilk tamamlanmamış lesson'dır; `lastVisitedLessonId` bunu değiştirmez.
+- Bütün lesson'lar tamamlandığında next course lesson `null` olur; Dashboard course-complete state gösterir ve Learn ekranında sıradaki badge'i kalmaz.
+- Guided completion flag'i yalnız mevcut guide order'ın bütün topic'leri öğrenildiyse etkili kabul edilir.
+- Lesson 2 canonical/guided sırası Conditional → Array/Dictionary → Loop → Class/Object/Instance olarak hizalıdır.
+
 ## Current Focus
 
-1–3. dersler ortak renderer ve canonical quick-term sistemiyle guided learning deneyimidir. Lesson 3, Node–Scene–SceneTree yapısını on core konuda kaynak sırasıyla öğretir; on recognize terimin tamamı ilgili core bağlamına birer kez yerleştirildi. Ders 4–14 klasik sunumu koruyor. Güncel odak gerçek tarayıcı QA'sı ve kullanıcı onayı sonrasında dersleri yalnızca verilen kapsamla tek tek dönüştürmektir.
+- Yeni guided lesson ancak açık bir görev kapsamıyla, `docs/GUIDED_LEARNING_SPEC.md` standardına göre eklenmeli.
+- İlk gerçek tarayıcı QA turunda search, dört review kombinasyonu, guided inline code, responsive görünüm, dialog focus ve LocalStorage devamlılığı kontrol edilmeli.
+- Yeni içerik eklenince sync ve dynamic validator birlikte çalıştırılmalı.
 
-## Verified Source Facts
+## Constraints
 
-- Veri dosyasında 343 terim, 14 ders, 14 quiz grubu ve toplam 42 açık hatırlama sorusu var.
-- Gerçek tier sayımı 125 `core`, 218 `recognize`; metadata 126 core diyor. Arayüz hesaplarında gerçek diziler kullanılmalı.
-- 14 kategori ve üç öğrenme yolu var; `first-50` yolu tam 50 terim içeriyor.
-- 18 terimde kod örneği bulunuyor.
-- İlgili terim ve ders terim referanslarında eksik ID bulunmadı.
-- Derslerde toplam 312 terim referansı, 309 benzersiz terim var; bazı terimler birden fazla derste geçiyor.
-
-## Implementation Decisions
-
-- Yalnızca HTML, CSS ve klasik Vanilla JavaScript kullanan SPA kuruldu.
-- Statik host uyumluluğu için hash router kullanıldı.
-- `file://` kısıtlarını önlemek için `fetch` ve ES module kaldırıldı.
-- İçerik değiştirilmeden kaynak JSON `window.GODOT_LEARN_DATA` atamasıyla `src/data/content.js` içine sarıldı; metin eşitliği doğrulandı.
-- Modüller `window.GodotApp` namespace'i kullanan sıralı klasik scriptlere dönüştürüldü.
-- Harici font veya runtime bağımlılığı eklenmedi; sistem fontları kullanıldı.
-- `core` ve `recognize` sunumları ayrıldı; bütün içerik ve ilişkiler data layer üzerinden çözülüyor.
-- Quizde yanlış/yeniden çalışma seçilen sorular Review ekranında, manuel işaretlenen terimlerden ayrı olarak gösteriliyor.
-- 1. dersin kaynak sırası pedagojik olarak korundu: Game Engine → Editor → Project → Asset → API → Library/Framework/Plugin → Build/Export → Runtime.
-- 2. dersin guided sırası: Variable → Constant → Data Type → Dynamic/Static Typing → Function/Method → Parameter/Argument → Return Value → Scope → Conditional → Array/Dictionary → Loop → Class/Object/Instance. Collection, loop'un doğal ön koşulu olduğu için kaynak liste sunumunda loop'tan önce gösterilir.
-- 3. dersin kaynak sırası pedagojik olarak korundu: Node → Scene → SceneTree → Parent/Child → NodePath/get_node → PackedScene/instantiate() → _ready() → queue_free() → Group → Autoload.
-- Guided içerik ders bazlı `src/data/lesson-01-guided.js`, `src/data/lesson-02-guided.js` ve `src/data/lesson-03-guided.js` içinde tutuluyor; ana database/source dosyaları değiştirilmedi.
-- Ön koşullar yalnızca gerektiğinde gösteriliyor; recognize terimler ilgili core konulara dağıtıldı.
-- Ortak recognize kartları kısa tanım, core bağlantısı, yerleştirme nedeni ve kavram ayrımı içeriyor. 1. dersteki `pipeline` yalnızca Asset altında, `platform` yalnızca Build/Export altında gösteriliyor; Runtime'a zayıf tekrar eklenmiyor.
-- Project → Repository ayrımı Godot project dosyaları ile Git değişiklik geçmişini ayrı katmanlar olarak açıklar.
-- Inline quick terms guide düzeyinde canonical katalog, topic düzeyinde explicit `quickTermIds` kullanıyor. Popup başlığı tıklanan surface label'dan değil `canonicalTitle` alanından geliyor; kısa açıklama ve isteğe bağlı örnek ayrı gösteriliyor.
-- Lesson 1 ve 2'nin her birinde 14 curated quick-term bulunuyor. Normal Türkçe/tekrar niteliğindeki işaretler kaldırıldı; aynı ID listede yalnızca bir kez gösteriliyor.
-- Opsiyonel bridge ve ders sonu summary ortak renderer tarafından üretiliyor.
-- Ders tamamlanması ile terim tamamlanması storage katmanında ayrıldı.
-- Scope ve Loop kavramlarının karışmış anlamları lesson context override ile düzeltildi.
-
-## Implemented Features
-
-- Dashboard: devam edilen ders, ders/temel terim/İlk 50 ilerlemesi, tekrar kuyruğu.
-- Learn ve Lesson Detail: 14 ders, temel/tanıma terimleri, öğrenildi ve ders tamamlandı durumları.
-- Glossary ve Term Detail: arama, harf/seviye/kategori filtreleri, alias, kod, ilişkiler ve temel terim navigasyonu.
-- Quiz, Review ve Favorites akışları.
-- Ctrl/Cmd+K global arama ve klavye navigasyonu.
-- LocalStorage kalıcılığı, açık/koyu tema, responsive sidebar drawer ve reduced-motion desteği.
-- README, içerik senkronizasyon/doğrulama scriptleri ve opsiyonel yerel sunucu.
-- `index.html` dosyasına çift tıklayarak çalışma; sunucu veya kurulum gerektirmeme.
-- 1. ve 2. ders landing ekranları, toplam yirmi ayrı guided konu rotası, inline terim dialogları, zihinsel modeller, Godot bağlamları, örnekler, yaygın hatalar, mini sorular ve net önceki/sonraki eylemleri.
-- 3. ders landing ekranı ve on guided konu rotası; 15 curated canonical quick-term, altı kod örneği, bağlamsal recognize kartları, kavram köprüleri ve dört parçalı ders sonu zihinsel haritası.
-
-## Next Steps
-
-1. Gerçek tarayıcıda file:// açılış, 1. ve 2. ders başla/devam et, önceki/sonraki, cevap açma, inline dialog, son konu özeti ve LocalStorage yenileme akışlarını elle doğrula.
-2. Variable ekranında `adıdır` inline label'ının modalda `Identifier (Tanımlayıcı)` başlığını; canonical listenin duplicate ve çekimli label içermediğini gerçek tarayıcıda kontrol et.
-3. Mobil genişlikte quick-term modalını, zengin recognize kartlarını, bridge akışlarını, sticky guided navigasyonu ve ders özetini görsel olarak kontrol et.
-4. Gerçek tarayıcıda Lesson 3 landing → topic → quick-term → recognize → mini soru → önceki/sonraki → summary → completion → refresh akışını doğrula.
-5. Kullanıcı yeni ders kapsamı verdiğinde yalnızca o dersin source core sırasını, ön koşullarını, recognize dağılımını ve bağlam çakışmalarını analiz edip ayrı guide verisi ekle.
-6. Ders 4–14'ü topluca veya kullanıcı onayı olmadan guided yapıya dönüştürme.
+- `file://`, Vanilla JavaScript, `window.GodotApp` ve no-build mimarisi korunur.
+- State translated title değil canonical ID üzerinden tutulur.
+- Memory Bank mevcut durumu anlatır; ayrıntılı değişiklik geçmişi Git'te kalır.

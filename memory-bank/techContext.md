@@ -1,29 +1,31 @@
 # Tech Context
 
-## Stack
+## Stack and Constraints
 
-- Semantic HTML5
-- Modern CSS (custom properties, grid, container-friendly responsive düzen)
-- Klasik Vanilla JavaScript dosyaları
-- JavaScript globaline sarılmış JSON içerik verisi
-- LocalStorage
+- Semantic HTML5, modern CSS, classic Vanilla JavaScript, LocalStorage
+- No Node/npm/framework/TypeScript/bundler/backend
+- `file://` compatible; optional PowerShell loopback server
+- Windows development; `.gitattributes` text LF, PowerShell CRLF standardı uygular
 
-## Runtime and Constraints
+## Key Files
 
-- Node.js, npm, framework, TypeScript, paket yöneticisi veya build adımı kullanılmaz.
-- Uygulama `fetch` veya ES module kullanmaz; `index.html` doğrudan `file://` üzerinden açılabilir.
-- Hash routing statik yayın ortamıyla uyumludur.
-- Kaynak paket `godot_learning_web_content/` altında korunur; runtime verisi `src/data/content.js` olur.
-- `src/data/lesson-01-guided.js`, `src/data/lesson-02-guided.js` ve `src/data/lesson-03-guided.js`, ilk üç dersin doğrulanmış kaynak kavramlarını yeni başlayanlara uygun öğretim adımlarına dönüştüren ek katmanlardır; ana JSON'u değiştirmez.
-- `scripts/sync-content.ps1`, kaynak JSON metnini değiştirmeden `window.GODOT_LEARN_DATA` atamasına sarar. Bu script yalnızca içerik bakımı içindir; uygulamayı çalıştırmak için gerekmez.
+- `godot_learning_web_content/content.database.json`: canonical combined data
+- split JSON files: structurally equal source representations
+- `src/data/content.js`: synchronized runtime wrapper
+- `src/data/locale.js`, `curriculum.js`: localization-ready presentation
+- `src/js/ui-copy.js`: tamamlanmış `tr` app/UI copy tablosu ve reusable LearnGodot brand kaynağı
+- `src/data/lesson-*-guided.js`: dynamically discoverable guided data
+- `docs/GUIDED_LEARNING_SPEC.md`: canonical guided and localization contract
 
-## Verification
+## Maintenance
 
-- `scripts/validate-content.ps1` JSON sayımlarını, benzersiz ID'leri, ders/quiz/related-term ilişkilerini, İlk 50 yolunu, gömülü JSON'un kaynakla karakter karakter eşitliğini ve ES module kalıntısı olmadığını denetler.
-- `scripts/serve.ps1` ek bağımlılık gerektirmeyen, yalnızca loopback üzerinde çalışan küçük bir statik sunucudur.
-- Statik taramada `fetch`, `type="module"`, `import/export`, framework, paket ve build kalıntısı bulunmadı.
-- Doğrulama scripti 1–3. derslerin bütün core/recognize ID'lerini, her recognize terimin tam bir bağlamsal karta yalnızca bir kez yerleşmesini, bütün core konuların zorunlu öğretim alanlarını, ders özetlerini ve guided rota/aksiyon bağlantılarını kontrol eder.
-- Quick-term doğrulaması her katalog kaydında `canonicalTitle` ve `shortExplanation` bulunmasını; topic listelerinde duplicate olmamasını; seçilen bütün ID'lerin katalogda bulunmasını; katalog kayıtlarının topicler tarafından kullanmasını ve bütün inline işaretlerin explicit seçime bağlı olmasını denetler.
-- Son HTTP smoke testinde index, CSS, ana veri, iki guided veri dosyası ve bütün klasik JS dosyaları 200/doğru MIME ile yüklendi.
-- Son kontrolde `content.js` kaynak JSON ile karakter karakter aynı kaldı; bütün doğrudan dosya assetleri bulundu ve ders/terim tamamlama fonksiyonları ayrılmış halde doğrulandı.
-- Ortamda Node.js ve desteklenen headless browser bulunmadığından otomatik tarayıcı DOM/etkileşim testi çalıştırılamadı; tarayıcı smoke testi sonraki kalite adımıdır.
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\sync-content.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\validate-content.ps1
+```
+
+Validator checks combined/split/runtime equality; exact baseline counts; metadata; unique and valid term, lesson, quiz and related IDs; ordered global previous/next chain; exact core-course order; curriculum records; every discovered guided file's exact source topic order, quick-term, inline marker, recognize and navigation coverage. It also guards LearnGodot branding, 14/14 null completion wiring, legacy warning placement, guided inline-code linkage, `file://` constraints and root live-region misuse.
+
+## QA Limit
+
+Static validation and HTTP asset smoke tests are automated. The current environment may not provide a supported real/headless browser; responsive layout, dialog focus and persisted click flows then require manual browser QA.

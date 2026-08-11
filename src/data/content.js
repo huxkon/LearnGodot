@@ -1,13 +1,13 @@
 window.GODOT_LEARN_DATA = {
   "meta": {
-    "project": "Godot + GDScript Öğrenme Platformu",
+    "project": "LearnGodot",
     "language": "tr",
     "source_document": "Yeni Başlayanlar İçin Terimler El Kitabı - Godot + GDScript",
     "source_focus": "Godot 4.x + genel oyun geliştirme terminolojisi",
     "generated_from_pdf_text": true,
     "counts": {
-      "terms": 343,
-      "core_terms": 126,
+      "terms": 346,
+      "core_terms": 128,
       "lessons": 14,
       "source_quiz_questions": 42,
       "first_50_terms": 50
@@ -884,8 +884,8 @@ window.GODOT_LEARN_DATA = {
         "loop",
         "class-object-instance"
       ],
-      "previous_core_term_id": "loop",
-      "next_core_term_id": "class-object-instance"
+      "previous_core_term_id": "conditional",
+      "next_core_term_id": "loop"
     },
     {
       "id": "aspect-ratio",
@@ -1076,9 +1076,28 @@ window.GODOT_LEARN_DATA = {
       },
       "related_term_ids": [
         "db",
-        "loop",
+        "audio-loop",
         "spatial-audio"
       ],
+      "previous_core_term_id": null,
+      "next_core_term_id": null
+    },
+    {
+      "id": "audio-loop",
+      "name": "Audio Loop (Ses Döngüsü)",
+      "aliases": ["Loop playback", "Looping audio"],
+      "definition": "Bir sesin sona geldiğinde başa dönüp yeniden çalmasıdır.",
+      "short_definition": "Ses sona geldiğinde başa dönüp yeniden çalar.",
+      "tier": "recognize",
+      "priority": "TANI",
+      "lesson_ids": ["lesson-11"],
+      "category_ids": ["audio-networking"],
+      "category_names": ["Audio ve Networking"],
+      "where_heard": "loop music, loop playback, audio loop.",
+      "memory_hook": "Kod döngüsü işlemi, audio loop ise sesi tekrarlar.",
+      "code_example": null,
+      "source": {"document": "Curriculum stabilization correction", "edition": "Godot 4.x / Ağustos 2026"},
+      "related_term_ids": ["audio-stream", "audio-bus", "sfx-bgm", "spatial-audio"],
       "previous_core_term_id": null,
       "next_core_term_id": null
     },
@@ -2158,7 +2177,7 @@ window.GODOT_LEARN_DATA = {
         "loop",
         "array-dictionary"
       ],
-      "previous_core_term_id": "array-dictionary",
+      "previous_core_term_id": "loop",
       "next_core_term_id": "node"
     },
     {
@@ -2560,7 +2579,7 @@ window.GODOT_LEARN_DATA = {
         "array-dictionary"
       ],
       "previous_core_term_id": "scope",
-      "next_core_term_id": "loop"
+      "next_core_term_id": "array-dictionary"
     },
     {
       "id": "config",
@@ -3153,7 +3172,7 @@ window.GODOT_LEARN_DATA = {
       },
       "related_term_ids": [
         "audio-stream",
-        "loop"
+        "audio-loop"
       ],
       "previous_core_term_id": null,
       "next_core_term_id": null
@@ -5752,11 +5771,11 @@ window.GODOT_LEARN_DATA = {
       },
       "related_term_ids": [
         "mvp",
-        "scope",
+        "project-scope",
         "playtest",
         "balancing"
       ],
-      "previous_core_term_id": "scope",
+      "previous_core_term_id": "project-scope",
       "next_core_term_id": "playtest"
     },
     {
@@ -6342,16 +6361,13 @@ window.GODOT_LEARN_DATA = {
       "tier": "core",
       "priority": "TEMEL",
       "lesson_ids": [
-        "lesson-02",
-        "lesson-11"
+        "lesson-02"
       ],
       "category_ids": [
-        "programming",
-        "audio-networking"
+        "programming"
       ],
       "category_names": [
-        "Programlama ve GDScript",
-        "Audio ve Networking"
+        "Programlama ve GDScript"
       ],
       "where_heard": "iterate, loop through array.",
       "memory_hook": "Sonsuz while döngülerine dikkat et.",
@@ -6369,8 +6385,8 @@ window.GODOT_LEARN_DATA = {
         "array-dictionary",
         "class-object-instance"
       ],
-      "previous_core_term_id": "conditional",
-      "next_core_term_id": "array-dictionary"
+      "previous_core_term_id": "array-dictionary",
+      "next_core_term_id": "class-object-instance"
     },
     {
       "id": "magnitude-length",
@@ -6839,11 +6855,11 @@ window.GODOT_LEARN_DATA = {
       "related_term_ids": [
         "prototype",
         "vertical-slice",
-        "scope",
+        "project-scope",
         "iteration"
       ],
       "previous_core_term_id": "vertical-slice",
-      "next_core_term_id": "scope"
+      "next_core_term_id": "project-scope"
     },
     {
       "id": "navigation-navmesh",
@@ -6906,9 +6922,29 @@ window.GODOT_LEARN_DATA = {
       },
       "related_term_ids": [
         "scene",
-        "scenetree"
+        "scenetree",
+        "script"
       ],
       "previous_core_term_id": "class-object-instance",
+      "next_core_term_id": "script"
+    },
+    {
+      "id": "script",
+      "name": "Script",
+      "aliases": ["Kod dosyası", "GDScript dosyası"],
+      "definition": "Bir Node'a veri ve davranış ekleyen GDScript, C# veya başka bir desteklenen dildeki kod dosyasıdır.",
+      "short_definition": "Bir Node'a veri ve davranış ekleyen kod dosyasıdır.",
+      "tier": "core",
+      "priority": "TEMEL",
+      "lesson_ids": ["lesson-03"],
+      "category_ids": ["godot-scenes"],
+      "category_names": ["Node, Scene ve SceneTree"],
+      "where_heard": "attach a script, player.gd.",
+      "memory_hook": "Node oyun parçasıdır; script o parçaya veri ve davranış ekler.",
+      "code_example": {"language": "gdscript", "code": "extends Node\n\nvar score: int = 0\n\nfunc add_score(points: int) -> void:\n    score += points"},
+      "source": {"document": "Curriculum stabilization extension", "edition": "Godot 4.x / Ağustos 2026"},
+      "related_term_ids": ["node", "scene", "_ready", "function-method", "variable"],
+      "previous_core_term_id": "node",
       "next_core_term_id": "scene"
     },
     {
@@ -7443,7 +7479,6 @@ window.GODOT_LEARN_DATA = {
         "edition": "Godot 4.x / Ağustos 2026"
       },
       "related_term_ids": [
-        "loop",
         "spatial-audio",
         "bandwidth",
         "packet-loss"
@@ -7908,7 +7943,7 @@ window.GODOT_LEARN_DATA = {
         "edition": "Godot 4.x / Ağustos 2026"
       },
       "related_term_ids": [
-        "scope",
+        "project-scope",
         "iteration",
         "balancing",
         "game-feel-juice"
@@ -7978,10 +8013,11 @@ window.GODOT_LEARN_DATA = {
         "event",
         "delta",
         "input-action-input-map",
+        "signal",
         "timer-cooldown"
       ],
       "previous_core_term_id": "input-action-input-map",
-      "next_core_term_id": "timer-cooldown"
+      "next_core_term_id": "signal"
     },
     {
       "id": "position",
@@ -9431,10 +9467,11 @@ window.GODOT_LEARN_DATA = {
       },
       "related_term_ids": [
         "node",
+        "script",
         "scenetree",
         "parent-child"
       ],
-      "previous_core_term_id": "node",
+      "previous_core_term_id": "script",
       "next_core_term_id": "scenetree"
     },
     {
@@ -9565,30 +9602,46 @@ window.GODOT_LEARN_DATA = {
       "next_core_term_id": null
     },
     {
+      "id": "project-scope",
+      "name": "Project Scope (Proje Kapsamı)",
+      "aliases": ["Proje kapsamı", "Scope"],
+      "definition": "Bir projede yapılacak işlerin, özelliklerin ve hedeflerin bilinçli sınırıdır.",
+      "short_definition": "Projede yapılacak işin ve hedeflerin sınırıdır.",
+      "tier": "core",
+      "priority": "TEMEL",
+      "lesson_ids": ["lesson-14"],
+      "category_ids": ["design-production"],
+      "category_names": ["Oyun Tasarımı ve Üretim"],
+      "where_heard": "project scope, reduce the scope, scope creep.",
+      "memory_hook": "Tamamlanabilir proje, sınırları görünür projedir.",
+      "code_example": null,
+      "source": {"document": "Curriculum stabilization correction", "edition": "Godot 4.x / Ağustos 2026"},
+      "related_term_ids": ["prototype", "vertical-slice", "mvp", "iteration", "playtest", "scope-creep"],
+      "previous_core_term_id": "mvp",
+      "next_core_term_id": "iteration"
+    },
+    {
       "id": "scope",
       "name": "Scope (Kapsam)",
       "aliases": [
         "Kapsam",
         "Scope"
       ],
-      "definition": "Projede yapılacak işin kapsamı ve sınırlarıdır.",
+      "definition": "Bir değişkenin, fonksiyonun veya ismin kodun hangi bölümünden erişilebilir olduğunu belirleyen sınırdır.",
       "short_definition": "Bir değişkenin kodun hangi bölümünden erişilebilir olduğunu belirler: local, sınıf/script kapsamı vb.",
       "tier": "core",
       "priority": "TEMEL",
       "lesson_ids": [
-        "lesson-02",
-        "lesson-14"
+        "lesson-02"
       ],
       "category_ids": [
-        "programming",
-        "design-production"
+        "programming"
       ],
       "category_names": [
-        "Programlama ve GDScript",
-        "Oyun Tasarımı ve Üretim"
+        "Programlama ve GDScript"
       ],
-      "where_heard": "scope creep, cut scope.",
-      "memory_hook": "Yeni başlayan projelerinin en büyük risklerinden biri aşırı scope.",
+      "where_heard": "local scope, function scope, global scope.",
+      "memory_hook": "Scope, bir ismin kodun neresinden görülebildiğini sınırlar.",
       "code_example": null,
       "source": {
         "document": "Yeni Başlayanlar İçin Terimler El Kitabı - Godot + GDScript",
@@ -9598,12 +9651,10 @@ window.GODOT_LEARN_DATA = {
         "parameter-vs-argument",
         "return-value",
         "conditional",
-        "loop",
-        "vertical-slice",
-        "mvp"
+        "loop"
       ],
-      "previous_core_term_id": "mvp",
-      "next_core_term_id": "iteration"
+      "previous_core_term_id": "return-value",
+      "next_core_term_id": "conditional"
     },
     {
       "id": "scope-creep",
@@ -9810,20 +9861,20 @@ window.GODOT_LEARN_DATA = {
       "aliases": [],
       "definition": "Bir Object’in “bir şey oldu” diye dinleyicilere mesaj yayınlama mekanizması.",
       "short_definition": "Bir Object’in “bir şey oldu” diye dinleyicilere mesaj yayınlama mekanizması.",
-      "tier": "recognize",
-      "priority": "TANI",
+      "tier": "core",
+      "priority": "TEMEL",
       "lesson_ids": [
-        "lesson-03"
+        "lesson-04"
       ],
       "category_ids": [
-        "godot-scenes"
+        "game-loop-input"
       ],
       "category_names": [
-        "Node, Scene ve SceneTree"
+        "Game Loop ve Input"
       ],
-      "where_heard": null,
-      "memory_hook": null,
-      "code_example": null,
+      "where_heard": "button.pressed, signal emitted, connect a signal.",
+      "memory_hook": "Signal, bir şey olduğunda ilgili kodlara haber verir.",
+      "code_example": {"language": "gdscript", "code": "signal health_changed(value: int)\n\nfunc take_damage(amount: int) -> void:\n    health -= amount\n    health_changed.emit(health)"},
       "source": {
         "document": "Yeni Başlayanlar İçin Terimler El Kitabı - Godot + GDScript",
         "edition": "Godot 4.x / Ağustos 2026"
@@ -9831,10 +9882,13 @@ window.GODOT_LEARN_DATA = {
       "related_term_ids": [
         "object",
         "lifecycle",
-        "notification"
+        "notification",
+        "polling-vs-event-driven-input",
+        "inputevent",
+        "signal-connection"
       ],
-      "previous_core_term_id": null,
-      "next_core_term_id": null
+      "previous_core_term_id": "polling-vs-event-driven-input",
+      "next_core_term_id": "timer-cooldown"
     },
     {
       "id": "signal-event-driven-architecture",
@@ -9995,7 +10049,7 @@ window.GODOT_LEARN_DATA = {
       },
       "related_term_ids": [
         "audio-stream",
-        "loop",
+        "audio-loop",
         "packet",
         "bandwidth"
       ],
@@ -10695,9 +10749,10 @@ window.GODOT_LEARN_DATA = {
       "related_term_ids": [
         "cooldown",
         "input-action-input-map",
-        "polling-vs-event-driven-input"
+        "polling-vs-event-driven-input",
+        "signal"
       ],
-      "previous_core_term_id": "polling-vs-event-driven-input",
+      "previous_core_term_id": "signal",
       "next_core_term_id": "coordinate-system"
     },
     {
@@ -11274,7 +11329,7 @@ window.GODOT_LEARN_DATA = {
       "related_term_ids": [
         "prototype",
         "mvp",
-        "scope"
+        "project-scope"
       ],
       "previous_core_term_id": "prototype",
       "next_core_term_id": "mvp"
@@ -11579,8 +11634,8 @@ window.GODOT_LEARN_DATA = {
         "return-value",
         "scope",
         "conditional",
-        "loop",
         "array-dictionary",
+        "loop",
         "class-object-instance"
       ],
       "recognize_term_ids": [
@@ -11615,9 +11670,10 @@ window.GODOT_LEARN_DATA = {
       "slug": "godot-scenes",
       "title": "Godot’un kalbi: Node, Scene ve SceneTree",
       "description": "Godot kurslarında sürekli duyacağın yapısal kavramlar.",
-      "goal": "Bu bölüm bittiğinde 10 ana terimi açıklayabilecek ve 10 ek terimi duyduğunda tanıyabileceksin.",
+      "goal": "Bu bölüm bittiğinde 11 ana terimi açıklayabilecek ve 9 ek terimi duyduğunda tanıyabileceksin.",
       "core_term_ids": [
         "node",
+        "script",
         "scene",
         "scenetree",
         "parent-child",
@@ -11637,8 +11693,7 @@ window.GODOT_LEARN_DATA = {
         "reparent",
         "unique-node",
         "lifecycle",
-        "notification",
-        "signal"
+        "notification"
       ],
       "estimated_minutes": 60,
       "quiz_id": "quiz-03"
@@ -11649,7 +11704,7 @@ window.GODOT_LEARN_DATA = {
       "slug": "game-loop-input",
       "title": "Game loop, frame, delta ve input",
       "description": "“Neden delta ile çarpıyoruz?” sorusunun oturduğu bölüm.",
-      "goal": "Bu bölüm bittiğinde 8 ana terimi açıklayabilecek ve 10 ek terimi duyduğunda tanıyabileceksin.",
+      "goal": "Bu bölüm bittiğinde 9 ana terimi açıklayabilecek ve 10 ek terimi duyduğunda tanıyabileceksin.",
       "core_term_ids": [
         "game-loop",
         "frame-fps",
@@ -11658,6 +11713,7 @@ window.GODOT_LEARN_DATA = {
         "delta",
         "input-action-input-map",
         "polling-vs-event-driven-input",
+        "signal",
         "timer-cooldown"
       ],
       "recognize_term_ids": [
@@ -11911,7 +11967,7 @@ window.GODOT_LEARN_DATA = {
       "recognize_term_ids": [
         "db",
         "audio-stream",
-        "loop",
+        "audio-loop",
         "spatial-audio",
         "packet",
         "bandwidth",
@@ -12009,7 +12065,7 @@ window.GODOT_LEARN_DATA = {
         "prototype",
         "vertical-slice",
         "mvp",
-        "scope",
+        "project-scope",
         "iteration",
         "playtest",
         "balancing",
@@ -12558,10 +12614,11 @@ window.GODOT_LEARN_DATA = {
           "return-value",
           "scope",
           "conditional",
-          "loop",
           "array-dictionary",
+          "loop",
           "class-object-instance",
           "node",
+          "script",
           "scene",
           "scenetree",
           "parent-child",
@@ -12578,6 +12635,7 @@ window.GODOT_LEARN_DATA = {
           "delta",
           "input-action-input-map",
           "polling-vs-event-driven-input",
+          "signal",
           "timer-cooldown",
           "coordinate-system",
           "vector2-vector3",
@@ -12661,7 +12719,7 @@ window.GODOT_LEARN_DATA = {
           "prototype",
           "vertical-slice",
           "mvp",
-          "scope",
+          "project-scope",
           "iteration",
           "playtest",
           "balancing",
@@ -12702,6 +12760,7 @@ window.GODOT_LEARN_DATA = {
           "asset-pipeline",
           "atlas-sprite-sheet",
           "audio-bus",
+          "audio-loop",
           "audio-stream",
           "authority",
           "autoload",
@@ -12921,6 +12980,7 @@ window.GODOT_LEARN_DATA = {
           "progression",
           "project",
           "projectile",
+          "project-scope",
           "prototype",
           "pull",
           "push",
@@ -12958,6 +13018,7 @@ window.GODOT_LEARN_DATA = {
           "scene-instancing",
           "scenetree",
           "schema",
+          "script",
           "scope",
           "scope-creep",
           "screen-space",
@@ -13021,4 +13082,5 @@ window.GODOT_LEARN_DATA = {
       }
     ]
   }
-};
+}
+;

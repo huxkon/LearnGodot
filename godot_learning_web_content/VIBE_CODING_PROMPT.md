@@ -1,3 +1,7 @@
+> **LEGACY / HISTORICAL INITIAL PROMPT - DO NOT EXECUTE AS CURRENT PROJECT INSTRUCTIONS**
+>
+> Güncel talimatlar için repo kökündeki `AGENTS.md`, `memory-bank/`, `docs/GUIDED_LEARNING_SPEC.md` ve `README.md` kaynaklarını kullan. Bu dosya yalnızca ilk prototipin tarihsel girdisidir.
+
 # Vibe Coding Ana Prompt - Godot + GDScript Öğrenme Sitesi
 
 Elimde bu repo ile birlikte gelen `src/data/content.database.json` (ve gerekirse ayrı JSON dosyaları) bulunuyor. Bunlar Godot + GDScript odaklı Türkçe bir oyun geliştirme öğrenme platformunun kaynak verisidir.

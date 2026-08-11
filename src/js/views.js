@@ -6,14 +6,15 @@ const {
   getAllLessons,
   getAllTerms,
   getDatabase,
+  getCurriculumSections,
   getLesson,
   getLessonTerms,
   getLearningPath,
+  getNextCourseLesson,
   getQuizByLesson,
   getStats,
   getTermById,
   getTermForContext,
-  getTermContexts,
 } = namespace.data;
 const { progress, STORAGE_KEYS } = namespace.storage;
 const {
@@ -31,14 +32,12 @@ const { COPY } = namespace;
 const lessonGuides = window.GODOT_LESSON_GUIDES || {};
 
 const percent = (value, total) => (total ? Math.round((value / total) * 100) : 0);
+const lessonTitle = (lesson) => lesson.displayTitle ?? lesson.title;
+const lessonDescription = (lesson) => lesson.displayDescription ?? lesson.description;
 const pageHead = (eyebrow, title, description, actions = "") => `<header class="page-head"><div><p class="eyebrow">${escapeHtml(eyebrow)}</p><h1>${escapeHtml(title)}</h1><p>${escapeHtml(description)}</p></div>${actions}</header>`;
 
 function nextLesson() {
-  const lessons = getAllLessons();
-  const completed = new Set(progress.completedLessonIds);
-  const last = getLesson(progress.lastVisitedLessonId);
-  if (last && !completed.has(last.id)) return last;
-  return lessons.find((lesson) => !completed.has(lesson.id)) ?? lessons.at(-1);
+  return getNextCourseLesson(progress.completedLessonIds);
 }
 
 function dashboardView() {
@@ -49,25 +48,33 @@ function dashboardView() {
   const lessonProgress = percent(progress.completedLessonIds.length, stats.lessons);
   const coreLearned = getAllTerms().filter((term) => term.tier === "core" && learned.has(term.id)).length;
   const current = nextLesson();
-  const currentTerms = getLessonTerms(current.id);
+  const currentTerms = current ? getLessonTerms(current.id) : null;
+  const reviewCount = progress.reviewCount;
+  const pageAction = current ? `<a class="button button--primary" href="#/learn/${current.id}">${icon("book", 18)} ${escapeHtml(COPY.actions.continueCourse)}</a>` : "";
+  const courseHero = current
+    ? `<article class="hero-progress">
+        <div class="hero-progress__copy"><span class="overline">${escapeHtml(COPY.status.nextLesson)} · ${escapeHtml(COPY.status.lessonNumber(current.number))}</span><h2>${escapeHtml(lessonTitle(current))}</h2><p>${escapeHtml(lessonDescription(current))}</p><div class="meta-row"><span>${icon("clock", 16)} ${escapeHtml(COPY.status.minutesShort(current.estimated_minutes))}</span><span>${escapeHtml(COPY.status.coreConcepts(currentTerms.core.length))}</span></div></div>
+        <div class="lesson-orbit" aria-hidden="true"><span>${current.number}</span><small>/ ${stats.lessons}</small></div>
+        <a class="stretched-link" href="#/learn/${current.id}" aria-label="${escapeHtml(COPY.aria.openLesson(lessonTitle(current)))}"></a>
+      </article>`
+    : `<article class="hero-progress hero-progress--complete">
+        <div class="hero-progress__copy"><span class="overline">${escapeHtml(COPY.dashboard.completeEyebrow)}</span><h2>${escapeHtml(COPY.dashboard.completeTitle)}</h2><p>${escapeHtml(COPY.dashboard.completeDescription)}</p><div class="dashboard-complete-actions"><a class="button button--primary" href="#/review">${escapeHtml(COPY.actions.goToReview)}</a><a class="button button--secondary" href="#/terms">${escapeHtml(COPY.actions.browseGlossary)}</a></div></div>
+        <div class="lesson-orbit" aria-hidden="true">${icon("check", 32)}</div>
+      </article>`;
 
   return `<div class="page dashboard-page">
-    ${pageHead("Çalışma alanın", "Tekrar hoş geldin.", "Godot diline alışmak için küçük ama düzenli adımlar at.", `<a class="button button--primary" href="#/learn/${current.id}">${icon("book", 18)} Derse devam et</a>`)}
+    ${pageHead(COPY.dashboard.eyebrow, COPY.dashboard.title, COPY.productPositioning, pageAction)}
     <section class="dashboard-grid">
-      <article class="hero-progress">
-        <div class="hero-progress__copy"><span class="overline">Sıradaki ders · ${String(current.number).padStart(2, "0")}</span><h2>${escapeHtml(current.title)}</h2><p>${escapeHtml(current.description)}</p><div class="meta-row"><span>${icon("clock", 16)} ${current.estimated_minutes} dk</span><span>${currentTerms.core.length} temel kavram</span></div></div>
-        <div class="lesson-orbit" aria-hidden="true"><span>${current.number}</span><small>/ ${stats.lessons}</small></div>
-        <a class="stretched-link" href="#/learn/${current.id}" aria-label="${escapeHtml(current.title)} dersini aç"></a>
-      </article>
-      <article class="progress-card"><div class="progress-card__head"><span class="metric-icon">${icon("book")}</span><span>${lessonProgress}%</span></div><h3>Ders ilerlemesi</h3><p>${progress.completedLessonIds.length} / ${stats.lessons} ders tamamlandı</p>${progressBar(lessonProgress, "Ders ilerlemesi")}</article>
-      <article class="progress-card"><div class="progress-card__head"><span class="metric-icon metric-icon--violet">${icon("check")}</span><span>${percent(coreLearned, stats.coreTerms)}%</span></div><h3>Temel terimler</h3><p>${coreLearned} / ${stats.coreTerms} terim öğrenildi</p>${progressBar(percent(coreLearned, stats.coreTerms), "Temel terimler")}</article>
-      <article class="progress-card"><div class="progress-card__head"><span class="metric-icon metric-icon--amber">50</span><span>${percent(first50Learned, first50.term_ids.length)}%</span></div><h3>İlk 50 rotası</h3><p>${first50Learned} / ${first50.term_ids.length} terim öğrenildi</p>${progressBar(percent(first50Learned, first50.term_ids.length), "İlk 50 rotası")}</article>
+      ${courseHero}
+      <article class="progress-card"><div class="progress-card__head"><span class="metric-icon">${icon("book")}</span><span>${lessonProgress}%</span></div><h3>${escapeHtml(COPY.dashboard.lessonProgress)}</h3><p>${escapeHtml(COPY.status.lessonsCompleted(progress.completedLessonIds.length, stats.lessons))}</p>${progressBar(lessonProgress, COPY.dashboard.lessonProgress)}</article>
+      <article class="progress-card"><div class="progress-card__head"><span class="metric-icon metric-icon--violet">${icon("check")}</span><span>${percent(coreLearned, stats.coreTerms)}%</span></div><h3>${escapeHtml(COPY.dashboard.coreTerms)}</h3><p>${escapeHtml(COPY.status.termsLearned(coreLearned, stats.coreTerms))}</p>${progressBar(percent(coreLearned, stats.coreTerms), COPY.dashboard.coreTerms)}</article>
+      <article class="progress-card"><div class="progress-card__head"><span class="metric-icon metric-icon--amber">50</span><span>${percent(first50Learned, first50.term_ids.length)}%</span></div><h3>${escapeHtml(COPY.dashboard.first50)}</h3><p>${escapeHtml(COPY.status.termsLearned(first50Learned, first50.term_ids.length))}</p>${progressBar(percent(first50Learned, first50.term_ids.length), COPY.dashboard.first50)}</article>
     </section>
     <section class="dashboard-lower">
-      <div class="panel recent-panel"><div class="panel-heading"><div><p class="eyebrow">Yol haritası</p><h2>Derslere genel bakış</h2></div><a href="#/learn">Tümünü gör ${icon("arrow", 16)}</a></div>
-        <div class="mini-lessons">${getAllLessons().slice(0, 5).map((lesson) => { const done = progress.completedLessonIds.includes(lesson.id); return `<a href="#/learn/${lesson.id}"><span class="lesson-state ${done ? "is-done" : ""}">${done ? icon("check", 15) : String(lesson.number).padStart(2, "0")}</span><span><strong>${escapeHtml(lesson.title)}</strong><small>${lesson.estimated_minutes} dk · ${lesson.core_term_ids.length} temel terim</small></span>${icon("chevron", 17)}</a>`; }).join("")}</div>
+      <div class="panel recent-panel"><div class="panel-heading"><div><p class="eyebrow">${escapeHtml(COPY.dashboard.roadmap)}</p><h2>${escapeHtml(COPY.dashboard.overview)}</h2></div><a href="#/learn">${escapeHtml(COPY.dashboard.viewAll)} ${icon("arrow", 16)}</a></div>
+        <div class="mini-lessons">${getAllLessons().slice(0, 5).map((lesson) => { const done = progress.completedLessonIds.includes(lesson.id); return `<a href="#/learn/${lesson.id}"><span class="lesson-state ${done ? "is-done" : ""}">${done ? icon("check", 15) : String(lesson.number).padStart(2, "0")}</span><span><strong>${escapeHtml(lessonTitle(lesson))}</strong><small>${escapeHtml(COPY.status.minutesShort(lesson.estimated_minutes))} · ${escapeHtml(COPY.status.coreTerms(lesson.core_term_ids.length))}</small></span>${icon("chevron", 17)}</a>`; }).join("")}</div>
       </div>
-      <div class="panel review-panel"><div class="panel-heading"><div><p class="eyebrow">Hatırlama</p><h2>Tekrar kuyruğu</h2></div></div>${progress.reviewTermIds.length ? `<div class="review-count"><strong>${progress.reviewTermIds.length}</strong><span>terim seni bekliyor</span></div><a class="button button--secondary button--full" href="#/review">Tekrara başla ${icon("arrow", 16)}</a>` : `<div class="quiet-success">${icon("check")}<strong>Kuyruk temiz</strong><p>Zorlandığın terimleri detay sayfasından ekleyebilirsin.</p></div>`}</div>
+      <div class="panel review-panel"><div class="panel-heading"><div><p class="eyebrow">${escapeHtml(COPY.dashboard.recall)}</p><h2>${escapeHtml(COPY.dashboard.reviewQueue)}</h2></div></div>${reviewCount ? `<div class="review-count"><strong>${reviewCount}</strong><span>${escapeHtml(COPY.dashboard.waitingReview)}</span></div><a class="button button--secondary button--full" href="#/review">${escapeHtml(COPY.dashboard.startReview)} ${icon("arrow", 16)}</a>` : `<div class="quiet-success">${icon("check")}<strong>${escapeHtml(COPY.dashboard.queueClean)}</strong><p>${escapeHtml(COPY.dashboard.queueCleanDescription)}</p></div>`}</div>
     </section>
   </div>`;
 }
@@ -75,36 +82,47 @@ function dashboardView() {
 function learnView() {
   const stats = getStats();
   const done = progress.completedLessonIds.length;
+  const lessons = getAllLessons();
   return `<div class="page">
-    ${pageHead("14 derslik temel yol", "Godot'u parça parça öğren.", "Ekosistemden oyun tasarımına uzanan düzenli bir öğrenme rotası.")}
-    <section class="course-summary"><div><strong>${done} / ${stats.lessons}</strong><span>ders tamamlandı</span></div>${progressBar(percent(done, stats.lessons), "Kurs ilerlemesi")}<p>%${percent(done, stats.lessons)} tamamlandı</p></section>
-    <div class="lesson-list">${getAllLessons().map((lesson) => lessonCard(lesson)).join("")}</div>
+    ${pageHead(COPY.learn.eyebrow, COPY.learn.title, `${COPY.productPositioning} ${COPY.learn.description}`)}
+    <section class="course-summary"><div><strong>${done} / ${stats.lessons}</strong><span>${escapeHtml(COPY.status.completed)}</span></div>${progressBar(percent(done, stats.lessons), COPY.learn.courseProgress)}<p>${escapeHtml(COPY.status.percentCompleted(percent(done, stats.lessons)))}</p></section>
+    <div class="course-outline">${getCurriculumSections().map((section) => {
+      const sectionLessons = lessons.filter((lesson) => lesson.section === section.id);
+      return `<section class="course-section" aria-labelledby="section-${section.id}"><div class="course-section__heading"><span>${String(section.order).padStart(2, "0")}</span><h2 id="section-${section.id}">${escapeHtml(section.title)}</h2></div><div class="lesson-list">${sectionLessons.map((lesson) => lessonCard(lesson)).join("")}</div></section>`;
+    }).join("")}</div>
   </div>`;
 }
 
 function lessonCard(lesson) {
   const complete = progress.completedLessonIds.includes(lesson.id);
   const isCurrent = nextLesson()?.id === lesson.id;
+  const learnedCount = lesson.core_term_ids.filter((id) => progress.learnedTermIds.includes(id)).length;
+  const allTopicsDone = learnedCount === lesson.core_term_ids.length;
+  const actionLabel = complete ? COPY.actions.repeatLesson : allTopicsDone ? COPY.actions.finishLesson : learnedCount ? COPY.actions.continue : COPY.actions.start;
   return `<article class="lesson-card ${complete ? "is-complete" : ""}">
     <div class="lesson-number">${complete ? icon("check", 18) : String(lesson.number).padStart(2, "0")}</div>
-    <div class="lesson-card__body"><div class="eyebrow-row">${isCurrent && !complete ? badge("Sıradaki", "accent") : ""}${complete ? badge("Tamamlandı", "success") : ""}</div><h2>${escapeHtml(lesson.title)}</h2><p>${escapeHtml(lesson.description)}</p><div class="meta-row"><span>${icon("clock", 15)} ${lesson.estimated_minutes} dk</span><span>${lesson.core_term_ids.length} temel</span><span>${lesson.recognize_term_ids.length} tanıma</span></div></div>
-    <span class="lesson-open">Dersi aç ${icon("arrow", 17)}</span><a class="stretched-link" href="#/learn/${lesson.id}" aria-label="${escapeHtml(lesson.title)} dersini aç"></a>
+    <div class="lesson-card__body"><div class="eyebrow-row">${isCurrent && !complete ? badge(COPY.status.nextLesson, "accent") : ""}${complete ? badge(COPY.status.completed, "success") : ""}</div><h2>${escapeHtml(lessonTitle(lesson))}</h2><p>${escapeHtml(lessonDescription(lesson))}</p><small class="technical-topics">${escapeHtml((lesson.technicalTopics ?? []).join(" · "))}</small><div class="lesson-card__progress"><span>${learnedCount} / ${escapeHtml(COPY.status.topics(lesson.core_term_ids.length))}</span>${progressBar(percent(learnedCount, lesson.core_term_ids.length), COPY.status.lessonProgressLabel(lessonTitle(lesson)))}</div></div>
+    <span class="lesson-open">${escapeHtml(actionLabel)} ${icon("arrow", 17)}</span><a class="stretched-link" href="#/learn/${lesson.id}" aria-label="${escapeHtml(lessonTitle(lesson))}: ${escapeHtml(actionLabel)}"></a>
   </article>`;
 }
 
 function richGuideText(text, quickTerms = {}) {
-  const pattern = /\[\[([^|\]]+)\|([^\]]+)\]\]/g;
+  const pattern = /\[\[([^|\]]+)\|([^\]]+)\]\]|`([^`\r\n]+)`/g;
   let html = "";
   let cursor = 0;
   let match;
   while ((match = pattern.exec(text)) !== null) {
     html += escapeHtml(text.slice(cursor, match.index));
-    const quickId = match[1];
-    const inlineLabel = match[2];
-    const quickTerm = quickTerms[quickId];
-    html += quickTerm
-      ? `<button class="inline-term" type="button" data-action="inline-term" data-quick-id="${escapeHtml(quickId)}" aria-label="${escapeHtml(quickTerm.canonicalTitle)} kavramını açıkla">${escapeHtml(inlineLabel)}<span aria-hidden="true">?</span></button>`
-      : escapeHtml(inlineLabel);
+    if (match[3] !== undefined) {
+      html += `<code class="inline-code">${escapeHtml(match[3])}</code>`;
+    } else {
+      const quickId = match[1];
+      const inlineLabel = match[2];
+      const quickTerm = quickTerms[quickId];
+      html += quickTerm
+        ? `<button class="inline-term" type="button" data-action="inline-term" data-quick-id="${escapeHtml(quickId)}" aria-label="${escapeHtml(COPY.aria.explainConcept(quickTerm.canonicalTitle))}">${escapeHtml(inlineLabel)}<span aria-hidden="true">?</span></button>`
+        : escapeHtml(inlineLabel);
+    }
     cursor = match.index + match[0].length;
   }
   return html + escapeHtml(text.slice(cursor));
@@ -126,17 +144,24 @@ function guidedLessonLanding(lesson) {
   const guide = lessonGuides[lesson.id];
   const completedIds = new Set(progress.learnedTermIds);
   const completedCount = guide.order.filter((id) => completedIds.has(id)).length;
-  const firstIncomplete = guide.order.find((id) => !completedIds.has(id)) ?? guide.order[0];
+  const firstIncomplete = guide.order.find((id) => !completedIds.has(id));
   const hasStarted = completedCount > 0;
+  const allTopicsDone = completedCount === guide.order.length;
+  const lessonComplete = progress.completedLessonIds.includes(lesson.id);
+  const startTarget = lessonComplete || !hasStarted ? guide.order[0] : firstIncomplete;
+  const ctaLabel = lessonComplete ? COPY.actions.repeatLesson : allTopicsDone ? COPY.actions.finishLesson : hasStarted ? COPY.actions.continueLesson : COPY.actions.startLesson;
+  const cta = allTopicsDone && !lessonComplete
+    ? `<button class="button button--primary button--large" data-action="guided-complete-from-landing" data-lesson-id="${lesson.id}">${escapeHtml(ctaLabel)} ${icon("arrow", 18)}</button>`
+    : `<a class="button button--primary button--large" href="#/learn/${lesson.id}/${startTarget}">${escapeHtml(ctaLabel)} ${icon("arrow", 18)}</a>`;
 
   return `<div class="page guided-landing">
-    <nav class="breadcrumbs" aria-label="İçerik yolu"><a href="#/learn">Öğren</a>${icon("chevron", 14)}<span>Ders ${String(lesson.number).padStart(2, "0")}</span></nav>
+    <nav class="breadcrumbs" aria-label="${escapeHtml(COPY.aria.contentPath)}"><a href="#/learn">${escapeHtml(COPY.nav.learn)}</a>${icon("chevron", 14)}<span>${escapeHtml(COPY.status.lessonNumber(lesson.number))}</span></nav>
     <header class="guided-landing__hero">
-      <div><p class="eyebrow">Guided ders · ${lesson.estimated_minutes} dakika</p><h1>${escapeHtml(lesson.title)}</h1><p>${escapeHtml(guide.intro)}</p><div class="guided-start-actions"><a class="button button--primary button--large" href="#/learn/${lesson.id}/${firstIncomplete}">${hasStarted ? "Kaldığın yerden devam et" : "Derse başla"} ${icon("arrow", 18)}</a>${hasStarted ? `<span>${completedCount} / ${guide.order.length} konu tamamlandı</span>` : `<span>Ön bilgi gerektirmez</span>`}</div></div>
-      <aside class="guided-promise"><p class="eyebrow">Bu dersten sonra</p><p>${escapeHtml(lesson.goal)}</p><ul><li>${icon("check", 15)} Her konu tek ekranda</li><li>${icon("check", 15)} Bilinmeyen terimler sayfadan ayrılmadan açıklanır</li><li>${icon("check", 15)} Her adımda tek bir sonraki yön vardır</li></ul></aside>
+      <div><p class="eyebrow">${escapeHtml(COPY.guided.lesson)} · ${escapeHtml(COPY.status.minutesLong(lesson.estimated_minutes))}</p><h1>${escapeHtml(lessonTitle(lesson))}</h1><p>${escapeHtml(lessonDescription(lesson))}</p><div class="guided-start-actions">${cta}${hasStarted ? `<span>${escapeHtml(COPY.status.topicsCompleted(completedCount, guide.order.length))}</span>` : `<span>${escapeHtml(COPY.status.noPrerequisite)}</span>`}</div></div>
+      <aside class="guided-promise"><p class="eyebrow">${escapeHtml(COPY.guided.afterLesson)}</p><p>${escapeHtml(lesson.goal)}</p><ul><li>${icon("check", 15)} ${escapeHtml(COPY.guided.oneScreen)}</li><li>${icon("check", 15)} ${escapeHtml(COPY.guided.inlineHelp)}</li><li>${icon("check", 15)} ${escapeHtml(COPY.guided.oneDirection)}</li></ul></aside>
     </header>
-    <section class="guided-outline"><div class="section-heading"><p class="eyebrow">Ders rotası</p><h2>Adım adım büyük resmi kur</h2><p>Konuları sırayla çalış. Bir sonraki konuya geçtiğinde bulunduğun konu ilerlemene kaydedilir.</p></div><ol>${guide.order.map((id, index) => { const topic = guide.topics[id]; const done = completedIds.has(id); const active = id === firstIncomplete; return `<li class="${done ? "is-done" : ""} ${active ? "is-next" : ""}"><span class="outline-index">${done ? icon("check", 16) : String(index + 1).padStart(2, "0")}</span><div><small>${active ? "Sıradaki konu" : done ? "Tamamlandı" : `Konu ${index + 1}`}</small><strong>${escapeHtml(topic.shortTitle)}</strong></div>${active ? `<a href="#/learn/${lesson.id}/${id}" aria-label="${escapeHtml(topic.shortTitle)} konusuna başla">Başla ${icon("arrow", 16)}</a>` : ""}</li>`; }).join("")}</ol></section>
-    <section class="recognize-preview"><div><p class="eyebrow">Ders boyunca</p><h2>“Bunu duyarsan tanı” kutuları</h2><p>${lesson.recognize_term_ids.length} ek terimi uzun derslere çevirmeden, bağlantılı olduğu konunun yanında kısa anlamı ve ayrımıyla göreceksin.</p></div><div class="recognize-chips">${lesson.recognize_term_ids.map((id) => { const term = getTermForContext(id, lesson.id); return `<span>${escapeHtml(term.name)}</span>`; }).join("")}</div></section>
+    <section class="guided-outline"><div class="section-heading"><p class="eyebrow">${escapeHtml(COPY.guided.route)}</p><h2>${escapeHtml(COPY.guided.routeTitle)}</h2><p>${escapeHtml(COPY.guided.routeDescription)}</p></div><ol>${guide.order.map((id, index) => { const topic = guide.topics[id]; const done = completedIds.has(id); const active = id === firstIncomplete; return `<li class="${done ? "is-done" : ""} ${active ? "is-next" : ""}"><span class="outline-index">${done ? icon("check", 16) : String(index + 1).padStart(2, "0")}</span><div><small>${escapeHtml(active ? COPY.status.nextTopic : done ? COPY.status.completed : `${COPY.routeTitles.topic} ${index + 1}`)}</small><strong>${escapeHtml(topic.shortTitle)}</strong></div>${active ? `<a href="#/learn/${lesson.id}/${id}" aria-label="${escapeHtml(COPY.aria.startTopic(topic.shortTitle))}">${escapeHtml(COPY.actions.start)} ${icon("arrow", 16)}</a>` : ""}</li>`; }).join("")}</ol></section>
+    <section class="recognize-preview"><div><p class="eyebrow">${escapeHtml(COPY.guided.recognizeEyebrow)}</p><h2>${escapeHtml(COPY.guided.recognizeTitle)}</h2><p>${escapeHtml(COPY.guided.recognizeDescription(lesson.recognize_term_ids.length))}</p></div><div class="recognize-chips">${lesson.recognize_term_ids.map((id) => { const term = getTermForContext(id, lesson.id); return `<span>${escapeHtml(term.name)}</span>`; }).join("")}</div></section>
   </div>`;
 }
 
@@ -159,23 +184,23 @@ function guidedRecognizeCards(entries, lessonId) {
     const term = getTermForContext(config.id, lessonId);
     if (!term) return "";
     const model = config.model?.length ? `<div class="recognize-model">${config.model.map((step, index) => `<span>${richGuideText(step)}</span>${index < config.model.length - 1 ? `<b aria-hidden="true">↓</b>` : ""}`).join("")}</div>` : "";
-    return `<article><span>Tanı</span><h3>${escapeHtml(term.name)}</h3><dl><div><dt>Kısaca</dt><dd>${richGuideText(config.brief ?? term.short_definition)}</dd></div>${config.connection ? `<div><dt>Bu konuyla bağlantısı</dt><dd>${richGuideText(config.connection)}</dd></div>` : ""}${config.whyHere ? `<div><dt>Neden burada?</dt><dd>${richGuideText(config.whyHere)}</dd></div>` : ""}</dl>${model}${config.example ? `<p class="recognize-example"><strong>Örnek:</strong> ${richGuideText(config.example)}</p>` : ""}${config.distinction ? `<p class="recognize-distinction"><strong>Karıştırma:</strong> ${richGuideText(config.distinction)}</p>` : ""}</article>`;
+    return `<article><span>${escapeHtml(COPY.guided.cardTag)}</span><h3>${escapeHtml(term.name)}</h3><dl><div><dt>${escapeHtml(COPY.guided.cardBrief)}</dt><dd>${richGuideText(config.brief ?? term.short_definition)}</dd></div>${config.connection ? `<div><dt>${escapeHtml(COPY.guided.cardConnection)}</dt><dd>${richGuideText(config.connection)}</dd></div>` : ""}${config.whyHere ? `<div><dt>${escapeHtml(COPY.guided.cardWhy)}</dt><dd>${richGuideText(config.whyHere)}</dd></div>` : ""}</dl>${model}${config.example ? `<p class="recognize-example"><strong>${escapeHtml(COPY.guided.example)}:</strong> ${richGuideText(config.example)}</p>` : ""}${config.distinction ? `<p class="recognize-distinction"><strong>${escapeHtml(COPY.guided.cardDistinction)}:</strong> ${richGuideText(config.distinction)}</p>` : ""}</article>`;
   }).join("")}</div>`;
 }
 
 function guidedBridge(bridge) {
   if (!bridge) return "";
-  return `<section class="guided-bridge"><div><p class="eyebrow">Buraya nasıl geldik?</p><h2>${escapeHtml(bridge.title)}</h2>${bridge.steps?.length ? `<div class="bridge-flow">${bridge.steps.map((step, index) => `<span>${richGuideText(step)}</span>${index < bridge.steps.length - 1 ? `<b aria-hidden="true">↓</b>` : ""}`).join("")}</div>` : ""}<p>${richGuideText(bridge.text)}</p></div></section>`;
+  return `<section class="guided-bridge"><div><p class="eyebrow">${escapeHtml(COPY.guided.bridge)}</p><h2>${escapeHtml(bridge.title)}</h2>${bridge.steps?.length ? `<div class="bridge-flow">${bridge.steps.map((step, index) => `<span>${richGuideText(step)}</span>${index < bridge.steps.length - 1 ? `<b aria-hidden="true">↓</b>` : ""}`).join("")}</div>` : ""}<p>${richGuideText(bridge.text)}</p></div></section>`;
 }
 
 function guidedLessonSummary(summary) {
   if (!summary) return "";
-  return `<section class="lesson-relation-summary"><div class="section-heading"><p class="eyebrow">Ders özeti</p><h2>${escapeHtml(summary.title ?? "Bu derste parçalar nasıl birleşiyor?")}</h2><p>${escapeHtml(summary.intro ?? "")}</p></div><div class="summary-groups">${summary.groups.map((group) => `<article><h3>${escapeHtml(group.title)}</h3><div>${group.steps.map((step, index) => `<span>${richGuideText(step)}</span>${index < group.steps.length - 1 ? `<b aria-hidden="true">↓</b>` : ""}`).join("")}</div>${group.note ? `<p>${richGuideText(group.note)}</p>` : ""}</article>`).join("")}</div>${summary.closing ? `<p class="summary-closing">${richGuideText(summary.closing)}</p>` : ""}</section>`;
+  return `<section class="lesson-relation-summary"><div class="section-heading"><p class="eyebrow">${escapeHtml(COPY.guided.summary)}</p><h2>${richGuideText(summary.title ?? COPY.guided.defaultSummaryTitle)}</h2><p>${richGuideText(summary.intro ?? "")}</p></div><div class="summary-groups">${summary.groups.map((group) => `<article><h3>${richGuideText(group.title)}</h3><div>${group.steps.map((step, index) => `<span>${richGuideText(step)}</span>${index < group.steps.length - 1 ? `<b aria-hidden="true">↓</b>` : ""}`).join("")}</div>${group.note ? `<p>${richGuideText(group.note)}</p>` : ""}</article>`).join("")}</div>${summary.closing ? `<p class="summary-closing">${richGuideText(summary.closing)}</p>` : ""}</section>`;
 }
 
 function guidedTopicView(lessonId, termId) {
   const guide = lessonGuides[lessonId];
-  if (!guide || !guide.order.includes(termId)) return notFoundView("Bu guided konu bulunamadı.");
+  if (!guide || !guide.order.includes(termId)) return notFoundView(COPY.errors.notFoundDescription);
   const lesson = getLesson(lessonId);
   const topic = guide.topics[termId];
   const term = getTermForContext(termId, lessonId);
@@ -191,30 +216,30 @@ function guidedTopicView(lessonId, termId) {
   progress.setLastLesson(lessonId);
 
   return `<div class="page guided-topic-page">
-    <nav class="guided-topnav"><a href="#/learn/${lessonId}">← Ders planı</a><div><span>Konu ${index + 1} / ${guide.order.length}</span>${progressBar(((index + 1) / guide.order.length) * 100, "Ders içindeki konum")}</div><span>${completedCount} tamamlandı</span></nav>
-    <header class="guided-topic-hero"><div class="topic-number">${String(index + 1).padStart(2, "0")}</div><div><p class="eyebrow">Ders ${String(lesson.number).padStart(2, "0")} · Temel kavram</p><h1>${escapeHtml(term.name)}</h1><p>${escapeHtml(term.short_definition)}</p></div>${learned.has(termId) ? `<span class="topic-complete-mark">${icon("check", 16)} Tamamlandı</span>` : ""}</header>
-    ${prerequisiteTerms.length ? `<aside class="prerequisite-box"><span>${icon("bookmark", 18)}</span><div><strong>Bu konudan önce bilmen iyi olur</strong>${prerequisiteTerms.map((item) => `<a href="#/learn/${lessonId}/${item.id}">${item.learned ? icon("check", 14) : ""}${escapeHtml(item.topic.shortTitle)}</a>`).join("")}</div></aside>` : ""}
+    <nav class="guided-topnav"><a href="#/learn/${lessonId}">← ${escapeHtml(COPY.guided.lessonPlan)}</a><div><span>${escapeHtml(COPY.status.topicPosition(index + 1, guide.order.length))}</span>${progressBar(((index + 1) / guide.order.length) * 100, COPY.learn.courseProgress)}</div><span>${completedCount} ${escapeHtml(COPY.status.completedLower)}</span></nav>
+    <header class="guided-topic-hero"><div class="topic-number">${String(index + 1).padStart(2, "0")}</div><div><p class="eyebrow">${escapeHtml(COPY.status.lessonNumber(lesson.number))} · ${escapeHtml(COPY.status.coreConcept)}</p><h1>${escapeHtml(term.name)}</h1><p>${escapeHtml(term.short_definition)}</p></div>${learned.has(termId) ? `<span class="topic-complete-mark">${icon("check", 16)} ${escapeHtml(COPY.status.completed)}</span>` : ""}</header>
+    ${prerequisiteTerms.length ? `<aside class="prerequisite-box"><span>${icon("bookmark", 18)}</span><div><strong>${escapeHtml(COPY.guided.prerequisite)}</strong>${prerequisiteTerms.map((item) => `<a href="#/learn/${lessonId}/${item.id}">${item.learned ? icon("check", 14) : ""}${escapeHtml(item.topic.shortTitle)}</a>`).join("")}</div></aside>` : ""}
     ${guidedBridge(topic.bridge)}
     <div class="guided-content">
-      <section class="guided-section"><div class="guided-section__label"><span>01</span><p>30 saniyede</p></div><div class="guided-section__body guided-fast">${topic.fast.map((paragraph) => `<p>${richGuideText(paragraph, quickTerms)}</p>`).join("")}</div></section>
-      <section class="guided-section"><div class="guided-section__label"><span>02</span><p>Basit zihinsel model</p></div><div class="guided-section__body">${guidedModel(topic.model, quickTerms)}</div></section>
-      <section class="guided-section"><div class="guided-section__label"><span>03</span><p>Neden buna ihtiyacımız var?</p></div><div class="guided-section__body"><p>${richGuideText(topic.why, quickTerms)}</p></div></section>
-      <section class="guided-section"><div class="guided-section__label"><span>04</span><p>Godot'ta nerede görürüm?</p></div><div class="guided-section__body"><ul class="godot-context-list">${topic.godot.map((item) => `<li>${icon("chevron", 15)}<span>${richGuideText(item, quickTerms)}</span></li>`).join("")}</ul></div></section>
-      <section class="guided-section"><div class="guided-section__label"><span>05</span><p>Örnek</p></div><div class="guided-section__body guided-example">${guidedExample(topic.example, quickTerms)}</div></section>
-      ${quickReferences.length ? `<section class="guided-section"><div class="guided-section__label"><span>06</span><p>Bilmediğim terimler</p></div><div class="guided-section__body"><div class="quick-reference-box"><p>Bu konuyu anlamak için gerekli teknik kavramları burada kısa açıklamalarıyla açabilirsin.</p><div>${quickReferences.map((item) => `<button class="inline-term inline-term--chip" type="button" data-action="inline-term" data-quick-id="${escapeHtml(item.id)}">${escapeHtml(item.canonicalTitle)}<span aria-hidden="true">?</span></button>`).join("")}</div></div></div></section>` : ""}
-      ${recognizeEntries.length ? `<section class="guided-section guided-recognize"><div class="guided-section__label"><span>+</span><p>Bunu duyarsan tanı</p></div><div class="guided-section__body">${guidedRecognizeCards(recognizeEntries, lessonId)}</div></section>` : ""}
-      <section class="guided-section"><div class="guided-section__label"><span>07</span><p>Yaygın hata</p></div><div class="guided-section__body"><div class="common-mistake"><span>!</span><p>${richGuideText(topic.mistake, quickTerms)}</p></div></div></section>
-      <section class="guided-section guided-check"><div class="guided-section__label"><span>08</span><p>Kendini kontrol et</p></div><div class="guided-section__body"><div class="mini-check"><p class="eyebrow">Tek cümleyle yanıtla</p><h2>${escapeHtml(topic.check.question)}</h2><button class="button button--secondary" data-action="reveal-guided-answer">Cevabı göster</button><div class="mini-check__answer" hidden><p class="eyebrow">Kısa cevap</p><p>${escapeHtml(topic.check.answer)}</p></div></div></div></section>
+      <section class="guided-section"><div class="guided-section__label"><span>01</span><p>${escapeHtml(COPY.guided.fast)}</p></div><div class="guided-section__body guided-fast">${topic.fast.map((paragraph) => `<p>${richGuideText(paragraph, quickTerms)}</p>`).join("")}</div></section>
+      <section class="guided-section"><div class="guided-section__label"><span>02</span><p>${escapeHtml(COPY.guided.model)}</p></div><div class="guided-section__body">${guidedModel(topic.model, quickTerms)}</div></section>
+      <section class="guided-section"><div class="guided-section__label"><span>03</span><p>${escapeHtml(COPY.guided.why)}</p></div><div class="guided-section__body"><p>${richGuideText(topic.why, quickTerms)}</p></div></section>
+      <section class="guided-section"><div class="guided-section__label"><span>04</span><p>${escapeHtml(COPY.guided.godotContext)}</p></div><div class="guided-section__body"><ul class="godot-context-list">${topic.godot.map((item) => `<li>${icon("chevron", 15)}<span>${richGuideText(item, quickTerms)}</span></li>`).join("")}</ul></div></section>
+      <section class="guided-section"><div class="guided-section__label"><span>05</span><p>${escapeHtml(COPY.guided.example)}</p></div><div class="guided-section__body guided-example">${guidedExample(topic.example, quickTerms)}</div></section>
+      ${quickReferences.length ? `<section class="guided-section"><div class="guided-section__label"><span>06</span><p>${escapeHtml(COPY.guided.quickTerms)}</p></div><div class="guided-section__body"><div class="quick-reference-box"><p>${escapeHtml(COPY.guided.quickTermsDescription)}</p><div>${quickReferences.map((item) => `<button class="inline-term inline-term--chip" type="button" data-action="inline-term" data-quick-id="${escapeHtml(item.id)}">${escapeHtml(item.canonicalTitle)}<span aria-hidden="true">?</span></button>`).join("")}</div></div></div></section>` : ""}
+      ${recognizeEntries.length ? `<section class="guided-section guided-recognize"><div class="guided-section__label"><span>+</span><p>${escapeHtml(COPY.guided.recognize)}</p></div><div class="guided-section__body">${guidedRecognizeCards(recognizeEntries, lessonId)}</div></section>` : ""}
+      <section class="guided-section"><div class="guided-section__label"><span>07</span><p>${escapeHtml(COPY.guided.mistake)}</p></div><div class="guided-section__body"><div class="common-mistake"><span>!</span><p>${richGuideText(topic.mistake, quickTerms)}</p></div></div></section>
+      <section class="guided-section guided-check"><div class="guided-section__label"><span>08</span><p>${escapeHtml(COPY.guided.check)}</p></div><div class="guided-section__body"><div class="mini-check"><p class="eyebrow">${escapeHtml(COPY.guided.answerPrompt)}</p><h2>${richGuideText(topic.check.question, quickTerms)}</h2><button class="button button--secondary" data-action="reveal-guided-answer">${escapeHtml(COPY.actions.revealAnswer)}</button><div class="mini-check__answer" hidden><p class="eyebrow">${escapeHtml(COPY.guided.shortAnswer)}</p><p>${richGuideText(topic.check.answer, quickTerms)}</p></div></div></div></section>
     </div>
     ${!nextId ? guidedLessonSummary(guide.summary) : ""}
-    <nav class="guided-navigation" aria-label="Ders konuları arasında gezinme">${previousId ? `<a class="button button--secondary" href="#/learn/${lessonId}/${previousId}">← Önceki Konu<span>${escapeHtml(guide.topics[previousId].shortTitle)}</span></a>` : `<span></span>`}${nextId ? `<button class="button button--primary" data-action="guided-next" data-lesson-id="${lessonId}" data-term-id="${termId}" data-next-id="${nextId}"><span>${learned.has(termId) ? "Sonraki Konu" : "Konuyu tamamla"}</span>${escapeHtml(guide.topics[nextId].shortTitle)} →</button>` : `<button class="button button--primary guided-finish-button" data-action="guided-complete-lesson" data-term-id="${termId}" data-lesson-id="${lessonId}">${icon("check", 18)} Dersi Tamamla</button>`}</nav>
-    <dialog class="quick-term-dialog" aria-labelledby="quick-term-title"><button class="icon-button" data-action="close-inline-term" aria-label="Açıklamayı kapat">${icon("close", 18)}</button><p class="eyebrow">Şimdilik bunu bilmen yeterli</p><h2 id="quick-term-title"></h2><p class="quick-term-definition"></p><div class="quick-term-example" hidden><strong>Örnek</strong><p></p></div><p class="quick-term-context" hidden></p></dialog>
+    <nav class="guided-navigation" aria-label="${escapeHtml(COPY.aria.lessonTopics)}">${previousId ? `<a class="button button--secondary" href="#/learn/${lessonId}/${previousId}">← ${escapeHtml(COPY.actions.previousTopic)}<span>${escapeHtml(guide.topics[previousId].shortTitle)}</span></a>` : `<span></span>`}${nextId ? `<button class="button button--primary" data-action="guided-next" data-lesson-id="${lessonId}" data-term-id="${termId}" data-next-id="${nextId}"><span>${escapeHtml(learned.has(termId) ? COPY.actions.nextTopic : COPY.actions.completeTopic)}</span>${escapeHtml(guide.topics[nextId].shortTitle)} →</button>` : `<button class="button button--primary guided-finish-button" data-action="guided-complete-lesson" data-term-id="${termId}" data-lesson-id="${lessonId}">${icon("check", 18)} ${escapeHtml(COPY.actions.completeLesson)}</button>`}</nav>
+    <dialog class="quick-term-dialog" aria-labelledby="quick-term-title"><button class="icon-button" data-action="close-inline-term" aria-label="${escapeHtml(COPY.actions.closeExplanation)}">${icon("close", 18)}</button><p class="eyebrow">${escapeHtml(COPY.guided.enoughForNow)}</p><h2 id="quick-term-title"></h2><p class="quick-term-definition"></p><div class="quick-term-example" hidden><strong>${escapeHtml(COPY.guided.example)}</strong><p></p></div><p class="quick-term-context" hidden></p></dialog>
   </div>`;
 }
 
 function lessonView(id) {
   const lesson = getLesson(id);
-  if (!lesson) return notFoundView("Bu ders bulunamadı.");
+  if (!lesson) return notFoundView(COPY.errors.notFoundDescription);
   if (lessonGuides[id]) return guidedLessonLanding(lesson);
   const { core, recognize } = getLessonTerms(id);
   const complete = progress.completedLessonIds.includes(id);
@@ -223,13 +248,13 @@ function lessonView(id) {
   const next = getLesson(`lesson-${String(lesson.number + 1).padStart(2, "0")}`);
   progress.setLastLesson(id);
   return `<div class="page lesson-detail-page">
-    <nav class="breadcrumbs" aria-label="İçerik yolu"><a href="#/learn">Öğren</a>${icon("chevron", 14)}<span>Ders ${String(lesson.number).padStart(2, "0")}</span></nav>
-    <header class="lesson-hero"><div><p class="eyebrow">Ders ${String(lesson.number).padStart(2, "0")} · ${lesson.estimated_minutes} dakika</p><h1>${escapeHtml(lesson.title)}</h1><p>${escapeHtml(lesson.description)}</p></div><div class="lesson-goal"><span>${icon("bookmark", 19)}</span><div><strong>Bu dersteki hedefin</strong><p>${escapeHtml(lesson.goal)}</p></div></div></header>
-    <section class="lesson-progress"><div><strong>${learnedCount} / ${core.length}</strong><span>temel terim öğrenildi</span></div>${progressBar(percent(learnedCount, core.length), "Ders terimleri")}</section>
-    <section class="lesson-section"><div class="section-heading"><p class="eyebrow">Aktif öğrenme</p><h2>Temel terimler</h2><p>Tanımın yanında bağlamı ve hatırlama ipucunu da çalış.</p></div><div class="term-grid">${core.map((term) => termCard(term)).join("")}</div></section>
-    <section class="lesson-section recognize-section"><div class="section-heading"><p class="eyebrow">Hızlı tanıma</p><h2>Duyunca yabancı gelmesin</h2><p>Şimdilik bu terimleri kategorisi ve kısa anlamıyla tanıman yeterli.</p></div><div class="recognize-list">${recognize.map((term) => `<a href="#/terms/${term.id}"><strong>${escapeHtml(term.name)}</strong><span>${escapeHtml(term.short_definition)}</span>${icon("chevron", 16)}</a>`).join("")}</div></section>
-    <section class="lesson-finish"><div><span class="finish-icon">${icon(complete ? "check" : "book")}</span><div><h2>${complete ? "Bu dersi tamamladın" : "Dersi bitirdin mi?"}</h2><p>${complete ? "İstersen terimleri yeniden gözden geçirebilirsin." : "Ders durumu ile tek tek öğrenilen terimler birbirinden bağımsız kaydedilir."}</p></div></div><button class="button ${complete ? "button--secondary" : "button--primary"}" data-action="complete-lesson" data-lesson-id="${lesson.id}">${complete ? "Tamamlamayı geri al" : "Dersi tamamla"}</button></section>
-    <nav class="lesson-pagination">${prev ? `<a href="#/learn/${prev.id}"><small>← Önceki ders</small><strong>${escapeHtml(prev.title)}</strong></a>` : "<span></span>"}${next ? `<a class="next" href="#/learn/${next.id}"><small>Sonraki ders →</small><strong>${escapeHtml(next.title)}</strong></a>` : `<a class="next" href="#/quiz"><small>Sırada</small><strong>Quizlere geç →</strong></a>`}</nav>
+    <nav class="breadcrumbs" aria-label="${escapeHtml(COPY.aria.contentPath)}"><a href="#/learn">${escapeHtml(COPY.nav.learn)}</a>${icon("chevron", 14)}<span>${escapeHtml(COPY.status.lessonNumber(lesson.number))}</span></nav>
+    <header class="lesson-hero"><div><p class="eyebrow">${escapeHtml(COPY.status.lessonNumber(lesson.number))} · ${escapeHtml(COPY.status.minutesLong(lesson.estimated_minutes))}</p><h1>${escapeHtml(lessonTitle(lesson))}</h1><p>${escapeHtml(lessonDescription(lesson))}</p><small class="technical-topics">${escapeHtml((lesson.technicalTopics ?? []).join(" · "))}</small></div><div class="lesson-goal"><span>${icon("bookmark", 19)}</span><div><strong>${escapeHtml(COPY.lesson.goal)}</strong><p>${escapeHtml(lesson.goal)}</p></div></div></header>
+    <section class="lesson-progress"><div><strong>${learnedCount} / ${core.length}</strong><span>${escapeHtml(COPY.status.coreTermsLearned)}</span></div>${progressBar(percent(learnedCount, core.length), COPY.lesson.termsProgress)}</section>
+    <section class="lesson-section"><div class="section-heading"><p class="eyebrow">${escapeHtml(COPY.lesson.activeLearning)}</p><h2>${escapeHtml(COPY.lesson.coreTerms)}</h2><p>${escapeHtml(COPY.lesson.coreDescription)}</p></div><div class="term-grid">${core.map((term) => termCard(term)).join("")}</div></section>
+    <section class="lesson-section recognize-section"><div class="section-heading"><p class="eyebrow">${escapeHtml(COPY.lesson.quickRecognition)}</p><h2>${escapeHtml(COPY.lesson.recognizeTitle)}</h2><p>${escapeHtml(COPY.lesson.recognizeDescription)}</p></div><div class="recognize-list">${recognize.map((term) => `<a href="#/terms/${term.id}"><strong>${escapeHtml(term.name)}</strong><span>${escapeHtml(term.short_definition)}</span>${icon("chevron", 16)}</a>`).join("")}</div></section>
+    <section class="lesson-finish"><div><span class="finish-icon">${icon(complete ? "check" : "book")}</span><div><h2>${escapeHtml(complete ? COPY.lesson.completedTitle : COPY.lesson.finishTitle)}</h2><p>${escapeHtml(complete ? COPY.lesson.completedDescription : COPY.lesson.finishDescription)}</p></div></div><button class="button ${complete ? "button--secondary" : "button--primary"}" data-action="complete-lesson" data-lesson-id="${lesson.id}">${escapeHtml(complete ? COPY.actions.undoLesson : COPY.actions.completeLesson)}</button></section>
+    <nav class="lesson-pagination">${prev ? `<a href="#/learn/${prev.id}"><small>← ${escapeHtml(COPY.lesson.previous)}</small><strong>${escapeHtml(lessonTitle(prev))}</strong></a>` : "<span></span>"}${next ? `<a class="next" href="#/learn/${next.id}"><small>${escapeHtml(COPY.lesson.next)} →</small><strong>${escapeHtml(lessonTitle(next))}</strong></a>` : `<a class="next" href="#/quiz"><small>${escapeHtml(COPY.lesson.upNext)}</small><strong>${escapeHtml(COPY.lesson.goToQuizzes)} →</strong></a>`}</nav>
   </div>`;
 }
 
@@ -240,34 +265,33 @@ function glossaryView(route) {
   const letter = route.params.get("letter") ?? "all";
   const terms = filterTerms({ query, tier, category, letter });
   const categories = getDatabase().categories;
-  const letters = [...new Set(getAllTerms().map((term) => term.name.replace(/^[^A-Za-zÇĞİÖŞÜçğıöşü]/, "#").slice(0, 1).toLocaleUpperCase("tr-TR")))].sort((a, b) => a.localeCompare(b, "tr"));
+  const activeLocale = namespace.locale?.contentLocale ?? "tr";
+  const letters = [...new Set(getAllTerms().map((term) => term.name.replace(/^[^A-Za-zÇĞİÖŞÜçğıöşü]/, "#").slice(0, 1).toLocaleUpperCase(activeLocale)))].sort((a, b) => a.localeCompare(b, activeLocale));
   return `<div class="page glossary-page">
-    ${pageHead("Hızlı referans", "Terimler A–Z", `${getAllTerms().length} Godot, GDScript ve oyun geliştirme terimi.`)}
-    <section class="filter-panel" aria-label="Terim filtreleri"><div class="inline-search">${icon("search", 18)}<input id="glossary-search" type="search" value="${escapeHtml(query)}" placeholder="Terimlerde ara…" aria-label="Terimlerde ara"></div><select id="tier-filter" aria-label="Seviye filtresi"><option value="all">Tüm seviyeler</option><option value="core" ${tier === "core" ? "selected" : ""}>Temel</option><option value="recognize" ${tier === "recognize" ? "selected" : ""}>Tanı</option></select><select id="category-filter" aria-label="Kategori filtresi"><option value="all">Tüm kategoriler</option>${categories.map((item) => `<option value="${item.id}" ${category === item.id ? "selected" : ""}>${escapeHtml(item.name)}</option>`).join("")}</select></section>
-    <div class="alphabet-filter" aria-label="Harf filtresi"><button data-action="filter-letter" data-letter="all" class="${letter === "all" ? "is-active" : ""}">Tümü</button>${letters.map((item) => `<button data-action="filter-letter" data-letter="${item}" class="${letter === item ? "is-active" : ""}">${escapeHtml(item)}</button>`).join("")}</div>
-    <div class="results-bar"><strong>${terms.length} terim</strong><span>${query || tier !== "all" || category !== "all" || letter !== "all" ? "Filtrelenmiş sonuçlar" : "Alfabetik sıralama"}</span></div>
-    ${terms.length ? `<div class="glossary-list">${terms.map((term) => termCard(term, { compact: true })).join("")}</div>` : emptyState("Sonuç bulunamadı", COPY.emptySearch, "search", `<button class="button button--secondary" data-action="clear-filters">Filtreleri temizle</button>`)}
+    ${pageHead(COPY.glossary.eyebrow, COPY.glossary.title, COPY.glossary.description(getAllTerms().length))}
+    <section class="filter-panel" aria-label="${escapeHtml(COPY.aria.termFilters)}"><div class="inline-search">${icon("search", 18)}<input id="glossary-search" type="search" value="${escapeHtml(query)}" placeholder="${escapeHtml(COPY.search.glossaryPlaceholder)}" aria-label="${escapeHtml(COPY.search.glossaryPlaceholder)}"></div><select id="tier-filter" aria-label="${escapeHtml(COPY.aria.termFilters)}"><option value="all">${escapeHtml(COPY.glossary.allLevels)}</option><option value="core" ${tier === "core" ? "selected" : ""}>${escapeHtml(COPY.status.core)}</option><option value="recognize" ${tier === "recognize" ? "selected" : ""}>${escapeHtml(COPY.status.recognize)}</option></select><select id="category-filter" aria-label="${escapeHtml(COPY.aria.termFilters)}"><option value="all">${escapeHtml(COPY.glossary.allCategories)}</option>${categories.map((item) => `<option value="${item.id}" ${category === item.id ? "selected" : ""}>${escapeHtml(item.name)}</option>`).join("")}</select></section>
+    <div class="alphabet-filter" aria-label="${escapeHtml(COPY.aria.letterFilter)}"><button data-action="filter-letter" data-letter="all" class="${letter === "all" ? "is-active" : ""}">${escapeHtml(COPY.glossary.allLetters)}</button>${letters.map((item) => `<button data-action="filter-letter" data-letter="${item}" class="${letter === item ? "is-active" : ""}">${escapeHtml(item)}</button>`).join("")}</div>
+    <div class="results-bar"><strong>${escapeHtml(COPY.status.termCount(terms.length))}</strong><span>${escapeHtml(query || tier !== "all" || category !== "all" || letter !== "all" ? COPY.glossary.filtered : COPY.glossary.alphabetical)}</span></div>
+    ${terms.length ? `<div class="glossary-list">${terms.map((term) => termCard(term, { compact: true })).join("")}</div>` : emptyState(COPY.glossary.noResults, COPY.search.empty, "search", `<button class="button button--secondary" data-action="clear-filters">${escapeHtml(COPY.actions.clearFilters)}</button>`)}
   </div>`;
 }
 
 function termView(id) {
   const term = getTermById(id);
-  if (!term) return notFoundView("Bu terim bulunamadı.");
-  const termContexts = getTermContexts(id);
+  if (!term) return notFoundView(COPY.errors.notFoundDescription);
   const favorite = progress.favoriteTermIds.includes(id);
   const review = progress.reviewTermIds.includes(id);
   const learned = progress.learnedTermIds.includes(id);
   return `<div class="page term-detail-page">
-    <nav class="breadcrumbs" aria-label="İçerik yolu"><a href="#/terms">Terimler</a>${icon("chevron", 14)}<span>${escapeHtml(term.name)}</span></nav>
-    <header class="term-hero"><div class="eyebrow-row">${badge(term.tier === "core" ? "Temel terim" : "Tanıma terimi", term.tier)}${term.category_names.map((name) => badge(name)).join("")}</div><div class="term-title-row"><div><h1>${escapeHtml(term.name)}</h1>${term.aliases?.length ? `<p class="aliases">Diğer adları: ${term.aliases.map(escapeHtml).join(", ")}</p>` : ""}</div><div class="term-actions"><button class="button button--icon-text ${favorite ? "is-active" : ""}" data-action="favorite" data-term-id="${term.id}" aria-pressed="${favorite}">${icon("star", 18)}<span>${favorite ? "Favoride" : "Favori"}</span></button><button class="button button--icon-text ${review ? "is-active" : ""}" data-action="review" data-term-id="${term.id}" aria-pressed="${review}">${icon("repeat", 18)}<span>${review ? "Tekrarda" : "Tekrar et"}</span></button></div></div></header>
-    <article class="definition-box"><p class="eyebrow">Tanım</p><p>${escapeHtml(term.definition)}</p></article>
-    ${termContexts.length ? `<section class="context-distinction"><div class="section-heading"><p class="eyebrow">Bağlam ayrımı</p><h2>Aynı kelime, farklı kavramlar</h2><p>Bu terimin anlamını duyduğun ders veya konuşma belirler.</p></div><div>${termContexts.map((context) => { const lesson = getLesson(context.lessonId); return `<article><span>Ders ${String(lesson.number).padStart(2, "0")}</span><h3>${escapeHtml(context.name)}</h3><p>${escapeHtml(context.definition)}</p><a href="#/learn/${lesson.id}">${escapeHtml(lesson.title)} ${icon("arrow", 15)}</a></article>`; }).join("")}</div></section>` : ""}
+    <nav class="breadcrumbs" aria-label="${escapeHtml(COPY.aria.contentPath)}"><a href="#/terms">${escapeHtml(COPY.nav.terms)}</a>${icon("chevron", 14)}<span>${escapeHtml(term.name)}</span></nav>
+    <header class="term-hero"><div class="eyebrow-row">${badge(term.tier === "core" ? COPY.termDetail.core : COPY.termDetail.recognize, term.tier)}${term.category_names.map((name) => badge(name)).join("")}</div><div class="term-title-row"><div><h1>${escapeHtml(term.name)}</h1>${term.aliases?.length ? `<p class="aliases">${escapeHtml(COPY.termDetail.aliases)}: ${term.aliases.map(escapeHtml).join(", ")}</p>` : ""}</div><div class="term-actions"><button class="button button--icon-text ${favorite ? "is-active" : ""}" data-action="favorite" data-term-id="${term.id}" aria-pressed="${favorite}">${icon("star", 18)}<span>${escapeHtml(favorite ? COPY.status.favorited : COPY.status.favorite)}</span></button><button class="button button--icon-text ${review ? "is-active" : ""}" data-action="review" data-term-id="${term.id}" aria-pressed="${review}">${icon("repeat", 18)}<span>${escapeHtml(review ? COPY.status.inReview : COPY.actions.repeat)}</span></button></div></div></header>
+    <article class="definition-box"><p class="eyebrow">${escapeHtml(COPY.termDetail.definition)}</p><p>${escapeHtml(term.definition)}</p></article>
     <div class="term-content-grid"><div>
-      ${term.where_heard ? `<section class="detail-section context-block"><div class="section-heading"><p class="eyebrow">Bağlam</p><h2>Nerede duyarsın?</h2></div><blockquote>“${escapeHtml(term.where_heard)}”</blockquote></section>` : ""}
-      ${term.memory_hook ? `<section class="detail-section memory-hook"><span class="memory-hook__icon">✦</span><div><p class="eyebrow">Akılda kalsın</p><p>${escapeHtml(term.memory_hook)}</p></div></section>` : ""}
-      ${term.code_example ? `<section class="detail-section"><div class="section-heading"><p class="eyebrow">GDScript</p><h2>Kod örneği</h2></div>${codeExample(term.code_example)}</section>` : ""}
+      ${term.where_heard ? `<section class="detail-section context-block"><div class="section-heading"><p class="eyebrow">${escapeHtml(COPY.termDetail.context)}</p><h2>${escapeHtml(COPY.termDetail.whereHeard)}</h2></div><blockquote>“${escapeHtml(term.where_heard)}”</blockquote></section>` : ""}
+      ${term.memory_hook ? `<section class="detail-section memory-hook"><span class="memory-hook__icon">✦</span><div><p class="eyebrow">${escapeHtml(COPY.termDetail.memory)}</p><p>${escapeHtml(term.memory_hook)}</p></div></section>` : ""}
+      ${term.code_example ? `<section class="detail-section"><div class="section-heading"><p class="eyebrow">GDScript</p><h2>${escapeHtml(COPY.termDetail.codeExample)}</h2></div>${codeExample(term.code_example)}</section>` : ""}
       ${relatedTerms(term)}
-    </div><aside class="term-side"><div class="side-card"><p class="eyebrow">Çalışma durumu</p><button class="learn-toggle ${learned ? "is-learned" : ""}" data-action="learn" data-term-id="${term.id}"><span>${learned ? icon("check") : icon("book")}</span><span><strong>${learned ? "Öğrenildi" : "Öğrendim olarak işaretle"}</strong><small>${learned ? "İlerlemene eklendi" : "İlerlemene kaydet"}</small></span></button></div><div class="side-card"><p class="eyebrow">Bu içerikte</p><dl><div><dt>Seviye</dt><dd>${term.tier === "core" ? "Temel" : "Tanı"}</dd></div><div><dt>Ders</dt><dd>${term.lesson_ids.map((lessonId) => { const lesson = getLesson(lessonId); return lesson ? `<a href="#/learn/${lesson.id}">${String(lesson.number).padStart(2, "0")}</a>` : "—"; }).join(", ")}</dd></div><div><dt>İlişki</dt><dd>${term.related_term_ids.length} terim</dd></div></dl></div></aside></div>
+    </div><aside class="term-side"><div class="side-card"><p class="eyebrow">${escapeHtml(COPY.termDetail.studyStatus)}</p><button class="learn-toggle ${learned ? "is-learned" : ""}" data-action="learn" data-term-id="${term.id}"><span>${learned ? icon("check") : icon("book")}</span><span><strong>${escapeHtml(learned ? COPY.status.learned : COPY.termDetail.markLearned)}</strong><small>${escapeHtml(learned ? COPY.termDetail.savedLearned : COPY.termDetail.saveProgress)}</small></span></button></div><div class="side-card"><p class="eyebrow">${escapeHtml(COPY.termDetail.inContent)}</p><dl><div><dt>${escapeHtml(COPY.termDetail.level)}</dt><dd>${escapeHtml(term.tier === "core" ? COPY.status.core : COPY.status.recognize)}</dd></div><div><dt>${escapeHtml(COPY.termDetail.lesson)}</dt><dd>${term.lesson_ids.map((lessonId) => { const lesson = getLesson(lessonId); return lesson ? `<a href="#/learn/${lesson.id}">${String(lesson.number).padStart(2, "0")}</a>` : "—"; }).join(", ")}</dd></div><div><dt>${escapeHtml(COPY.termDetail.relation)}</dt><dd>${escapeHtml(COPY.status.relatedTerms(term.related_term_ids.length))}</dd></div></dl></div></aside></div>
     ${coreNavigation(term)}
   </div>`;
 }
@@ -279,14 +303,14 @@ function quizView(route) {
   const results = progress.quizResults;
   const answered = questions.filter((question) => results[question.id]).length;
   return `<div class="page quiz-page">
-    ${pageHead("Açık hatırlama", "Kendini test et.", "Önce cevabı zihninden kur, sonra kaynak cevabı aç ve kendini değerlendir.")}
-    <section class="quiz-toolbar"><div><strong>${answered} / ${questions.length}</strong><span>değerlendirildi</span></div>${progressBar(percent(answered, questions.length), "Quiz ilerlemesi")}<select id="quiz-lesson-filter" aria-label="Quiz dersi"><option value="all">Tüm dersler</option>${getAllLessons().map((lesson) => `<option value="${lesson.id}" ${selectedLesson === lesson.id ? "selected" : ""}>${String(lesson.number).padStart(2, "0")} · ${escapeHtml(lesson.title)}</option>`).join("")}</select></section>
-    <div class="quiz-list">${quizzes.map((quiz) => { const lesson = getLesson(quiz.lesson_id); return `<section class="quiz-group"><div class="quiz-group__head"><span>Ders ${String(lesson.number).padStart(2, "0")}</span><h2>${escapeHtml(lesson.title)}</h2></div>${quiz.questions.map((question, i) => quizCard(question, i, results[question.id])).join("")}</section>`; }).join("")}</div>
+    ${pageHead(COPY.quiz.eyebrow, COPY.quiz.title, COPY.quiz.description)}
+    <section class="quiz-toolbar"><div><strong>${answered} / ${questions.length}</strong><span>${escapeHtml(COPY.quiz.evaluated)}</span></div>${progressBar(percent(answered, questions.length), COPY.quiz.progress)}<select id="quiz-lesson-filter" aria-label="${escapeHtml(COPY.aria.quizLesson)}"><option value="all">${escapeHtml(COPY.quiz.allLessons)}</option>${getAllLessons().map((lesson) => `<option value="${lesson.id}" ${selectedLesson === lesson.id ? "selected" : ""}>${String(lesson.number).padStart(2, "0")} · ${escapeHtml(lessonTitle(lesson))}</option>`).join("")}</select></section>
+    <div class="quiz-list">${quizzes.map((quiz) => { const lesson = getLesson(quiz.lesson_id); return `<section class="quiz-group"><div class="quiz-group__head"><span>${escapeHtml(COPY.status.lessonNumber(lesson.number))}</span><h2>${escapeHtml(lessonTitle(lesson))}</h2></div>${quiz.questions.map((question, i) => quizCard(question, i, results[question.id])).join("")}</section>`; }).join("")}</div>
   </div>`;
 }
 
 function quizCard(question, index, result) {
-  return `<article class="quiz-card" data-question-id="${question.id}"><div class="quiz-card__count">${String(index + 1).padStart(2, "0")}</div><div class="quiz-card__body"><p class="eyebrow">Kendi cümlenle yanıtla</p><h3>${escapeHtml(question.question)}</h3><button class="button button--secondary reveal-answer" data-action="reveal-answer">Cevabı göster</button><div class="quiz-answer" hidden><p class="eyebrow">Kaynak cevap</p><p>${escapeHtml(question.answer)}</p><div class="self-rating"><span>Nasıl geçti?</span><button data-action="rate-quiz" data-question-id="${question.id}" data-status="correct" class="${result?.status === "correct" ? "is-selected" : ""}">${icon("check", 16)} Hatırladım</button><button data-action="rate-quiz" data-question-id="${question.id}" data-status="review" class="${result?.status === "review" ? "is-selected" : ""}">${icon("repeat", 16)} Tekrar et</button></div></div></div></article>`;
+  return `<article class="quiz-card" data-question-id="${question.id}"><div class="quiz-card__count">${String(index + 1).padStart(2, "0")}</div><div class="quiz-card__body"><p class="eyebrow">${escapeHtml(COPY.quiz.answerYourself)}</p><h3>${escapeHtml(question.question)}</h3><button class="button button--secondary reveal-answer" data-action="reveal-answer">${escapeHtml(COPY.actions.revealAnswer)}</button><div class="quiz-answer" hidden><p class="eyebrow">${escapeHtml(COPY.quiz.sourceAnswer)}</p><p>${escapeHtml(question.answer)}</p><div class="self-rating"><span>${escapeHtml(COPY.quiz.rating)}</span><button data-action="rate-quiz" data-question-id="${question.id}" data-status="correct" class="${result?.status === "correct" ? "is-selected" : ""}">${icon("check", 16)} ${escapeHtml(COPY.quiz.remembered)}</button><button data-action="rate-quiz" data-question-id="${question.id}" data-status="review" class="${result?.status === "review" ? "is-selected" : ""}">${icon("repeat", 16)} ${escapeHtml(COPY.actions.repeat)}</button></div></div></div></article>`;
 }
 
 function reviewView() {
@@ -294,19 +318,20 @@ function reviewView() {
   const resultMap = progress.quizResults;
   const quizItems = getDatabase().quizzes.flatMap((quiz) => quiz.questions).filter((q) => resultMap[q.id]?.status === "review");
   return `<div class="page">
-    ${pageHead("Odaklı tekrar", "Zorlandıklarına geri dön.", "İşaretlediğin terimler ve yeniden çözmek istediğin sorular burada toplanır.")}
-    ${terms.length ? `<section class="review-section"><div class="section-heading"><p class="eyebrow">Terimler</p><h2>${terms.length} terim tekrar listende</h2></div><div class="term-grid">${terms.map((term) => termCard(term)).join("")}</div></section>` : emptyState("Tekrar listesi boş", COPY.noReview, "repeat", `<a class="button button--secondary" href="#/terms">Terimlere göz at</a>`)}
-    ${quizItems.length ? `<section class="review-section"><div class="section-heading"><p class="eyebrow">Sorular</p><h2>Yeniden düşün</h2></div><div class="quiz-list">${quizItems.map((question, index) => quizCard(question, index, resultMap[question.id])).join("")}</div></section>` : ""}
+    ${pageHead(COPY.review.eyebrow, COPY.review.title, COPY.review.description)}
+    ${terms.length ? `<section class="review-section"><div class="section-heading"><p class="eyebrow">${escapeHtml(COPY.review.terms)}</p><h2>${escapeHtml(COPY.status.reviewTerms(terms.length))}</h2></div><div class="term-grid">${terms.map((term) => termCard(term)).join("")}</div></section>` : ""}
+    ${quizItems.length ? `<section class="review-section"><div class="section-heading"><p class="eyebrow">${escapeHtml(COPY.review.questions)}</p><h2>${escapeHtml(COPY.review.thinkAgain)}</h2></div><div class="quiz-list">${quizItems.map((question, index) => quizCard(question, index, resultMap[question.id])).join("")}</div></section>` : ""}
+    ${!terms.length && !quizItems.length ? emptyState(COPY.review.emptyTitle, COPY.review.emptyDescription, "repeat", `<a class="button button--secondary" href="#/terms">${escapeHtml(COPY.actions.browseTerms)}</a>`) : ""}
   </div>`;
 }
 
 function favoritesView() {
   const terms = progress.favoriteTermIds.map(getTermById).filter(Boolean);
-  return `<div class="page">${pageHead("Kişisel koleksiyon", "Favori terimlerin", "Sık döndüğün kavramları tek yerde tut.")}${terms.length ? `<div class="term-grid">${terms.map((term) => termCard(term)).join("")}</div>` : emptyState("Koleksiyonun boş", COPY.noFavorites, "star", `<a class="button button--secondary" href="#/terms">Terimleri keşfet</a>`)}</div>`;
+  return `<div class="page">${pageHead(COPY.favorites.eyebrow, COPY.favorites.title, COPY.favorites.description)}${terms.length ? `<div class="term-grid">${terms.map((term) => termCard(term)).join("")}</div>` : emptyState(COPY.favorites.emptyTitle, COPY.favorites.emptyDescription, "star", `<a class="button button--secondary" href="#/terms">${escapeHtml(COPY.actions.discoverTerms)}</a>`)}</div>`;
 }
 
-function notFoundView(message = "Aradığın sayfa burada değil.") {
-  return `<div class="page">${emptyState("Sayfa bulunamadı", message, "search", `<a class="button button--primary" href="#/dashboard">Dashboard'a dön</a>`)}</div>`;
+function notFoundView(message = COPY.errors.notFoundDescription) {
+  return `<div class="page">${emptyState(COPY.routeTitles.notFound, message, "search", `<a class="button button--primary" href="#/dashboard">${escapeHtml(COPY.actions.returnDashboard)}</a>`)}</div>`;
 }
 
 function renderView(route) {

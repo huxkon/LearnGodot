@@ -1,17 +1,18 @@
 (function initRouter(namespace) {
   "use strict";
+  const { COPY } = namespace;
 
   const routes = [
-    { name: "dashboard", pattern: /^\/?$/, title: "Dashboard" },
-    { name: "dashboard", pattern: /^\/dashboard\/?$/, title: "Dashboard" },
-    { name: "learn", pattern: /^\/learn\/?$/, title: "Öğren" },
-    { name: "lesson", pattern: /^\/learn\/([^/]+)\/?$/, title: "Ders" },
-    { name: "lesson-topic", pattern: /^\/learn\/([^/]+)\/([^/]+)\/?$/, title: "Konu" },
-    { name: "terms", pattern: /^\/terms\/?$/, title: "Terimler" },
-    { name: "term", pattern: /^\/terms\/([^/]+)\/?$/, title: "Terim" },
-    { name: "quiz", pattern: /^\/quiz\/?$/, title: "Quiz" },
-    { name: "review", pattern: /^\/review\/?$/, title: "Tekrar" },
-    { name: "favorites", pattern: /^\/favorites\/?$/, title: "Favoriler" },
+    { name: "dashboard", pattern: /^\/?$/, title: COPY.nav.dashboard },
+    { name: "dashboard", pattern: /^\/dashboard\/?$/, title: COPY.nav.dashboard },
+    { name: "learn", pattern: /^\/learn\/?$/, title: COPY.nav.learn },
+    { name: "lesson", pattern: /^\/learn\/([^/]+)\/?$/, title: COPY.routeTitles.lesson },
+    { name: "lesson-topic", pattern: /^\/learn\/([^/]+)\/([^/]+)\/?$/, title: COPY.routeTitles.topic },
+    { name: "terms", pattern: /^\/terms\/?$/, title: COPY.nav.terms },
+    { name: "term", pattern: /^\/terms\/([^/]+)\/?$/, title: COPY.routeTitles.term },
+    { name: "quiz", pattern: /^\/quiz\/?$/, title: COPY.nav.quiz },
+    { name: "review", pattern: /^\/review\/?$/, title: COPY.nav.review },
+    { name: "favorites", pattern: /^\/favorites\/?$/, title: COPY.nav.favorites },
   ];
 
   function getRoute() {
@@ -21,7 +22,7 @@
       const match = pathname.match(route.pattern);
       if (match) return { ...route, param: match[1], subparam: match[2], params: new URLSearchParams(query), pathname };
     }
-    return { name: "not-found", title: "Sayfa bulunamadı", pathname };
+    return { name: "not-found", title: COPY.routeTitles.notFound, pathname };
   }
 
   function navigate(path) {

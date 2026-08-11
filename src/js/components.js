@@ -41,7 +41,7 @@ function badge(text, tone = "neutral") {
   return `<span class="badge badge--${tone}">${escapeHtml(text)}</span>`;
 }
 
-function progressBar(value, label = "İlerleme") {
+function progressBar(value, label = COPY.status.progress) {
   const safe = Math.max(0, Math.min(100, Number(value) || 0));
   return `<div class="progress-track" role="progressbar" aria-label="${escapeHtml(label)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(safe)}"><span style="width:${safe}%"></span></div>`;
 }
@@ -54,16 +54,16 @@ function termCard(term, { compact = false } = {}) {
   const favorite = progress.has(STORAGE_KEYS.favoriteTermIds, term.id);
   const learned = progress.has(STORAGE_KEYS.learnedTermIds, term.id);
   return `<article class="term-card ${compact ? "term-card--compact" : ""}">
-    <a class="term-card__link" href="#/terms/${encodeURIComponent(term.id)}" aria-label="${escapeHtml(term.name)} detayını aç"></a>
+    <a class="term-card__link" href="#/terms/${encodeURIComponent(term.id)}" aria-label="${escapeHtml(term.name)} ${escapeHtml(COPY.terms.openDetails)}"></a>
     <div class="term-card__head">
       <div>
-        <div class="eyebrow-row">${badge(term.tier === "core" ? "Temel" : "Tanı", term.tier)}${learned ? `<span class="learned-mark">${icon("check", 14)} Öğrenildi</span>` : ""}</div>
+        <div class="eyebrow-row">${badge(term.tier === "core" ? COPY.status.core : COPY.status.recognize, term.tier)}${learned ? `<span class="learned-mark">${icon("check", 14)} ${escapeHtml(COPY.status.learned)}</span>` : ""}</div>
         <h3>${escapeHtml(term.name)}</h3>
       </div>
-      <button class="icon-button card-action ${favorite ? "is-active" : ""}" data-action="favorite" data-term-id="${escapeHtml(term.id)}" aria-label="${favorite ? "Favorilerden çıkar" : "Favorilere ekle"}" aria-pressed="${favorite}">${icon("star", 18)}</button>
+      <button class="icon-button card-action ${favorite ? "is-active" : ""}" data-action="favorite" data-term-id="${escapeHtml(term.id)}" aria-label="${escapeHtml(favorite ? COPY.terms.removeFavorite : COPY.terms.addFavorite)}" aria-pressed="${favorite}">${icon("star", 18)}</button>
     </div>
     <p>${escapeHtml(compact ? term.short_definition : term.definition)}</p>
-    <div class="term-card__footer"><span>${escapeHtml(term.category_names[0] ?? "Genel")}</span><span class="detail-link">Detayı gör ${icon("arrow", 15)}</span></div>
+    <div class="term-card__footer"><span>${escapeHtml(term.category_names[0] ?? COPY.status.general)}</span><span class="detail-link">${escapeHtml(COPY.terms.viewDetails)} ${icon("arrow", 15)}</span></div>
   </article>`;
 }
 
@@ -74,38 +74,38 @@ function codeExample(example) {
     .replace(/(&quot;[^&]*?&quot;)/g, '<span class="tok-string">$1</span>')
     .replace(/\b(\d+(?:\.\d+)?)\b/g, '<span class="tok-number">$1</span>')
     .replace(/\b(true|false|null|void|float|int|String|Array|Dictionary|Vector2|Vector3)\b/g, '<span class="tok-type">$1</span>');
-  return `<div class="code-block"><div class="code-block__bar"><span>${icon("code", 15)} ${escapeHtml(example.language ?? "gdscript")}</span><button class="copy-code" data-action="copy-code" type="button">Kopyala</button></div><pre><code>${highlighted}</code></pre></div>`;
+  return `<div class="code-block"><div class="code-block__bar"><span>${icon("code", 15)} ${escapeHtml(example.language ?? "gdscript")}</span><button class="copy-code" data-action="copy-code" type="button">${escapeHtml(COPY.actions.copy)}</button></div><pre><code>${highlighted}</code></pre></div>`;
 }
 
 function relatedTerms(term) {
   const related = getRelatedTerms(term);
   if (!related.length) return "";
-  return `<section class="detail-section"><div class="section-heading"><p class="eyebrow">Bağlantılar</p><h2>İlgili terimler</h2></div><div class="related-grid">${related.map((item) => `<a href="#/terms/${encodeURIComponent(item.id)}"><span>${escapeHtml(item.name)}</span>${icon("arrow", 16)}</a>`).join("")}</div></section>`;
+  return `<section class="detail-section"><div class="section-heading"><p class="eyebrow">${escapeHtml(COPY.terms.connections)}</p><h2>${escapeHtml(COPY.terms.related)}</h2></div><div class="related-grid">${related.map((item) => `<a href="#/terms/${encodeURIComponent(item.id)}"><span>${escapeHtml(item.name)}</span>${icon("arrow", 16)}</a>`).join("")}</div></section>`;
 }
 
 const navItems = [
-  ["dashboard", "/dashboard", "grid", "Dashboard"],
-  ["learn", "/learn", "book", "Öğren"],
-  ["terms", "/terms", "list", "Terimler"],
-  ["quiz", "/quiz", "quiz", "Quiz"],
-  ["review", "/review", "repeat", "Tekrar"],
-  ["favorites", "/favorites", "star", "Favoriler"],
+  ["dashboard", "/dashboard", "grid", COPY.nav.dashboard],
+  ["learn", "/learn", "book", COPY.nav.learn],
+  ["terms", "/terms", "list", COPY.nav.terms],
+  ["quiz", "/quiz", "quiz", COPY.nav.quiz],
+  ["review", "/review", "repeat", COPY.nav.review],
+  ["favorites", "/favorites", "star", COPY.nav.favorites],
 ];
 
 function appShell(route, content) {
   const activeName = route.name === "lesson" || route.name === "lesson-topic" ? "learn" : route.name === "term" ? "terms" : route.name;
   return `<div class="app-shell">
-    <aside class="sidebar" id="sidebar" aria-label="Ana navigasyon">
-      <a class="brand" href="#/dashboard"><span class="brand-mark">G</span><span><strong>${COPY.appName}</strong><small>Godot + GDScript</small></span></a>
-      <nav>${navItems.map(([name, path, iconName, label]) => `<a href="#${path}" class="nav-link ${activeName === name ? "is-active" : ""}" ${activeName === name ? 'aria-current="page"' : ""}>${icon(iconName)}<span>${label}</span>${name === "review" && progress.reviewTermIds.length ? `<b>${progress.reviewTermIds.length}</b>` : ""}</a>`).join("")}</nav>
-      <div class="sidebar-foot"><div class="data-note"><span class="status-dot"></span><span><strong>Yerel ilerleme</strong><small>${COPY.saved}</small></span></div></div>
+    <aside class="sidebar" id="sidebar" aria-label="${escapeHtml(COPY.aria.mainNavigation)}">
+      <a class="brand" href="#/dashboard"><span class="brand-mark">L</span><span><strong>${escapeHtml(COPY.appName)}</strong><small>${escapeHtml(COPY.appTagline)}</small></span></a>
+      <nav>${navItems.map(([name, path, iconName, label]) => `<a href="#${path}" class="nav-link ${activeName === name ? "is-active" : ""}" ${activeName === name ? 'aria-current="page"' : ""}>${icon(iconName)}<span>${label}</span>${name === "review" && progress.reviewCount ? `<b>${progress.reviewCount}</b>` : ""}</a>`).join("")}</nav>
+      <div class="sidebar-foot"><div class="data-note"><span class="status-dot"></span><span><strong>${escapeHtml(COPY.status.localProgress)}</strong><small>${escapeHtml(COPY.saved)}</small></span></div></div>
     </aside>
-    <button class="sidebar-scrim" data-action="close-menu" aria-label="Menüyü kapat"></button>
+    <button class="sidebar-scrim" data-action="close-menu" aria-label="${escapeHtml(COPY.aria.closeMenu)}"></button>
     <div class="page-column">
       <header class="topbar">
-        <button class="icon-button mobile-menu" data-action="open-menu" aria-label="Menüyü aç">${icon("menu")}</button>
-        <button class="search-trigger" data-action="open-search">${icon("search", 18)}<span>Her yerde ara</span><kbd>⌘ K</kbd></button>
-        <div class="topbar-actions"><a class="text-link topbar-learn" href="#/learn">Öğrenmeye devam et</a><button class="icon-button" data-action="toggle-theme" aria-label="Temayı değiştir">${icon("moon")}</button></div>
+        <button class="icon-button mobile-menu" data-action="open-menu" aria-label="${escapeHtml(COPY.aria.openMenu)}">${icon("menu")}</button>
+        <button class="search-trigger" data-action="open-search">${icon("search", 18)}<span>${escapeHtml(COPY.actions.search)}</span><kbd>${escapeHtml(COPY.search.shortcut)}</kbd></button>
+        <div class="topbar-actions"><a class="text-link topbar-learn" href="#/learn">${escapeHtml(COPY.actions.continueLearning)}</a><button class="icon-button" data-action="toggle-theme" aria-label="${escapeHtml(COPY.aria.changeTheme)}">${icon("moon")}</button></div>
       </header>
       <main id="main-content" class="main-content" tabindex="-1">${content}</main>
     </div>
@@ -116,16 +116,16 @@ function appShell(route, content) {
 
 function searchDialog() {
   return `<dialog class="search-dialog" aria-labelledby="search-title">
-    <div class="search-dialog__head"><div class="search-field">${icon("search", 20)}<label class="sr-only" id="search-title" for="global-search">Terim ara</label><input id="global-search" type="search" autocomplete="off" placeholder="${COPY.searchPlaceholder}" /><kbd>ESC</kbd></div></div>
-    <div class="search-results" role="listbox"><div class="search-intro"><span>${icon("search", 24)}</span><p>Tüm terimler içinde ada, alias'a veya tanıma göre ara.</p></div></div>
-    <div class="search-dialog__foot"><span><kbd>↑</kbd><kbd>↓</kbd> gezin</span><span><kbd>↵</kbd> aç</span></div>
+    <div class="search-dialog__head"><div class="search-field">${icon("search", 20)}<label class="sr-only" id="search-title" for="global-search">${escapeHtml(COPY.search.label)}</label><input id="global-search" type="search" autocomplete="off" placeholder="${escapeHtml(COPY.search.placeholder)}" /><kbd>ESC</kbd></div></div>
+    <div class="search-results" role="listbox"><div class="search-intro"><span>${icon("search", 24)}</span><p>${escapeHtml(COPY.search.intro)}</p></div></div>
+    <div class="search-dialog__foot"><span><kbd>↑</kbd><kbd>↓</kbd> ${escapeHtml(COPY.search.navigate)}</span><span><kbd>↵</kbd> ${escapeHtml(COPY.search.open)}</span></div>
   </dialog>`;
 }
 
 function searchResults(terms, query) {
-  if (!query.trim()) return `<div class="search-intro"><span>${icon("search", 24)}</span><p>Aramaya başlamak için bir terim yaz.</p></div>`;
-  if (!terms.length) return `<div class="search-intro"><p>${COPY.emptySearch}</p></div>`;
-  return `<div class="search-result-meta">${terms.length} sonuç</div>${terms.slice(0, 12).map((term, index) => `<a class="search-result ${index === 0 ? "is-selected" : ""}" role="option" aria-selected="${index === 0}" href="#/terms/${encodeURIComponent(term.id)}"><span class="search-result__icon">${term.name.slice(0, 1).toLocaleUpperCase("tr-TR")}</span><span><strong>${escapeHtml(term.name)}</strong><small>${escapeHtml(term.short_definition)}</small></span><em>${escapeHtml(term.tier === "core" ? "Temel" : "Tanı")}</em></a>`).join("")}`;
+  if (!query.trim()) return `<div class="search-intro"><span>${icon("search", 24)}</span><p>${escapeHtml(COPY.search.prompt)}</p></div>`;
+  if (!terms.length) return `<div class="search-intro"><p>${escapeHtml(COPY.search.empty)}</p></div>`;
+  return `<div class="search-result-meta">${escapeHtml(COPY.search.results(terms.length))}</div>${terms.slice(0, 12).map((term, index) => `<a class="search-result ${index === 0 ? "is-selected" : ""}" role="option" aria-selected="${index === 0}" href="#/terms/${encodeURIComponent(term.id)}"><span class="search-result__icon">${term.name.slice(0, 1).toLocaleUpperCase(namespace.locale?.contentLocale ?? "tr")}</span><span><strong>${escapeHtml(term.name)}</strong><small>${escapeHtml(term.short_definition)}</small></span><em>${escapeHtml(term.tier === "core" ? COPY.status.core : COPY.status.recognize)}</em></a>`).join("")}`;
 }
 
 function toast(message) {
@@ -142,9 +142,9 @@ function coreNavigation(term) {
   const previous = getTermById(term.previous_core_term_id);
   const next = getTermById(term.next_core_term_id);
   if (!previous && !next) return "";
-  return `<nav class="term-pagination" aria-label="Temel terimler arasında gezinme">
-    ${previous ? `<a href="#/terms/${encodeURIComponent(previous.id)}"><small>← Önceki temel terim</small><strong>${escapeHtml(previous.name)}</strong></a>` : "<span></span>"}
-    ${next ? `<a class="next" href="#/terms/${encodeURIComponent(next.id)}"><small>Sonraki temel terim →</small><strong>${escapeHtml(next.name)}</strong></a>` : "<span></span>"}
+  return `<nav class="term-pagination" aria-label="${escapeHtml(COPY.aria.coreTerms)}">
+    ${previous ? `<a href="#/terms/${encodeURIComponent(previous.id)}"><small>← ${escapeHtml(COPY.terms.previousCore)}</small><strong>${escapeHtml(previous.name)}</strong></a>` : "<span></span>"}
+    ${next ? `<a class="next" href="#/terms/${encodeURIComponent(next.id)}"><small>${escapeHtml(COPY.terms.nextCore)} →</small><strong>${escapeHtml(next.name)}</strong></a>` : "<span></span>"}
   </nav>`;
 }
 

@@ -172,14 +172,25 @@ kbd { border: 1px solid var(--border); border-bottom-color: var(--border-strong)
 .course-summary > div { display: grid; }
 .course-summary strong { font: 700 17px "Segoe UI Variable Display", "Segoe UI", sans-serif; }
 .course-summary span, .course-summary p { margin: 0; color: var(--muted); font-size: 11px; }
-.lesson-list { display: grid; gap: 10px; }
-.lesson-card { position: relative; min-height: 135px; padding: 25px 26px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 22px; transition: .2s ease; }
+.course-outline { display: grid; gap: 34px; }
+.course-section { display: grid; gap: 12px; }
+.course-section__heading { display: flex; align-items: baseline; gap: 10px; padding: 0 4px; }
+.course-section__heading span { color: var(--faint); font-size: 10px; font-weight: 800; letter-spacing: .08em; }
+.course-section__heading h2 { margin: 0; font-size: 15px; letter-spacing: .04em; text-transform: uppercase; }
+.lesson-list { display: grid; gap: 7px; }
+.lesson-card { position: relative; min-height: 102px; padding: 17px 20px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 18px; transition: .2s ease; }
 .lesson-card:hover { border-color: var(--border-strong); box-shadow: var(--shadow); transform: translateY(-1px); }
 .lesson-card.is-complete { background: color-mix(in srgb, var(--green-soft) 25%, var(--surface)); }
 .lesson-number { width: 46px; height: 46px; border: 1px solid var(--border); border-radius: 12px; display: grid; place-items: center; color: var(--faint); font: 700 13px "Segoe UI Variable Display", "Segoe UI", sans-serif; }
 .is-complete .lesson-number { color: var(--green); background: var(--green-soft); border-color: transparent; }
-.lesson-card__body h2 { margin: 7px 0 7px; font-size: 19px; }
-.lesson-card__body > p { max-width: 680px; margin-bottom: 10px; color: var(--muted); font-size: 13px; }
+.lesson-card__body h2 { margin: 4px 0; font-size: 17px; }
+.lesson-card__body > p { max-width: 760px; margin: 0 0 5px; color: var(--muted); font-size: 12px; }
+.technical-topics { display: block; color: var(--faint); font-size: 10px; font-weight: 650; letter-spacing: .025em; }
+.lesson-card__progress { max-width: 340px; margin-top: 9px; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 10px; }
+.lesson-card__progress > span { color: var(--muted); font-size: 9px; white-space: nowrap; }
+.lesson-card__progress .progress-track { height: 4px; }
+.inline-code { padding: .08em .36em; border: 1px solid var(--border); border-radius: 5px; background: var(--surface-2); color: var(--text); font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; font-size: .9em; white-space: nowrap; }
+.dashboard-complete-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
 .lesson-open { display: inline-flex; align-items: center; gap: 8px; color: var(--accent); font-size: 12px; font-weight: 700; }
 .breadcrumbs { display: flex; align-items: center; gap: 6px; margin-bottom: 30px; color: var(--faint); font-size: 12px; }
 .breadcrumbs a:hover { color: var(--accent); }
@@ -429,13 +440,6 @@ select { height: 42px; padding: 0 34px 0 12px; border: 1px solid var(--border); 
 .quick-term-example strong { display: block; margin-bottom: 5px; color: var(--faint); font-size: 9px; letter-spacing: .07em; text-transform: uppercase; }
 .quick-term-example p { margin: 0; font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: 12px; line-height: 1.6; }
 .quick-term-dialog .quick-term-context { margin-top: 14px; padding: 12px 14px; border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; background: var(--surface-2); color: var(--text); font-size: 12px; }
-.context-distinction { margin: -30px 0 60px; }
-.context-distinction > div:last-child { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-.context-distinction article { padding: 21px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
-.context-distinction article > span { color: var(--accent); font-size: 9px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
-.context-distinction h3 { margin: 8px 0; font-size: 16px; }
-.context-distinction article p { color: var(--muted); font-size: 12px; }
-.context-distinction article a { display: inline-flex; align-items: center; gap: 6px; color: var(--accent); font-size: 10px; font-weight: 700; }
 
 @media (max-width: 1100px) {
   .dashboard-grid { grid-template-columns: repeat(3, 1fr); }.hero-progress { grid-column: 1 / -1; }.glossary-list { grid-template-columns: repeat(2, 1fr); }.lesson-hero { gap: 35px; }.recognize-list { grid-template-columns: 1fr; }.recognize-list a:nth-child(odd) { border-right: 0; }
@@ -447,7 +451,7 @@ select { height: 42px; padding: 0 34px 0 12px; border: 1px solid var(--border); 
   .page-column { padding-left: 0; }.mobile-menu { display: grid; }.topbar { padding: 0 18px; }.search-trigger { flex: 1; width: auto; }.topbar-learn { display: none; }.page { width: min(100% - 36px, 720px); padding-top: 42px; }
   .page-head { align-items: flex-start; }.page-head h1 { font-size: 38px; }.dashboard-grid { grid-template-columns: 1fr; }.hero-progress { min-height: 260px; }.lesson-orbit { margin-right: 10px; }.progress-card { grid-column: auto; }.dashboard-lower { grid-template-columns: 1fr; }
   .lesson-hero { grid-template-columns: 1fr; }.term-content-grid { grid-template-columns: 1fr; }.term-side { grid-template-columns: repeat(2, 1fr); grid-row: 1; }.glossary-list { grid-template-columns: repeat(2, 1fr); }.filter-panel { grid-template-columns: 1fr 1fr; }.filter-panel .inline-search { grid-column: 1 / -1; }.quiz-toolbar { grid-template-columns: auto 1fr; }.quiz-toolbar select { grid-column: 1 / -1; }.term-grid { grid-template-columns: 1fr; }
-  .guided-landing__hero { grid-template-columns: 1fr; align-items: start; }.recognize-preview { grid-template-columns: 1fr; }.guided-section { grid-template-columns: 145px minmax(0, 1fr); gap: 25px; }.prerequisite-box { margin-left: 0; }.context-distinction > div:last-child { grid-template-columns: 1fr; }
+  .guided-landing__hero { grid-template-columns: 1fr; align-items: start; }.recognize-preview { grid-template-columns: 1fr; }.guided-section { grid-template-columns: 145px minmax(0, 1fr); gap: 25px; }.prerequisite-box { margin-left: 0; }
 }
 
 @media (max-width: 560px) {

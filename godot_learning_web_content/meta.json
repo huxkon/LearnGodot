@@ -1,12 +1,12 @@
 {
-  "project": "Godot + GDScript Öğrenme Platformu",
+  "project": "LearnGodot",
   "language": "tr",
   "source_document": "Yeni Başlayanlar İçin Terimler El Kitabı - Godot + GDScript",
   "source_focus": "Godot 4.x + genel oyun geliştirme terminolojisi",
   "generated_from_pdf_text": true,
   "counts": {
-    "terms": 343,
-    "core_terms": 126,
+    "terms": 346,
+    "core_terms": 128,
     "lessons": 14,
     "source_quiz_questions": 42,
     "first_50_terms": 50

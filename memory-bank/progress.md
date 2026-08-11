@@ -1,78 +1,38 @@
 # Progress
 
-## Completed
+## Working
 
-- `AGENTS.md` okundu.
-- Kaynak dosya listesi, README ve ana prompt incelendi.
-- `content.database.json` ana yapısı ve ilişkileri doğrulandı.
-- Altı zorunlu memory bank dosyası oluşturuldu.
-- Hash router, app shell, desktop sidebar ve mobil drawer tamamlandı.
-- Dashboard, Learn, Lesson Detail, Glossary, Term Detail, Quiz, Review ve Favorites ekranları tamamlandı.
-- Data layer, LocalStorage ilerlemesi, global arama, tema ve responsive stiller tamamlandı.
-- GDScript kod blokları, ilgili terim linkleri ve önceki/sonraki temel terim navigasyonu tamamlandı.
-- README, yerel statik sunucu ve otomatik içerik doğrulama scripti eklendi.
-- Veri doğrulaması başarılı: 343 terim, 14 ders, 42 soru, 50 terimlik İlk 50 yolu ve geçerli ilişkiler.
-- Kaynak ile çalışma JSON kopyasının SHA-256 hash değerleri eşleşiyor.
-- HTTP smoke-test başarılı: giriş, JSON ve JS 200/doğru MIME; eksik kaynak 404.
-- Frameworksüz çalışma şartı kesinleştirildi: proje yalnızca HTML, CSS ve Vanilla JavaScript kullanıyor.
-- `fetch` ve ES module mimarisi kaldırıldı; tüm dosyalar `window.GodotApp` namespace'ini kullanan klasik scriptlere geçirildi.
-- Kaynak JSON, eğitim içeriği değişmeden `src/data/content.js` içindeki `window.GODOT_LEARN_DATA` atamasına dönüştürüldü.
-- `index.html` doğrudan çift tıklamayla çalışacak sıralı klasik script yükleme düzenine geçirildi.
-- Opsiyonel `scripts/sync-content.ps1` bakım aracı ve doğrudan açılışa uygun README eklendi.
-- Son doğrulamada kaynak ve runtime verisi karakter karakter aynı bulundu; `fetch`, ES module, framework, paket ve build kalıntısı bulunmadı.
-- 1. ders guided landing ve sekiz sıralı core konu ekranı ortak renderer üzerinden çalışıyor.
-- Her guided konuda 30 saniyelik açıklama, zihinsel model, ihtiyaç, Godot bağlamı, örnek, inline bilinmeyen terimler, yaygın hata ve mini kontrol sorusu eklendi.
-- On recognize terimin tamamı ilgili core konulara “Bunu duyarsan tanı” kutuları olarak dağıtıldı.
-- Önceki/Sonraki Konu ve son konudaki Dersi Tamamla akışı bağlandı.
-- `learnedTermIds` tek tek konu geçişlerinde; `completedLessonIds` yalnızca ders bitişinde güncellenecek şekilde ayrıldı.
-- Scope ve Loop için programlama/proje yönetimi ile programlama/audio bağlam düzeltmeleri uygulama katmanında yapıldı; kaynak database değiştirilmedi.
-- Guided içerik kapsam doğrulaması başarılı: 8/8 core, 10/10 recognize ve her core için 8 zorunlu öğretim alanı mevcut.
-- Kaynak JSON ile runtime verisinin birebir eşitliği yeniden doğrulandı; bütün direct-file assetleri mevcut.
-- Guided renderer lesson ID tabanlı `window.GODOT_LESSON_GUIDES` registry'sine genellendi; rota, devam, konu tamamlama ve ders tamamlama eylemlerindeki 1. ders hard-code'ları kaldırıldı.
-- 1. dersin 10 recognize terimi ilgili core konularda tam bir kez gösterilecek biçimde yeniden denetlendi. Project → Repository örneği, Import/Pipeline, API/SDK, paket bağımlılığı/lisans ve Export/Platform ayrımları görünür hale getirildi.
-- Inline quick term dialogu opsiyonel bağlam cümlesi destekliyor; 1. dersin kritik terimlerine konu düzeyi bağlam eklendi.
-- Ortak `bridge` ve `summary` sunumları eklendi; 1. derste dört kavram köprüsü ve üç ilişkisel özet grubu bulunuyor.
-- Yalnızca 2. ders guided yapıya dönüştürüldü: 12/12 core konu ve 21/21 recognize terim kapsanıyor; her recognize terim tam bir bağlamsal kartta bir kez bulunuyor.
-- 2. ders pedagojik sırası Variable → Constant → Data Type → Dynamic/Static Typing → Function/Method → Parameter/Argument → Return Value → Scope → Conditional → Array/Dictionary → Loop → Class/Object/Instance olarak belirlendi.
-- 2. ders recognize dağılımı: Variable (Annotation, @export, @onready, Null), Constant (Enum), Data Type (Int, Float, Bool, String, Variant), Typing (Casting), Function/Method (Callable, Lambda, Await), Conditional (Operator, Expression, Statement), Class/Object/Instance (extends, class_name, Inheritance, Composition). Zayıf bağ kurulacak core konulara kart zorlanmadı.
-- 2. derste değer/tür, function giriş-çıkışı, scope, karar/collection/loop ve class-instance ilişkileri bridge'ler ile ders sonu dört parçalı özet içinde görünür kılındı.
-- Ders 3–14 guided yapıya geçirilmedi ve klasik görünümünü koruyor.
-- README ortak guided veri/renderer mimarisini ve iki dersin ilerleme modelini açıklayacak biçimde güncellendi.
-- Genişletilmiş doğrulama başarılı: 343 terim, 14 ders, 42 soru, kaynak/runtime metin eşitliği, 1–2. ders zorunlu alanları ve recognize kart tekilliği doğrulandı.
-- HTTP smoke testi başarılı: index, CSS, ana veri, iki guided veri dosyası ve bütün klasik JS dosyaları 200 ve doğru MIME ile servis edildi.
-- Lesson 1 ve Lesson 2 quick-term kullanımlarının tamamı audit edildi. Surface label'ın modal/list başlığı olması ve listenin metindeki işaretlerden otomatik çıkarılması kaldırıldı.
-- Quick-term şeması `canonicalTitle`, `shortExplanation`, isteğe bağlı `example` / `context` ve topic başına explicit `quickTermIds` kullanacak biçimde yenilendi.
-- Lesson 1'de 14 curated kavram tutuldu. Project altındaki tekrarlı Script, API örneğindeki genel Function ve aynı konudaki recognize kartıyla yinelenen Platform quick-term işaretleri kaldırıldı.
-- Lesson 2'de 14 curated kavram tutuldu. Variable konusundaki genel “durumunu” işareti kaldırıldı; `değeri`, `bildirim`, `atama` ve `adıdır` sırasıyla Value, Declaration, Assignment ve Identifier canonical kayıtlarına bağlandı.
-- Lesson 2 canonical kayıtları Type Inference, Function Body, Function Call, Calling Code, Member/Local Variable, Condition, Index, Key ve Iteration adlarıyla düzeltildi.
-- Quick-term modalı artık DOM'daki tıklanan label'ı başlık olarak okumuyor; canonical başlık, kısa açıklama ve ayrı örnek alanı gösteriyor. Bilmediğim Terimler listesi de yalnızca canonical başlıkları gösteriyor.
-- Duplicate önleme, katalog alanları, explicit seçim, marker bağlantısı ve eski `target.firstChild` davranışı doğrulama scriptine regresyon kontrolleri olarak eklendi.
-- Son denetimde Lesson 1 ve Lesson 2 için ayrı ayrı 14 curated ID, 14 unique ID ve 14 inline marker doğrulandı. Kaynak/runtime veri eşitliği korundu ve değişen web assetleri HTTP üzerinden 200/doğru MIME ile yüklendi.
-- Contextual recognize kartlarının renderer ve veri davranışı geri alınmadı veya değiştirilmedi.
-- Yalnızca Lesson 3 guided yapıya dönüştürüldü; Lesson 1–2 eğitim verileri ile Lesson 4–14 sunumu değiştirilmedi.
-- Lesson 3 core sırası kaynakla aynı tutuldu: Node → Scene → SceneTree → Parent/Child → NodePath/get_node → PackedScene/instantiate() → _ready() → queue_free() → Group → Autoload.
-- Lesson 3 için 10/10 core konu; 30 saniyelik anlatım, zihinsel model, ihtiyaç, Godot bağlamı, somut örnek, gerçek yaygın hata ve senaryo tabanlı mini soruyla tamamlandı.
-- Lesson 3 recognize dağılımı: Scene (Root Node, Main Scene, Owner), SceneTree (add_child), Parent/Child (remove_child, reparent), NodePath/get_node (Unique Node), _ready() (Lifecycle, Notification, Signal). 10/10 terim tam bir kez bağlamsal karta yerleştirildi.
-- Lesson 3'te 15 curated canonical quick-term kullanıldı; inline surface label ile popup/list başlığı ayrı tutuldu ve kırık marker bulunmadı.
-- NodePath, PackedScene, _ready(), queue_free(), Group ve Autoload konularında amacı olan kısa GDScript örnekleri ve satır açıklamaları eklendi; salt görsel dolgu için kod eklenmedi.
-- Lesson 3 sonuna Node → Scene, PackedScene → SceneTree, NodePath → lifecycle ve Group → Autoload ilişkilerini yeni bilgi eklemeden birleştiren dört parçalı ders özeti eklendi.
-- `index.html`, README ve doğrulama scripti üçüncü guided veri dosyasını kapsayacak biçimde güncellendi; ortak renderer/storage mimarisi değiştirilmedi.
-- Genişletilmiş doğrulama başarılı: 343 terim, 14 ders, 42 soru, 1–3. ders guided alanları, recognize tekilliği, canonical quick-term bağları ve kaynak/runtime metin eşitliği doğrulandı.
-- HTTP smoke testi başarılı: index, CSS, ana veri, üç guided veri dosyası, views ve app dosyaları 200/doğru MIME ile yüklendi.
+- Kullanıcıya dönük ürün adı LearnGodot; root/source README, metadata, app title ve serve mesajı güncel.
+- Dashboard, Learn, lesson/term detail, glossary, search, quiz, review ve favorites rotaları çalışır.
+- Learn ekranı beginner display metadata, section grouping, sıra, açıklama, technical topics, ilerleme ve bağlama uygun CTA gösterir.
+- Lesson 1–3 ortak guided registry/renderer kullanır; Lesson 3'e küçük Script topic'i eklendi.
+- Lesson 2 operator prerequisite'i conditional içinde görünürdür; Collection quick-term'i Array/Dictionary bağımlılığını açıklar.
+- Guided CTA state'leri başlanmadı, kısmi, topic'ler bitti ve lesson tamamlandı durumlarını ayırır.
+- Review badge manual terimler ile review durumundaki quiz sorularını birlikte sayar.
+- SPA root'taki geniş `aria-live` kaldırıldı; toast live region korunur.
+- Curriculum, UI copy ve locale katmanları eğitim source verisinden ayrıdır.
+- Non-educational app copy `GODOT_UI_COPY.tr` altında merkezileştirildi; document language resolved content locale'den gelir.
+- Search `I/İ/ı/i` ve accent folding ile Türkçe/İngilizce teknik sorguları birlikte bulur.
+- Review global empty state, yalnız term ve quiz kuyruklarının ikisi de boşsa görünür.
+- “Sıradaki ders” ilk tamamlanmamış course lesson'ıdır; guided stale completion flag'i eksik topic varsa etkisizdir.
+- 14/14 tamamlanınca next lesson null olur; Dashboard tekrar/sözlük eylemli completion state gösterir ve Learn'de fake sıradaki badge'i yoktur.
+- Lesson 2 source, guided, previous/next ve core-course sırası Conditional → Array/Dictionary → Loop → Class/Object/Instance olarak eşitlendi.
+- Guided backtick syntax güvenli inline code olarak render edilir; Lesson 2 Class/Object/Instance forward-reference'ları sadeleştirildi.
+- Script, basic Signal, project-scope ve audio-loop migration'ları canonical kaynaklara işlendi.
+- AGENTS agent-independent; legacy prompt uyarılı; guided standardı ve i18n planı belgeli; `.gitattributes` mevcut.
 
-## Remaining / Optional QA
+## Verified Baseline
 
-- Ortamda Node.js veya desteklenen bir headless browser olmadığı için Lesson 3 dahil gerçek DOM tıklama/LocalStorage yenileme ve görsel responsive testi otomatik çalışmadı. Statik rota/aksiyon/storage bağlantıları ile HTTP yüklemeleri doğrulandı; gerçek tarayıcı smoke testi gerekir.
-- Dağıtım bu MVP görevinin kapsamında değildi.
+- 346 term: 128 core, 218 recognize
+- 14 lesson, 42 quiz question
+- First 50 path: 50; core course: 128; full glossary: 346
+- Combined/split/runtime equality ve ilişkiler validator kapsamındadır.
+- Marka, legacy prompt başlangıcı, exact counts ve inline-code renderer bağlantısı validator kapsamındadır.
+- Guided/source exact sıra, flattened core-course sırası, global core zinciri ve 14/14 null completion bağlantısı validator kapsamındadır.
+- Guided dosyalar hard-code edilmeden keşfedilir; şu an yalnız Lesson 1–3 bulunur.
 
-## Latest Review
+## Remaining
 
-- `AGENTS.md`, altı memory-bank dosyası, mevcut mimari, 1. ders referans deneyimi ve `godot_learning_web_content` kaynak paketi yeniden incelendi.
-- 1. ve 2. ders quick-term sistemi canonical/surface ayrımı ve explicit curated topic listeleriyle düzeltildi.
-- Contextual recognize kartları aynı modelle çalışmaya devam ediyor.
-- Kaynak JSON değişmedi. Scope/Loop context override'ları ve LocalStorage anahtarları korunuyor.
-- Lesson 3 ortak guided registry'ye eklendi; core kaynak sırası korundu, recognize terimler pedagojik bağlarına göre dağıtıldı ve Lesson 4–14 klasik kaldı.
-
-## Known Data Note
-
-Metadata `core_terms: 126` bildirirken gerçek `tier: core` sayısı 125. İçerik değiştirilmez; UI gerçek veri üzerinden hesap yapar.
+- Lesson 4–14 için guided içerik yalnız gelecekte ayrı görevlerle üretilecek.
+- İngilizce curriculum/guided içerik henüz yok; locale switcher bu nedenle gösterilmiyor.
+- Desteklenen bir gerçek/headless browser bulunduğunda search, LocalStorage migration, review kombinasyonları, inline code ve focus davranışı etkileşimsel olarak doğrulanmalı.

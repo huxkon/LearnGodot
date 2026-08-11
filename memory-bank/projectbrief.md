@@ -1,34 +1,30 @@
-# Project Brief
+# LearnGodot Project Brief
 
-## Project
+## Purpose
 
-Godot + GDScript odaklı, Türkçe bir developer education web uygulaması.
+LearnGodot; Godot'u, GDScript'in temelini ve oyun geliştirme kavramlarını Türkçe ve sıralı biçimde öğreten, kurs ile başvuru sözlüğünü birleştiren taşınabilir bir beginner learning application.
 
-## Core Requirements
+## Requirements
 
-- Eğitim içeriğinin doğruluk kaynağı `godot_learning_web_content/content.database.json` dosyasıdır; tarayıcı için içerik değiştirilmeden `src/data/content.js` içine sarılır.
-- Dashboard, 14 derslik Learn akışı, ders detayları, A-Z sözlük, terim detayı, quiz, tekrar, favoriler ve global arama ekranları bulunur.
-- Uygulama hem sıralı öğrenme deneyimi hem de hızlı referans olarak çalışır.
-- İlerleme, favoriler, tekrar listesi, quiz sonuçları ve son ziyaret edilen ders LocalStorage'da saklanır.
-- Backend, kimlik doğrulama, ödeme, yönetim paneli, sosyal özellikler ve AI sohbeti MVP kapsamı dışındadır.
-- Tema, responsive tasarım, klavye kullanımı ve erişilebilirlik desteklenir.
-- Uygulama yalnızca HTML, CSS ve Vanilla JavaScript kullanır; `index.html` çift tıklanarak sunucusuz çalışır.
-- Framework, TypeScript, npm paketi, bundler, build sistemi, backend ve server-side database kullanılmaz.
-- 1–3. dersler guided learning deneyimidir; 1. ders ekosistemin sekiz core kavramını, 2. ders kodun on iki temel yapı taşını, 3. ders Node–Scene–SceneTree sisteminin on core kavramını sırayla öğretir. Ders 4–14 mevcut sunumunu korur.
-- Guided derste her core terim ayrı tamamlanır; ders tamamlanması terimleri topluca öğrenildi saymaz.
+- HTML, CSS ve Vanilla JavaScript; framework, npm, build, backend veya hesap yok.
+- `index.html` doğrudan `file://` üzerinden çalışır.
+- Canonical source `content.database.json`; split JSON ve runtime `content.js` bunun eşit temsilleridir.
+- 14 lesson'ın canonical ID/order değeri korunur; beginner başlık ve gruplama curriculum presentation katmanından gelir.
+- Dashboard, Learn, term detail, glossary, quiz, review, favorites ve global search bulunur.
+- Progress, favorites, manual review ve quiz state canonical ID'lerle LocalStorage'da saklanır.
+- Lesson 1–3 guided; Lesson 4–14 classic. Guided ilerleme topic ve lesson tamamlanmasını ayrı tutar.
+- UI copy, curriculum metadata ve eğitim içeriği localization için ayrı katmanlardır.
+- `COPY.appName` kullanıcıya dönük tek reusable brand kaynağıdır; teknik namespace ve canonical ID'ler brand'den bağımsızdır.
+- Erişilebilir klavye/focus davranışı, responsive görünüm ve açık/koyu tema korunur.
 
 ## Content Rules
 
-- Eğitim metinleri UI bileşenlerine kopyalanmaz veya uydurulmaz.
-- `tier: core` terimleri öğretici, `tier: recognize` terimleri kompakt biçimde sunulur.
-- Arama `name`, `aliases` ve `definition` alanlarını kapsar.
-- Kod örnekleri ve ilgili terimler veri ilişkilerinden üretilir.
-- İlerleme oranları veri içindeki gerçek listelerden hesaplanır.
-- Guided derslerin genişletilmiş öğretim metni ana database'i değiştirmeden ders bazlı ayrı uygulama içerik katmanlarında tutulur.
-- Guided quick-term sisteminde cümledeki çekimli inline label ile canonical teknik kavram adı ayrıdır. Her topic gerekli quick-term ID'lerini açıkça seçer; liste metin taramasından otomatik üretilmez.
-- Recognize terimler yalnızca ilgili core konunun yanında bağlam, yerleştirme nedeni ve gerekli ayrımla gösterilir; uzun bağımsız konuya dönüştürülmez.
-- Aynı ID altında karışmış Scope ve Loop anlamları kaynak dosya değiştirilmeden ders bağlamına göre ayrılır.
+- Core kavram ayrıntılı öğretilir; recognize kavram ilgili core bağlamında anlamlı bir kartla tanıtılır.
+- Inline grammatical quick label ile canonical quick-term title birbirinden ayrıdır.
+- Source lesson taxonomy kullanıcıya gösterilen beginner curriculum olmak zorunda değildir.
+- `scope`, `project-scope`, `loop` ve `audio-loop` ayrı anlamlar ve canonical ID'ler taşır.
+- State ve ilişkiler translated title üzerinden değil stable ID üzerinden kurulur.
 
-## Acceptance Summary
+## Acceptance Baseline
 
-343 terimin tümü erişilebilir olmalı; 14 ders ve detay rotaları çalışmalı; arama alias bulmalı; ilişkili terimler linklenmeli; ilerleme yenilemeden sonra korunmalı; açık/koyu tema ve mobil görünüm çalışmalı; kritik konsol hatası olmamalı; README çalışma ve içerik geliştirme akışını açıklamalıdır.
+346 terim (128 core, 218 recognize), 14 lesson, 42 quiz sorusu; çalışan route/state; source/split/runtime eşitliği; scalable guided validation; README ve güncel Memory Bank.

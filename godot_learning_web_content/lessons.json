@@ -48,8 +48,8 @@
       "return-value",
       "scope",
       "conditional",
-      "loop",
       "array-dictionary",
+      "loop",
       "class-object-instance"
     ],
     "recognize_term_ids": [
@@ -84,9 +84,10 @@
     "slug": "godot-scenes",
     "title": "Godot’un kalbi: Node, Scene ve SceneTree",
     "description": "Godot kurslarında sürekli duyacağın yapısal kavramlar.",
-    "goal": "Bu bölüm bittiğinde 10 ana terimi açıklayabilecek ve 10 ek terimi duyduğunda tanıyabileceksin.",
+    "goal": "Bu bölüm bittiğinde 11 ana terimi açıklayabilecek ve 9 ek terimi duyduğunda tanıyabileceksin.",
     "core_term_ids": [
       "node",
+      "script",
       "scene",
       "scenetree",
       "parent-child",
@@ -106,8 +107,7 @@
       "reparent",
       "unique-node",
       "lifecycle",
-      "notification",
-      "signal"
+      "notification"
     ],
     "estimated_minutes": 60,
     "quiz_id": "quiz-03"
@@ -118,7 +118,7 @@
     "slug": "game-loop-input",
     "title": "Game loop, frame, delta ve input",
     "description": "“Neden delta ile çarpıyoruz?” sorusunun oturduğu bölüm.",
-    "goal": "Bu bölüm bittiğinde 8 ana terimi açıklayabilecek ve 10 ek terimi duyduğunda tanıyabileceksin.",
+    "goal": "Bu bölüm bittiğinde 9 ana terimi açıklayabilecek ve 10 ek terimi duyduğunda tanıyabileceksin.",
     "core_term_ids": [
       "game-loop",
       "frame-fps",
@@ -127,6 +127,7 @@
       "delta",
       "input-action-input-map",
       "polling-vs-event-driven-input",
+      "signal",
       "timer-cooldown"
     ],
     "recognize_term_ids": [
@@ -380,7 +381,7 @@
     "recognize_term_ids": [
       "db",
       "audio-stream",
-      "loop",
+      "audio-loop",
       "spatial-audio",
       "packet",
       "bandwidth",
@@ -478,7 +479,7 @@
       "prototype",
       "vertical-slice",
       "mvp",
-      "scope",
+      "project-scope",
       "iteration",
       "playtest",
       "balancing",

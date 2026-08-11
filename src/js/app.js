@@ -6,11 +6,20 @@ const { appShell, icon, searchResults, toast } = namespace.components;
 const { getRoute, navigate } = namespace.router;
 const { progress, STORAGE_KEYS } = namespace.storage;
 const { renderView } = namespace.views;
+const { COPY } = namespace;
 
 const app = document.querySelector("#app");
 let currentRoute;
 let searchIndex = 0;
 let glossaryTimer;
+document.documentElement.lang = namespace.locale?.contentLocale ?? "tr";
+
+function documentTitleFor(route) {
+  if (route.name === "term") return getTermById(route.param)?.name ?? route.title;
+  if (route.name === "lesson-topic") return getTermById(route.subparam)?.name ?? getLesson(route.param)?.displayTitle ?? route.title;
+  if (route.name === "lesson") return getLesson(route.param)?.displayTitle ?? route.title;
+  return route.title;
+}
 
 function preferredTheme() {
   try {
@@ -29,7 +38,7 @@ function applyTheme(theme) {
 
 function render({ focus = false } = {}) {
   currentRoute = getRoute();
-  document.title = `${currentRoute.title} · Godot Atlası`;
+  document.title = `${documentTitleFor(currentRoute)} · ${COPY.appName}`;
   app.innerHTML = appShell(currentRoute, renderView(currentRoute));
   applyTheme(preferredTheme());
   document.body.classList.remove("menu-open");
@@ -87,7 +96,7 @@ async function copyText(text) {
   textarea.select();
   const copied = document.execCommand("copy");
   textarea.remove();
-  if (!copied) throw new Error("Kopyalama desteklenmiyor.");
+  if (!copied) throw new Error(COPY.errors.copyUnsupported);
 }
 
 document.addEventListener("click", async (event) => {
@@ -106,24 +115,24 @@ document.addEventListener("click", async (event) => {
   if (action === "favorite") {
     const added = progress.toggle(STORAGE_KEYS.favoriteTermIds, target.dataset.termId);
     render();
-    toast(added ? "Favorilere eklendi." : "Favorilerden çıkarıldı.");
+    toast(added ? COPY.messages.favoriteAdded : COPY.messages.favoriteRemoved);
   }
   if (action === "review") {
     const added = progress.toggle(STORAGE_KEYS.reviewTermIds, target.dataset.termId);
     render();
-    toast(added ? "Tekrar listesine eklendi." : "Tekrar listesinden çıkarıldı.");
+    toast(added ? COPY.messages.reviewAdded : COPY.messages.reviewRemoved);
   }
   if (action === "learn") {
     const added = progress.toggle(STORAGE_KEYS.learnedTermIds, target.dataset.termId);
     render();
-    toast(added ? "Terim öğrenildi olarak işaretlendi." : "Öğrenildi işareti kaldırıldı.");
+    toast(added ? COPY.messages.learnedAdded : COPY.messages.learnedRemoved);
   }
   if (action === "complete-lesson") {
     const lesson = getLesson(target.dataset.lessonId);
     const completed = !progress.completedLessonIds.includes(lesson.id);
     progress.completeLesson(lesson, completed);
     render();
-    toast(completed ? "Ders tamamlandı. Harika iş." : "Ders tamamlanmadı olarak işaretlendi.");
+    toast(completed ? COPY.messages.lessonCompleted : COPY.messages.lessonUncompleted);
   }
   if (action === "filter-letter") updateQuery("letter", target.dataset.letter);
   if (action === "clear-filters") navigate("/terms");
@@ -171,25 +180,31 @@ document.addEventListener("click", async (event) => {
     const firstIncomplete = guide.order.find((id) => !progress.learnedTermIds.includes(id));
     if (firstIncomplete) {
       navigate(`/learn/${target.dataset.lessonId}/${firstIncomplete}`);
-      setTimeout(() => toast("Dersi tamamlamadan önce kalan konuyu çalış."), 80);
+      setTimeout(() => toast(COPY.messages.finishRemaining), 80);
     } else {
       progress.completeLesson(getLesson(target.dataset.lessonId), true);
       navigate(`/learn/${target.dataset.lessonId}`);
-      setTimeout(() => toast(`${getLesson(target.dataset.lessonId).number}. ders tamamlandı.`), 80);
+      setTimeout(() => toast(COPY.messages.numberedLessonCompleted(getLesson(target.dataset.lessonId).number)), 80);
     }
+  }
+  if (action === "guided-complete-from-landing") {
+    const lesson = getLesson(target.dataset.lessonId);
+    progress.completeLesson(lesson, true);
+    render();
+    toast(COPY.messages.numberedLessonCompleted(lesson.number));
   }
   if (action === "rate-quiz") {
     progress.setQuizResult(target.dataset.questionId, target.dataset.status);
     target.parentElement.querySelectorAll("button").forEach((button) => button.classList.toggle("is-selected", button === target));
-    toast(target.dataset.status === "correct" ? "Yanıt kaydedildi." : "Soru tekrar listene eklendi.");
+    toast(target.dataset.status === "correct" ? COPY.messages.answerSaved : COPY.messages.questionReviewAdded);
   }
   if (action === "copy-code") {
     const code = target.closest(".code-block").querySelector("code").textContent;
     try {
       await copyText(code);
-      target.textContent = "Kopyalandı";
-      setTimeout(() => { target.textContent = "Kopyala"; }, 1400);
-    } catch { toast("Kod kopyalanamadı."); }
+      target.textContent = COPY.actions.copied;
+      setTimeout(() => { target.textContent = COPY.actions.copy; }, 1400);
+    } catch { toast(COPY.messages.copyFailed); }
   }
 });
 
@@ -212,7 +227,7 @@ document.addEventListener("change", (event) => {
 });
 
 document.addEventListener("keydown", (event) => {
-  if ((event.ctrlKey || event.metaKey) && event.key.toLocaleLowerCase() === "k") {
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
     event.preventDefault();
     openSearch();
   }
@@ -240,6 +255,6 @@ try {
   render();
 } catch (error) {
   console.error(error);
-  app.innerHTML = `<div class="fatal-error"><strong>Uygulama başlatılamadı.</strong><p>İçerik dosyalarının index.html ile birlikte bulunduğundan emin ol.</p><code>${String(error.message)}</code></div>`;
+  app.innerHTML = `<div class="fatal-error"><strong>${COPY.errors.startupTitle}</strong><p>${COPY.errors.startupDescription}</p><code>${String(error.message)}</code></div>`;
 }
 })(window.GodotApp = window.GodotApp || {});

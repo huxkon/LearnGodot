@@ -36,12 +36,23 @@
   }
 
   const progress = {
-    get completedLessonIds() { return read(STORAGE_KEYS.completedLessonIds); },
+    get completedLessonIds() {
+      const learned = new Set(this.learnedTermIds);
+      const guides = window.GODOT_LESSON_GUIDES || {};
+      return read(STORAGE_KEYS.completedLessonIds).filter((lessonId) => {
+        const guide = guides[lessonId];
+        return !guide || guide.order.every((termId) => learned.has(termId));
+      });
+    },
     get learnedTermIds() { return read(STORAGE_KEYS.learnedTermIds); },
     get favoriteTermIds() { return read(STORAGE_KEYS.favoriteTermIds); },
     get reviewTermIds() { return read(STORAGE_KEYS.reviewTermIds); },
     get quizResults() { return read(STORAGE_KEYS.quizResults); },
     get lastVisitedLessonId() { return read(STORAGE_KEYS.lastVisitedLessonId); },
+    get reviewCount() {
+      const quizReviewCount = Object.values(this.quizResults).filter((result) => result?.status === "review").length;
+      return this.reviewTermIds.length + quizReviewCount;
+    },
 
     has(key, id) {
       return read(key).includes(id);

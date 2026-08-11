@@ -18,7 +18,7 @@ $mimeTypes = @{
 
 try {
     $listener.Start()
-    Write-Host "Godot Atlası çalışıyor: $prefix"
+    Write-Host "LearnGodot çalışıyor: $prefix"
     Write-Host "Durdurmak için Ctrl+C kullan."
 
     while ($true) {

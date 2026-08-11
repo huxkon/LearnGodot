@@ -1,55 +1,44 @@
-# Godot + GDScript Öğrenme Platformu - Web Content Database
+# LearnGodot Canonical Content Source
 
-Bu paket, **Yeni Başlayanlar İçin Terimler El Kitabı - Godot + GDScript** PDF'sindeki içeriğin web uygulaması için yapılandırılmış sürümüdür.
+Bu klasör LearnGodot'un canonical Godot, GDScript ve oyun geliştirme içerik verisini taşır. Uygulama kodu veya ilk prototip çalışma talimatı değildir.
 
-## İçerik
+## Güncel veri özeti
 
-- **343 terim** (`terms.json`)
-- **126 TEMEL terim** ayrıntılı ders kartı verisiyle
-- **14 ders** (`lessons.json`)
-- **42 PDF mini kontrol sorusu + cevapları** (`quizzes.json`)
-- PDF'deki **İlk 50 Terim** yolu (`learning_paths.json`)
-- Arama/filtre için kategori ve alias alanları
-- Terimler arası başlangıç seviyesinde `related_term_ids` ilişkileri
-- Varsa GDScript kod örnekleri
+- 346 canonical term
+- 128 core term
+- 218 recognize term
+- 14 lesson
+- 42 quiz question
+- First 50 learning path: 50 term
 
-## Dosyalar
+Bu değerler `content.database.json` içindeki gerçek kayıtlardan türetilir ve `scripts/validate-content.ps1` tarafından doğrulanır.
 
-| Dosya | Amaç |
-|---|---|
-| `content.database.json` | Her şeyi tek dosyada isteyen vibe-coding araçları için |
-| `terms.json` | A-Z sözlük ve terim detay sayfalarının ana kaynağı |
-| `lessons.json` | Learn ekranı ve 14 derslik akış |
-| `quizzes.json` | PDF'deki mini kontrol soruları |
-| `learning_paths.json` | İlk 50, temel ders yolu ve tam sözlük yolları |
-| `categories.json` | Filtreleme ve kategori navigasyonu |
-| `term.schema.json` | Terim veri modelinin JSON Schema'sı |
-| `VIBE_CODING_PROMPT.md` | Siteyi üretecek coding agent'a verilecek ana prompt |
+## Source-of-truth modeli
 
-## Önerilen kullanım
+- `content.database.json`: canonical combined source
+- `meta.json`, `categories.json`, `terms.json`, `lessons.json`, `quizzes.json`, `learning_paths.json`: combined source'un yapısal olarak eş split temsilleri
+- `../src/data/content.js`: combined JSON'un `window.GODOT_LEARN_DATA` atamasına sarılmış runtime kopyası
 
-1. İlk prototipte `content.database.json` dosyasını projeye `src/data/content.database.json` olarak koy.
-2. UI kodunun içine terim metni hard-code etme; bütün içerik bu veriden gelsin.
-3. Terim detay rotası `/terms/:id`, ders rotası `/learn/:lessonId` gibi kurulabilir.
-4. Aramada `name`, `aliases`, `definition` alanlarını tara.
-5. LocalStorage'da yalnızca kullanıcı ilerlemesini tut: tamamlanan dersler, quiz sonuçları, favoriler, tekrar listesi.
-6. İçeriği büyütürken `terms.json` ve `lessons.json` ayrı tutulabilir; tek-dosya veritabanı sadece başlangıç kolaylığıdır.
+Combined source, split dosyalar ve runtime wrapper sessizce drift etmemelidir. Canonical veri değişikliğinden sonra repo kökünde şunları çalıştır:
 
-## İçerik seviyesi
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\sync-content.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\validate-content.ps1
+```
 
-`tier = core` -> PDF'de **TEMEL** kart olarak işlenen, aktif öğrenilmesi gereken terim.
+## Uygulama katmanları
 
-`tier = recognize` -> Şimdilik duyunca kategorisini tanımak için yeterli olan sözlük terimi.
+Beginner curriculum display title, description, section ve technical topic metadata'sı `../src/data/curriculum.js` içindedir. Bu presentation katmanı historical source lesson title'larını veya stable lesson ID'lerini değiştirmez.
 
-## Sonraki içerik geliştirmeleri
+Lesson 1–3 guided enrichment verisi `../src/data/lesson-*-guided.js` dosyalarındadır. Guided açıklamalar canonical term kayıtlarını çoğaltmaz; ortak renderer tarafından source lesson/core ID'leriyle birleştirilir. Guided standardı `../docs/GUIDED_LEARNING_SPEC.md` içinde tanımlıdır.
 
-Web sürümünün PDF'den daha öğretici olması için ikinci fazda her TEMEL terime şu alanlar eklenebilir:
+## Historical prompt
 
-- `common_mistakes`
-- `real_game_example`
-- `micro_exercise`
-- `multiple_choice_quiz`
-- `prerequisite_term_ids`
-- `godot_demo_scene`
+`VIBE_CODING_PROMPT.md` yalnız ilk prototipin historical girdisidir ve güncel proje talimatı olarak çalıştırılmamalıdır. Güncel kaynaklar:
 
-Bunları ilk MVP'den önce yapmak zorunlu değildir. Mevcut paket çalışan ve güçlü bir ilk site için yeterlidir.
+- `../AGENTS.md`
+- `../memory-bank/`
+- `../docs/GUIDED_LEARNING_SPEC.md`
+- `../README.md`
+
+Source PDF'nin gerçek adı ve teknik `Atlas / Sprite Sheet` kavramları ürün markasından bağımsızdır; branding cleanup sırasında değiştirilmez.
