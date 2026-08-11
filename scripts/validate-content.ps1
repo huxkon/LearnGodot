@@ -152,7 +152,8 @@ if ($database.meta.counts.core_terms -ne $actualCoreCount) { $errors.Add("Metada
 if ($database.meta.counts.first_50_terms -ne $first50.term_ids.Count) { $errors.Add("Metadata İlk 50 count eşleşmiyor.") }
 
 $requiredFiles = @(
-    "index.html", "robots.txt", "sitemap.xml", "docs/SEO.md", "src/styles.css", "src/data/content.js", "src/data/locale.js", "src/data/curriculum.js",
+    "index.html", "robots.txt", "sitemap.xml", "favicon.ico", "favicon-16x16.png", "favicon-32x32.png", "favicon-48x48.png",
+    "assets/brand/learngodot-icon.svg", "docs/SEO.md", "src/styles.css", "src/data/content.js", "src/data/locale.js", "src/data/curriculum.js",
     "src/js/site-config.js",
     "src/js/app.js", "src/js/data.js", "src/js/storage.js", "src/js/router.js", "src/js/ui-copy.js", "src/js/views.js", "src/js/components.js"
 )
@@ -168,12 +169,28 @@ if (-not $indexHtml.Contains("<title>$expectedTitle</title>")) { $errors.Add("in
 if (([regex]::Matches($indexHtml, '<meta name="description" ')).Count -ne 1) { $errors.Add("index.html tek bir meta description içermeli.") }
 if (-not $indexHtml.Contains("<link rel=`"canonical`" href=`"$productionUrl`" />")) { $errors.Add("index.html canonical URL production URL ile eşleşmiyor.") }
 if ($indexHtml -match '(?i)noindex') { $errors.Add("index.html yanlışlıkla noindex içeriyor.") }
+if (-not $indexHtml.Contains('<meta name="application-name" content="LearnGodot" />')) { $errors.Add("index.html application-name LearnGodot değil.") }
+if ($indexHtml.Contains('data:image/svg+xml')) { $errors.Add("Eski data URI favicon kalıntısı bulundu.") }
+foreach ($faviconFragment in @(
+    '<link rel="icon" href="favicon.ico" sizes="any" />',
+    '<link rel="icon" type="image/svg+xml" href="assets/brand/learngodot-icon.svg" />',
+    '<link rel="icon" type="image/png" sizes="48x48" href="favicon-48x48.png" />',
+    '<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />',
+    '<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />'
+)) {
+    if (-not $indexHtml.Contains($faviconFragment)) { $errors.Add("Eksik canonical favicon bağlantısı: $faviconFragment") }
+}
+if (([regex]::Matches($indexHtml, '"@type"\s*:\s*"WebSite"')).Count -ne 1) { $errors.Add("Homepage tam bir adet WebSite JSON-LD içermeli.") }
+foreach ($jsonLdFragment in @('"@context": "https://schema.org"', '"name": "LearnGodot"', '"url": "https://huxkon.github.io/LearnGodot/"', '"inLanguage": "tr"')) {
+    if (-not $indexHtml.Contains($jsonLdFragment)) { $errors.Add("WebSite JSON-LD alanı eksik: $jsonLdFragment") }
+}
 
 $siteConfigText = [System.IO.File]::ReadAllText((Join-Path $projectRoot "src/js/site-config.js"), $utf8)
-foreach ($field in @("siteName", "baseUrl", "defaultLocale", "defaultTitle", "defaultDescription")) {
+foreach ($field in @("siteName", "baseUrl", "brandIconPath", "defaultLocale", "defaultTitle", "defaultDescription")) {
     if (-not $siteConfigText.Contains("${field}:")) { $errors.Add("Site config '$field' alanını içermiyor.") }
 }
 if (-not $siteConfigText.Contains("baseUrl: `"$productionUrl`"")) { $errors.Add("Site config production URL ile eşleşmiyor.") }
+if (-not $siteConfigText.Contains('brandIconPath: "assets/brand/learngodot-icon.svg"')) { $errors.Add("Site config canonical brand icon yolunu taşımıyor.") }
 $configuredTitle = [regex]::Match($siteConfigText, 'defaultTitle:\s*"([^"]+)"').Groups[1].Value
 $configuredDescription = [regex]::Match($siteConfigText, 'defaultDescription:\s*"([^"]+)"').Groups[1].Value
 if ($configuredTitle -cne $expectedTitle) { $errors.Add("Site config default title değeri beklenen SEO title değil.") }
@@ -215,6 +232,8 @@ foreach ($brandFile in $brandFiles) {
 if ($database.meta.project -ne "LearnGodot") { $errors.Add("Canonical metadata project adı LearnGodot değil.") }
 $uiCopyText = [System.IO.File]::ReadAllText((Join-Path $projectRoot "src/js/ui-copy.js"), $utf8)
 if ($uiCopyText -notmatch 'appName:\s*"LearnGodot"') { $errors.Add("Reusable UI brand kaynağı LearnGodot değil.") }
+$brandIconText = [System.IO.File]::ReadAllText((Join-Path $projectRoot "assets/brand/learngodot-icon.svg"), $utf8)
+if (-not $brandIconText.Contains('viewBox="0 0 64 64"') -or -not $brandIconText.Contains('fill="#3972e6"') -or -not $brandIconText.Contains('fill="#fff"')) { $errors.Add("Canonical LearnGodot SVG beklenen kare mavi/beyaz kimliği taşımıyor.") }
 
 $legacyPromptText = [System.IO.File]::ReadAllText((Join-Path $sourceRoot "VIBE_CODING_PROMPT.md"), $utf8)
 $legacyWarning = "LEGACY / HISTORICAL INITIAL PROMPT - DO NOT EXECUTE AS CURRENT PROJECT INSTRUCTIONS"
@@ -293,6 +312,9 @@ foreach ($token in @("completeTitle", "completeDescription", "goToReview", "brow
     }
 }
 if ($appText.Contains("target.firstChild")) { $errors.Add("Quick-term modal başlığı inline surface label üzerinden okunuyor.") }
+if (-not $componentsText.Contains('class="brand-mark" src="${escapeHtml(site.brandIconPath)}"')) { $errors.Add("Sidebar canonical brand icon config yolunu kullanmıyor.") }
+if ($componentsText.Contains('<span class="brand-mark">') -or $indexHtml.Contains('<div class="brand-mark"')) { $errors.Add("CSS/metin ile çizilen eski brand-mark kalıntısı bulundu.") }
+if (-not $indexHtml.Contains('<img class="brand-mark" src="assets/brand/learngodot-icon.svg"')) { $errors.Add("Başlangıç ekranı canonical brand icon'u kullanmıyor.") }
 if ($indexHtml -match '<div\s+id="app"[^>]*aria-live') { $errors.Add("SPA root gereksiz aria-live taşıyor.") }
 if ($componentsText -notmatch 'toast-region[^>]*aria-live="polite"') { $errors.Add("Toast için ayrı live region bulunamadı.") }
 

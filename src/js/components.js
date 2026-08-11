@@ -4,6 +4,7 @@
 const { getRelatedTerms, getTermById } = namespace.data;
 const { progress, STORAGE_KEYS } = namespace.storage;
 const { COPY } = namespace;
+const { site } = namespace;
 
 function escapeHtml(value = "") {
   return String(value)
@@ -96,7 +97,7 @@ function appShell(route, content) {
   const activeName = route.name === "lesson" || route.name === "lesson-topic" ? "learn" : route.name === "term" ? "terms" : route.name;
   return `<div class="app-shell">
     <aside class="sidebar" id="sidebar" aria-label="${escapeHtml(COPY.aria.mainNavigation)}">
-      <a class="brand" href="#/dashboard"><span class="brand-mark">L</span><span><strong>${escapeHtml(COPY.appName)}</strong><small>${escapeHtml(COPY.appTagline)}</small></span></a>
+      <a class="brand" href="#/dashboard"><img class="brand-mark" src="${escapeHtml(site.brandIconPath)}" alt="" width="38" height="38" /><span><strong>${escapeHtml(COPY.appName)}</strong><small>${escapeHtml(COPY.appTagline)}</small></span></a>
       <nav>${navItems.map(([name, path, iconName, label]) => `<a href="#${path}" class="nav-link ${activeName === name ? "is-active" : ""}" ${activeName === name ? 'aria-current="page"' : ""}>${icon(iconName)}<span>${label}</span>${name === "review" && progress.reviewCount ? `<b>${progress.reviewCount}</b>` : ""}</a>`).join("")}</nav>
       <div class="sidebar-foot"><div class="data-note"><span class="status-dot"></span><span><strong>${escapeHtml(COPY.status.localProgress)}</strong><small>${escapeHtml(COPY.saved)}</small></span></div></div>
     </aside>

@@ -4,6 +4,7 @@
 
 - Klasik script kullanan, hash-routed, dependency-free SPA.
 - `src/js/site-config.js` public site adı, production base URL, default locale, title ve description için küçük merkezi metadata kaynağıdır.
+- `assets/brand/learngodot-icon.svg` tek canonical marka ikonudur; sidebar, boot ve favicon varyantları aynı mavi rounded-square / beyaz `L` kimliğini kullanır.
 - Canonical homepage sabit production URL'sinde kalır; runtime hash route title'ları değişebilir fakat canonical hash'e çevrilmez.
 - `content.database.json` canonical combined source; split JSON dosyaları ve `src/data/content.js` eşit temsillerdir.
 - `src/data/locale.js` geçerli content locale'ini, `curriculum.js` beginner presentation metadata'sını sağlar.
