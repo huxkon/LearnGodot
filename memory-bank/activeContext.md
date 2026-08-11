@@ -3,6 +3,8 @@
 ## Current State
 
 - Final kullanıcı markası LearnGodot'tur; `window.GodotApp`, route, canonical ID ve LocalStorage anahtarları değişmedi.
+- Production canonical URL `https://huxkon.github.io/LearnGodot/` değeridir. Homepage metadata, sosyal metadata, `robots.txt` ve tek-URL sitemap içeren SEO Foundation aktiftir.
+- Hash SPA bilinçli olarak korunur; hash lesson/term route'ları canonical veya sitemap URL'si yapılmaz.
 - Uygulama beginner curriculum sunumunu source taxonomy'den ayırır; 14 lesson beş bölümden oluşan kompakt course outline olarak görünür.
 - Lesson ID'leri, route'lar ve LocalStorage progress anahtarları değişmedi.
 - Lesson 1–3 guided; Lesson 4–14 klasik içerik sunumundadır ve bu görevde guided içerik üretilmedi.
@@ -22,6 +24,7 @@
 ## Current Focus
 
 - Yeni guided lesson ancak açık bir görev kapsamıyla, `docs/GUIDED_LEARNING_SPEC.md` standardına göre eklenmeli.
+- Full crawlable lesson/term SEO mimarisi Türkçe guided curriculum tamamlandıktan sonra ayrı bir aşamada ele alınmalı.
 - İlk gerçek tarayıcı QA turunda search, dört review kombinasyonu, guided inline code, responsive görünüm, dialog focus ve LocalStorage devamlılığı kontrol edilmeli.
 - Yeni içerik eklenince sync ve dynamic validator birlikte çalıştırılmalı.
 

@@ -152,7 +152,8 @@ if ($database.meta.counts.core_terms -ne $actualCoreCount) { $errors.Add("Metada
 if ($database.meta.counts.first_50_terms -ne $first50.term_ids.Count) { $errors.Add("Metadata İlk 50 count eşleşmiyor.") }
 
 $requiredFiles = @(
-    "index.html", "src/styles.css", "src/data/content.js", "src/data/locale.js", "src/data/curriculum.js",
+    "index.html", "robots.txt", "sitemap.xml", "docs/SEO.md", "src/styles.css", "src/data/content.js", "src/data/locale.js", "src/data/curriculum.js",
+    "src/js/site-config.js",
     "src/js/app.js", "src/js/data.js", "src/js/storage.js", "src/js/router.js", "src/js/ui-copy.js", "src/js/views.js", "src/js/components.js"
 )
 foreach ($file in $requiredFiles) {
@@ -161,7 +162,44 @@ foreach ($file in $requiredFiles) {
 
 $indexHtml = [System.IO.File]::ReadAllText((Join-Path $projectRoot "index.html"), $utf8)
 if ($indexHtml -match 'type\s*=\s*["'']module["'']') { $errors.Add("index.html hâlâ ES module kullanıyor.") }
-if ($indexHtml -notmatch '<title>LearnGodot</title>') { $errors.Add("index.html başlangıç title değeri LearnGodot değil.") }
+$productionUrl = "https://huxkon.github.io/LearnGodot/"
+$expectedTitle = "T$([char]0x00FC)rk$([char]0x00E7)e Godot $([char]0x00D6)$([char]0x011F)ren | LearnGodot"
+if (-not $indexHtml.Contains("<title>$expectedTitle</title>")) { $errors.Add("index.html SEO title değeri beklenen başlık değil.") }
+if (([regex]::Matches($indexHtml, '<meta name="description" ')).Count -ne 1) { $errors.Add("index.html tek bir meta description içermeli.") }
+if (-not $indexHtml.Contains("<link rel=`"canonical`" href=`"$productionUrl`" />")) { $errors.Add("index.html canonical URL production URL ile eşleşmiyor.") }
+if ($indexHtml -match '(?i)noindex') { $errors.Add("index.html yanlışlıkla noindex içeriyor.") }
+
+$siteConfigText = [System.IO.File]::ReadAllText((Join-Path $projectRoot "src/js/site-config.js"), $utf8)
+foreach ($field in @("siteName", "baseUrl", "defaultLocale", "defaultTitle", "defaultDescription")) {
+    if (-not $siteConfigText.Contains("${field}:")) { $errors.Add("Site config '$field' alanını içermiyor.") }
+}
+if (-not $siteConfigText.Contains("baseUrl: `"$productionUrl`"")) { $errors.Add("Site config production URL ile eşleşmiyor.") }
+$configuredTitle = [regex]::Match($siteConfigText, 'defaultTitle:\s*"([^"]+)"').Groups[1].Value
+$configuredDescription = [regex]::Match($siteConfigText, 'defaultDescription:\s*"([^"]+)"').Groups[1].Value
+if ($configuredTitle -cne $expectedTitle) { $errors.Add("Site config default title değeri beklenen SEO title değil.") }
+if (-not $configuredDescription -or -not $indexHtml.Contains("<meta name=`"description`" content=`"$configuredDescription`" />")) { $errors.Add("Site config ve index.html meta description değerleri eşleşmiyor.") }
+foreach ($socialFragment in @(
+    '<meta property="og:type" content="website" />',
+    '<meta property="og:site_name" content="LearnGodot" />',
+    '<meta property="og:locale" content="tr_TR" />',
+    '<meta name="twitter:card" content="summary" />'
+)) {
+    if (-not $indexHtml.Contains($socialFragment)) { $errors.Add("Eksik sosyal metadata: $socialFragment") }
+}
+
+$robotsText = [System.IO.File]::ReadAllText((Join-Path $projectRoot "robots.txt"), $utf8)
+if (-not $robotsText.Contains("Allow: /LearnGodot/")) { $errors.Add("robots.txt GitHub Pages proje yolunu crawl'a açmıyor.") }
+if ($robotsText -match '(?im)^\s*Disallow\s*:\s*/LearnGodot') { $errors.Add("robots.txt public proje yolunu engelliyor.") }
+if (-not $robotsText.Contains("Sitemap: ${productionUrl}sitemap.xml")) { $errors.Add("robots.txt sitemap URL değeri yanlış.") }
+
+try {
+    [xml]$sitemap = [System.IO.File]::ReadAllText((Join-Path $projectRoot "sitemap.xml"), $utf8)
+    $sitemapUrls = @($sitemap.urlset.url | ForEach-Object { [string]$_.loc })
+    if ($sitemapUrls.Count -ne 1 -or $sitemapUrls[0] -cne $productionUrl) { $errors.Add("sitemap.xml yalnız canonical homepage URL'sini içermeli.") }
+    if (@($sitemapUrls | Where-Object { $_.Contains("#") }).Count) { $errors.Add("sitemap.xml hash URL içeriyor.") }
+} catch {
+    $errors.Add("sitemap.xml geçerli XML değil: $($_.Exception.Message)")
+}
 
 # Ürün markası yalnız kullanıcıya dönük/proje metadata alanlarında denetlenir; teknik Atlas terimleri kapsam dışıdır.
 $brandFiles = @(
@@ -184,7 +222,7 @@ if (-not $legacyPromptText.StartsWith("> **$legacyWarning**")) { $errors.Add("Le
 if (([regex]::Matches($legacyPromptText, [regex]::Escape($legacyWarning))).Count -ne 1) { $errors.Add("Legacy prompt uyarısı tekil değil.") }
 $guidedFiles = @(Get-ChildItem (Join-Path $projectRoot "src/data") -Filter "lesson-*-guided.js" | Sort-Object Name)
 $guideScriptPaths = @($guidedFiles | ForEach-Object { "src/data/$($_.Name)" })
-$expectedScriptOrder = @("src/data/content.js", "src/data/locale.js", "src/data/curriculum.js") + $guideScriptPaths + @(
+$expectedScriptOrder = @("src/js/site-config.js", "src/data/content.js", "src/data/locale.js", "src/data/curriculum.js") + $guideScriptPaths + @(
     "src/js/ui-copy.js", "src/js/data.js", "src/js/storage.js", "src/js/router.js", "src/js/components.js", "src/js/views.js", "src/js/app.js"
 )
 $actualScriptOrder = @([regex]::Matches($indexHtml, '<script\s+defer\s+src="([^"]+)"\s*></script>') | ForEach-Object { $_.Groups[1].Value })

@@ -8,6 +8,7 @@ LearnGodot; Godot'u, GDScript'in temelini ve oyun geliştirme kavramlarını Tü
 
 - HTML, CSS ve Vanilla JavaScript; framework, npm, build, backend veya hesap yok.
 - `index.html` doğrudan `file://` üzerinden çalışır.
+- Canonical public homepage `https://huxkon.github.io/LearnGodot/` adresidir; hash route'lar ayrı crawlable sayfa sayılmaz.
 - Canonical source `content.database.json`; split JSON ve runtime `content.js` bunun eşit temsilleridir.
 - 14 lesson'ın canonical ID/order değeri korunur; beginner başlık ve gruplama curriculum presentation katmanından gelir.
 - Dashboard, Learn, term detail, glossary, quiz, review, favorites ve global search bulunur.

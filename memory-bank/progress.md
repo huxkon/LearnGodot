@@ -3,6 +3,7 @@
 ## Working
 
 - Kullanıcıya dönük ürün adı LearnGodot; root/source README, metadata, app title ve serve mesajı güncel.
+- SEO Foundation canonical `https://huxkon.github.io/LearnGodot/`, homepage/social metadata, görünür Türkçe onboarding copy, `robots.txt` ve yalnız homepage'i içeren sitemap ile aktiftir.
 - Dashboard, Learn, lesson/term detail, glossary, search, quiz, review ve favorites rotaları çalışır.
 - Learn ekranı beginner display metadata, section grouping, sıra, açıklama, technical topics, ilerleme ve bağlama uygun CTA gösterir.
 - Lesson 1–3 ortak guided registry/renderer kullanır; Lesson 3'e küçük Script topic'i eklendi.
@@ -30,9 +31,11 @@
 - Marka, legacy prompt başlangıcı, exact counts ve inline-code renderer bağlantısı validator kapsamındadır.
 - Guided/source exact sıra, flattened core-course sırası, global core zinciri ve 14/14 null completion bağlantısı validator kapsamındadır.
 - Guided dosyalar hard-code edilmeden keşfedilir; şu an yalnız Lesson 1–3 bulunur.
+- SEO static validator ve `/LearnGodot/` HTTP path smoke testi homepage, robots, sitemap, CSS ve JS asset'leri için başarılıdır.
 
 ## Remaining
 
 - Lesson 4–14 için guided içerik yalnız gelecekte ayrı görevlerle üretilecek.
 - İngilizce curriculum/guided içerik henüz yok; locale switcher bu nedenle gösterilmiyor.
+- Crawlable non-hash lesson/term URL'leri, expanded sitemap, TR/EN URL'leri, `hreflang` ve page-specific metadata Türkçe guided curriculum sonrasındaki Full SEO aşamasına bırakıldı.
 - Desteklenen bir gerçek/headless browser bulunduğunda search, LocalStorage migration, review kombinasyonları, inline code ve focus davranışı etkileşimsel olarak doğrulanmalı.

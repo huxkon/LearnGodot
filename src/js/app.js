@@ -7,12 +7,13 @@ const { getRoute, navigate } = namespace.router;
 const { progress, STORAGE_KEYS } = namespace.storage;
 const { renderView } = namespace.views;
 const { COPY } = namespace;
+const { site } = namespace;
 
 const app = document.querySelector("#app");
 let currentRoute;
 let searchIndex = 0;
 let glossaryTimer;
-document.documentElement.lang = namespace.locale?.contentLocale ?? "tr";
+document.documentElement.lang = namespace.locale?.contentLocale ?? site.defaultLocale;
 
 function documentTitleFor(route) {
   if (route.name === "term") return getTermById(route.param)?.name ?? route.title;
@@ -38,7 +39,7 @@ function applyTheme(theme) {
 
 function render({ focus = false } = {}) {
   currentRoute = getRoute();
-  document.title = `${documentTitleFor(currentRoute)} · ${COPY.appName}`;
+  document.title = currentRoute.name === "dashboard" ? site.defaultTitle : `${documentTitleFor(currentRoute)} · ${site.siteName}`;
   app.innerHTML = appShell(currentRoute, renderView(currentRoute));
   applyTheme(preferredTheme());
   document.body.classList.remove("menu-open");

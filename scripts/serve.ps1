@@ -1,9 +1,12 @@
 param(
-    [int]$Port = 4173
+    [int]$Port = 4173,
+    [string]$BasePath = ""
 )
 
 $projectRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 $prefix = "http://127.0.0.1:$Port/"
+$normalizedBasePath = if ([string]::IsNullOrWhiteSpace($BasePath)) { "" } else { "/" + $BasePath.Trim("/") }
+$publicPrefix = if ($normalizedBasePath) { "$($prefix.TrimEnd('/'))$normalizedBasePath/" } else { $prefix }
 $listener = [System.Net.Sockets.TcpListener]::new([System.Net.IPAddress]::Loopback, $Port)
 
 $mimeTypes = @{
@@ -11,6 +14,8 @@ $mimeTypes = @{
     ".css"  = "text/css; charset=utf-8"
     ".js"   = "text/javascript; charset=utf-8"
     ".json" = "application/json; charset=utf-8"
+    ".txt"  = "text/plain; charset=utf-8"
+    ".xml"  = "application/xml; charset=utf-8"
     ".svg"  = "image/svg+xml"
     ".png"  = "image/png"
     ".ico"  = "image/x-icon"
@@ -18,7 +23,7 @@ $mimeTypes = @{
 
 try {
     $listener.Start()
-    Write-Host "LearnGodot çalışıyor: $prefix"
+    Write-Host "LearnGodot çalışıyor: $publicPrefix"
     Write-Host "Durdurmak için Ctrl+C kullan."
 
     while ($true) {
@@ -32,7 +37,16 @@ try {
             $parts = $requestLine -split " "
             $method = if ($parts.Count -gt 0) { $parts[0] } else { "" }
             $rawTarget = if ($parts.Count -gt 1) { $parts[1].Split("?")[0] } else { "/" }
-            $requestPath = [Uri]::UnescapeDataString($rawTarget.TrimStart("/"))
+            $mappedTarget = if (-not $normalizedBasePath) {
+                $rawTarget
+            } elseif ($rawTarget -eq $normalizedBasePath -or $rawTarget -eq "$normalizedBasePath/") {
+                "/"
+            } elseif ($rawTarget.StartsWith("$normalizedBasePath/", [StringComparison]::OrdinalIgnoreCase)) {
+                $rawTarget.Substring($normalizedBasePath.Length)
+            } else {
+                ""
+            }
+            $requestPath = [Uri]::UnescapeDataString($mappedTarget.TrimStart("/"))
             if ([string]::IsNullOrWhiteSpace($requestPath)) { $requestPath = "index.html" }
 
             $candidate = [System.IO.Path]::GetFullPath((Join-Path $projectRoot $requestPath))
@@ -43,7 +57,7 @@ try {
                 $status = "405 Method Not Allowed"
                 $contentType = "text/plain; charset=utf-8"
                 $body = [Text.Encoding]::UTF8.GetBytes("405 - Yalnızca GET ve HEAD desteklenir")
-            } elseif (-not $insideRoot -or -not (Test-Path -LiteralPath $candidate -PathType Leaf)) {
+            } elseif ([string]::IsNullOrEmpty($mappedTarget) -or -not $insideRoot -or -not (Test-Path -LiteralPath $candidate -PathType Leaf)) {
                 $status = "404 Not Found"
                 $contentType = "text/plain; charset=utf-8"
                 $body = [Text.Encoding]::UTF8.GetBytes("404 - Dosya bulunamadı")

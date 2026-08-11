@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /LearnGodot/
+
+Sitemap: https://huxkon.github.io/LearnGodot/sitemap.xml

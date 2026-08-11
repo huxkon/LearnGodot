@@ -5,7 +5,7 @@
     tr: {
       appName: "LearnGodot",
       appTagline: "Godot + GDScript öğrenme alanı",
-      productPositioning: "Godot'u, GDScript'in temelini ve oyun geliştirme kavramlarını sırayla öğren.",
+      productPositioning: "Godot'u, GDScript'in temelini ve oyun geliştirme kavramlarını sıfırdan, sırayla ve bağlantılı biçimde öğren.",
       saved: "İlerlemen bu cihazda otomatik kaydedilir.",
       nav: {
         dashboard: "Dashboard",
@@ -120,8 +120,8 @@
         results: (count) => `${count} sonuç`,
       },
       dashboard: {
-        eyebrow: "Çalışma alanın",
-        title: "Tekrar hoş geldin.",
+        eyebrow: "Türkçe başlangıç rotası",
+        title: "Godot'u Türkçe Öğren",
         roadmap: "Yol haritası",
         overview: "Derslere genel bakış",
         viewAll: "Tümünü gör",
@@ -140,7 +140,7 @@
       },
       learn: {
         eyebrow: "Başlangıç kursu",
-        title: "Godot'u sırayla öğren.",
+        title: "Godot'u adım adım öğren",
         description: "Her bölüm bir öncekinin üzerine kurulur. Sıradaki dersi açıp kaldığın yerden devam et.",
         courseProgress: "Kurs ilerlemesi",
       },

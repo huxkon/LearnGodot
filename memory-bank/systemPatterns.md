@@ -3,6 +3,8 @@
 ## Architecture
 
 - Klasik script kullanan, hash-routed, dependency-free SPA.
+- `src/js/site-config.js` public site adı, production base URL, default locale, title ve description için küçük merkezi metadata kaynağıdır.
+- Canonical homepage sabit production URL'sinde kalır; runtime hash route title'ları değişebilir fakat canonical hash'e çevrilmez.
 - `content.database.json` canonical combined source; split JSON dosyaları ve `src/data/content.js` eşit temsillerdir.
 - `src/data/locale.js` geçerli content locale'ini, `curriculum.js` beginner presentation metadata'sını sağlar.
 - `src/js/ui-copy.js` brand, navigation, action, status, empty state, toast, search, quiz/review ve ARIA copy'sini eğitim içeriğinden ayırır.
@@ -11,12 +13,13 @@
 
 ## Load Order
 
-1. content
-2. locale
-3. curriculum
-4. bulunan guided lesson veri dosyaları
-5. UI copy
-6. data, storage, router, components, views, app
+1. site config
+2. content
+3. locale
+4. curriculum
+5. bulunan guided lesson veri dosyaları
+6. UI copy
+7. data, storage, router, components, views, app
 
 `defer` sırası korunur; fetch/import/export yoktur.
 
