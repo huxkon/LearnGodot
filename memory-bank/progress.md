@@ -7,7 +7,7 @@
 - Sidebar, boot screen ve favicon'lar tek canonical mavi `L` brand icon asset'ini kullanır; homepage application/site-name ve minimal WebSite sinyalleri taşır.
 - Dashboard, Learn, lesson/term detail, glossary, search, quiz, review ve favorites rotaları çalışır.
 - Learn ekranı beginner display metadata, section grouping, sıra, açıklama, technical topics, ilerleme ve bağlama uygun CTA gösterir.
-- Lesson 1–3 ortak guided registry/renderer kullanır; Lesson 3'e küçük Script topic'i eklendi.
+- Lesson 1–4 ortak guided registry/renderer kullanır; Lesson 4 zaman, process, input, temel Signal ve Timer/Cooldown akışını bağlar.
 - Lesson 2 operator prerequisite'i conditional içinde görünürdür; Collection quick-term'i Array/Dictionary bağımlılığını açıklar.
 - Guided CTA state'leri başlanmadı, kısmi, topic'ler bitti ve lesson tamamlandı durumlarını ayırır.
 - Review badge manual terimler ile review durumundaki quiz sorularını birlikte sayar.
@@ -31,13 +31,14 @@
 - Combined/split/runtime equality ve ilişkiler validator kapsamındadır.
 - Marka, legacy prompt başlangıcı, exact counts ve inline-code renderer bağlantısı validator kapsamındadır.
 - Guided/source exact sıra, flattened core-course sırası, global core zinciri ve 14/14 null completion bağlantısı validator kapsamındadır.
-- Guided dosyalar hard-code edilmeden keşfedilir; şu an yalnız Lesson 1–3 bulunur.
+- Guided dosyalar hard-code edilmeden keşfedilir; şu an Lesson 1–4 bulunur.
+- Guided dosya syntax/registry kaydı ile landing/topic dispatch'in registry tabanlı kalması validator tarafından korunur.
 - SEO static validator ve `/LearnGodot/` HTTP path smoke testi homepage, robots, sitemap, CSS ve JS asset'leri için başarılıdır.
 - Canonical SVG ile 16/32/48 PNG ve ICO varyantları boyut, deterministik üretim, `file://` relative path ve `/LearnGodot/` HTTP erişimi açısından doğrulandı.
 
 ## Remaining
 
-- Lesson 4–14 için guided içerik yalnız gelecekte ayrı görevlerle üretilecek.
+- Lesson 5–14 için guided içerik yalnız gelecekte ayrı görevlerle üretilecek.
 - İngilizce curriculum/guided içerik henüz yok; locale switcher bu nedenle gösterilmiyor.
 - Crawlable non-hash lesson/term URL'leri, expanded sitemap, TR/EN URL'leri, `hreflang` ve page-specific metadata Türkçe guided curriculum sonrasındaki Full SEO aşamasına bırakıldı.
 - Desteklenen bir gerçek/headless browser bulunduğunda search, LocalStorage migration, review kombinasyonları, inline code ve focus davranışı etkileşimsel olarak doğrulanmalı.

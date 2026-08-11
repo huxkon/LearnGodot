@@ -122,9 +122,9 @@
     "core_term_ids": [
       "game-loop",
       "frame-fps",
+      "delta",
       "_process",
       "_physics_process",
-      "delta",
       "input-action-input-map",
       "polling-vs-event-driven-input",
       "signal",

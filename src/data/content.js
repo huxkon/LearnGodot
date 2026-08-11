@@ -243,7 +243,7 @@ window.GODOT_LEARN_DATA = {
         "input-action-input-map"
       ],
       "previous_core_term_id": "_process",
-      "next_core_term_id": "delta"
+      "next_core_term_id": "input-action-input-map"
     },
     {
       "id": "_process",
@@ -281,7 +281,7 @@ window.GODOT_LEARN_DATA = {
         "frame-fps",
         "delta"
       ],
-      "previous_core_term_id": "frame-fps",
+      "previous_core_term_id": "delta",
       "next_core_term_id": "_physics_process"
     },
     {
@@ -3384,8 +3384,8 @@ window.GODOT_LEARN_DATA = {
         "input-action-input-map",
         "polling-vs-event-driven-input"
       ],
-      "previous_core_term_id": "_physics_process",
-      "next_core_term_id": "input-action-input-map"
+      "previous_core_term_id": "frame-fps",
+      "next_core_term_id": "_process"
     },
     {
       "id": "dependency",
@@ -4534,7 +4534,7 @@ window.GODOT_LEARN_DATA = {
         "_physics_process"
       ],
       "previous_core_term_id": "game-loop",
-      "next_core_term_id": "_process"
+      "next_core_term_id": "delta"
     },
     {
       "id": "frame-independent",
@@ -5418,7 +5418,7 @@ window.GODOT_LEARN_DATA = {
         "polling-vs-event-driven-input",
         "timer-cooldown"
       ],
-      "previous_core_term_id": "delta",
+      "previous_core_term_id": "_physics_process",
       "next_core_term_id": "polling-vs-event-driven-input"
     },
     {
@@ -11708,9 +11708,9 @@ window.GODOT_LEARN_DATA = {
       "core_term_ids": [
         "game-loop",
         "frame-fps",
+        "delta",
         "_process",
         "_physics_process",
-        "delta",
         "input-action-input-map",
         "polling-vs-event-driven-input",
         "signal",
@@ -12630,9 +12630,9 @@ window.GODOT_LEARN_DATA = {
           "autoload",
           "game-loop",
           "frame-fps",
+          "delta",
           "_process",
           "_physics_process",
-          "delta",
           "input-action-input-map",
           "polling-vs-event-driven-input",
           "signal",

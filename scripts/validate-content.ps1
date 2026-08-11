@@ -15,6 +15,44 @@ function Json-Shape($value) {
     $value | ConvertTo-Json -Compress -Depth 100
 }
 
+function Get-GuidedStringSyntaxIssue([string]$text) {
+    $inString = $false
+    $escaped = $false
+    for ($index = 0; $index -lt $text.Length; $index++) {
+        $character = $text[$index]
+        if (-not $inString) {
+            if ($character -eq '"') { $inString = $true }
+            continue
+        }
+        if ($escaped) {
+            $escaped = $false
+            continue
+        }
+        if ($character -eq '\') {
+            $escaped = $true
+            continue
+        }
+        if ($character -eq "`r" -or $character -eq "`n") {
+            return "satır sonuna kadar kapanmayan double-quoted string"
+        }
+        if ($character -ne '"') { continue }
+
+        $inString = $false
+        $nextIndex = $index + 1
+        while ($nextIndex -lt $text.Length -and [char]::IsWhiteSpace($text[$nextIndex])) { $nextIndex++ }
+        if ($nextIndex -lt $text.Length -and ($text[$nextIndex] -match '[A-Za-z_$]')) {
+            return "string kapanışından sonra ayraçsız JavaScript token'ı"
+        }
+    }
+    if ($inString) { return "dosya sonunda kapanmayan double-quoted string" }
+    return $null
+}
+
+$guidedStringGuardProbe = 'godot: ["Input.is_action_pressed("move_left")"]'
+if (-not (Get-GuidedStringSyntaxIssue $guidedStringGuardProbe)) {
+    throw "Guided JavaScript string syntax guard kendi regression probe'unu yakalayamadı."
+}
+
 $sourceText = [System.IO.File]::ReadAllText($sourcePath, $utf8)
 $database = $sourceText | ConvertFrom-Json
 $contentScript = [System.IO.File]::ReadAllText($contentScriptPath, $utf8)
@@ -257,11 +295,17 @@ foreach ($field in @("lessonId", "displayTitle", "displayDescription", "section"
 
 foreach ($guideFile in $guidedFiles) {
     $guideText = [System.IO.File]::ReadAllText($guideFile.FullName, $utf8)
+    $stringSyntaxIssue = Get-GuidedStringSyntaxIssue $guideText
+    if ($stringSyntaxIssue) { $errors.Add("$($guideFile.Name): $stringSyntaxIssue bulundu.") }
     $lessonMatch = [regex]::Match($guideText, 'lessonId:\s*"([^"]+)"')
     if (-not $lessonMatch.Success) { $errors.Add("$($guideFile.Name): lessonId bulunamadı."); continue }
     $lessonId = $lessonMatch.Groups[1].Value
     $lesson = $database.lessons | Where-Object id -eq $lessonId
     if (-not $lesson) { $errors.Add("$($guideFile.Name): bilinmeyen lesson '$lessonId'."); continue }
+    if ($guideFile.Name -cne "$lessonId-guided.js") { $errors.Add("$($guideFile.Name): dosya adı lessonId '$lessonId' ile eşleşmiyor.") }
+    if (([regex]::Matches($guideText, 'window\.GODOT_LESSON_GUIDES\[guide\.lessonId\]\s*=\s*guide\s*;')).Count -ne 1) {
+        $errors.Add("$($guideFile.Name): generic runtime guided registry kaydı tekil değil.")
+    }
 
     $orderMatch = [regex]::Match($guideText, 'order:\s*\[(?<body>.*?)\],\s*\r?\n\s*topics:', [System.Text.RegularExpressions.RegexOptions]::Singleline)
     $orderIds = @([regex]::Matches($orderMatch.Groups['body'].Value, '"([^"]+)"') | ForEach-Object { $_.Groups[1].Value })
@@ -301,9 +345,16 @@ $appText = [System.IO.File]::ReadAllText((Join-Path $projectRoot "src/js/app.js"
 $componentsText = [System.IO.File]::ReadAllText((Join-Path $projectRoot "src/js/components.js"), $utf8)
 $dataText = [System.IO.File]::ReadAllText((Join-Path $projectRoot "src/js/data.js"), $utf8)
 $uiCopyText = [System.IO.File]::ReadAllText((Join-Path $projectRoot "src/js/ui-copy.js"), $utf8)
+$routerText = [System.IO.File]::ReadAllText((Join-Path $projectRoot "src/js/router.js"), $utf8)
+$storageText = [System.IO.File]::ReadAllText((Join-Path $projectRoot "src/js/storage.js"), $utf8)
 foreach ($token in @("guidedTopicView", "inline-term", "guided-next", "guided-complete-lesson", "guided-complete-from-landing", "canonicalTitle", "quickTermIds")) {
     if (-not ($viewsText.Contains($token) -or $appText.Contains($token))) { $errors.Add("Guided akış bağlantısı eksik: $token") }
 }
+if ($viewsText -notmatch 'const\s+lessonGuides\s*=\s*window\.GODOT_LESSON_GUIDES\s*\|\|\s*\{\}\s*;') { $errors.Add("Views runtime guided registry'yi generic olarak okumuyor.") }
+if ($viewsText -notmatch 'if\s*\(lessonGuides\[id\]\)\s*return\s+guidedLessonLanding\(lesson\)\s*;') { $errors.Add("Lesson landing guided registry varlığına göre generic seçilmiyor.") }
+if ($viewsText -notmatch 'case\s+"lesson-topic"\s*:\s*return\s+guidedTopicView\(route\.param,\s*route\.subparam\)\s*;') { $errors.Add("Guided topic route generic lesson/topic parametrelerini renderer'a aktarmıyor.") }
+$guidedRuntimeText = $viewsText + "`n" + $routerText + "`n" + $storageText + "`n" + $appText
+if ($guidedRuntimeText -match 'lesson-[0-9]{2}') { $errors.Add("Guided runtime entegrasyonu hard-coded lesson ID içeriyor.") }
 if (-not $viewsText.Contains('class="inline-code"')) { $errors.Add("Guided inline-code renderer bağlantısı bulunamadı.") }
 if ($dataText -notmatch 'lessons\.find\(\(lesson\)\s*=>\s*!completed\.has\(lesson\.id\)\)\s*\?\?\s*null') { $errors.Add("Tüm kurs tamamlandığında next course lesson null dönmüyor.") }
 foreach ($token in @("completeTitle", "completeDescription", "goToReview", "browseGlossary")) {

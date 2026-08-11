@@ -136,7 +136,7 @@
       "input-action-input-map"
     ],
     "previous_core_term_id": "_process",
-    "next_core_term_id": "delta"
+    "next_core_term_id": "input-action-input-map"
   },
   {
     "id": "_process",
@@ -174,7 +174,7 @@
       "frame-fps",
       "delta"
     ],
-    "previous_core_term_id": "frame-fps",
+    "previous_core_term_id": "delta",
     "next_core_term_id": "_physics_process"
   },
   {
@@ -3280,8 +3280,8 @@
       "input-action-input-map",
       "polling-vs-event-driven-input"
     ],
-    "previous_core_term_id": "_physics_process",
-    "next_core_term_id": "input-action-input-map"
+    "previous_core_term_id": "frame-fps",
+    "next_core_term_id": "_process"
   },
   {
     "id": "dependency",
@@ -4430,7 +4430,7 @@
       "_physics_process"
     ],
     "previous_core_term_id": "game-loop",
-    "next_core_term_id": "_process"
+    "next_core_term_id": "delta"
   },
   {
     "id": "frame-independent",
@@ -5314,7 +5314,7 @@
       "polling-vs-event-driven-input",
       "timer-cooldown"
     ],
-    "previous_core_term_id": "delta",
+    "previous_core_term_id": "_physics_process",
     "next_core_term_id": "polling-vs-event-driven-input"
   },
   {
