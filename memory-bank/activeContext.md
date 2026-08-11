@@ -7,7 +7,7 @@
 - Hash SPA bilinçli olarak korunur; hash lesson/term route'ları canonical veya sitemap URL'si yapılmaz.
 - Uygulama beginner curriculum sunumunu source taxonomy'den ayırır; 14 lesson beş bölümden oluşan kompakt course outline olarak görünür.
 - Lesson ID'leri, route'lar ve LocalStorage progress anahtarları değişmedi.
-- Lesson 1–7 guided; Lesson 8–14 klasik içerik sunumundadır.
+- Lesson 1–9 guided; Lesson 10–14 klasik içerik sunumundadır.
 - Canonical veri 346 terim içerir: 128 core, 218 recognize.
 - Lesson 3 core akışında Node'dan sonra `script`, ardından Scene bulunur.
 - Basic `signal` Lesson 4 core metadata'sında input/polling sonrasına konumlandı; ileri event-driven architecture Lesson 9'da ayrıdır.
@@ -15,6 +15,8 @@
 - Lesson 5 canonical/guided sırası Coordinate System → Vector2/Vector3 → Magnitude/Length → Normalize → Local/Global Coordinates → Transform → Interpolation/Lerp → Distance/Direction olarak korunur.
 - Lesson 6 canonical/guided sırası Lesson 5'e doğal hareket köprüsü için Velocity/Acceleration → Collision → CollisionShape → CharacterBody → RigidBody → StaticBody → Area → Collision Layer/Mask → RayCast/ShapeCast olarak hizalıdır.
 - Lesson 7 canonical/guided sırası Sprite/Texture → Atlas/Sprite Sheet → Tile/TileMap → Camera → Viewport → Material/Shader → AnimationPlayer → Tween → Draw Call olarak korunur.
+- Lesson 8 canonical/guided sırası UI/GUI → Control → Container → Anchor/Offset → Resolution → Aspect Ratio → Scaling/Stretch → Theme → HUD olarak korunur; akış world/UI ayrımından responsive layout'a ilerler.
+- Lesson 9 canonical/guided sırası Data vs Logic → Resource → Serialization → Save/Load → State → FSM → Coupling → Cohesion → Encapsulation → Signal/Event-driven Architecture olarak korunur; runtime state, kalıcı save verisi ve Resource ayrı rollerdir.
 - `scope` / `project-scope` ve `loop` / `audio-loop` farklı canonical kayıtlardır.
 - Combined source, split JSON dosyaları ve runtime veri aynı source-of-truth'un doğrulanan temsilleridir.
 - Locale altyapısı `tr` içerik ile aktiftir; `en` içerik tamamlanana kadar kullanıcıya yarım bir dil modu sunulmaz.
