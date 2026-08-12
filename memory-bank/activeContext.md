@@ -7,7 +7,7 @@
 - Hash SPA bilinçli olarak korunur; hash lesson/term route'ları canonical veya sitemap URL'si yapılmaz.
 - Uygulama beginner curriculum sunumunu source taxonomy'den ayırır; 14 lesson beş bölümden oluşan kompakt course outline olarak görünür.
 - Lesson ID'leri, route'lar ve LocalStorage progress anahtarları değişmedi.
-- Lesson 1–11 guided; Lesson 12–14 klasik içerik sunumundadır.
+- Lesson 1–12 guided; Lesson 13–14 klasik içerik sunumundadır.
 - Canonical veri 346 terim içerir: 128 core, 218 recognize.
 - Lesson 3 core akışında Node'dan sonra `script`, ardından Scene bulunur.
 - Basic `signal` Lesson 4 core metadata'sında input/polling sonrasına konumlandı; ileri event-driven architecture Lesson 9'da ayrıdır.
@@ -31,7 +31,7 @@
 
 ## Current Focus
 
-- İçerik güncel stable Godot 4.x'i hedefler; sürüme duyarlı değişiklikler resmi stable belgelerle doğrulanır. Son merkezi kontrol 2026-08-12 tarihinde Godot 4.7.1 için yapıldı.
+- İçerik güncel stable Godot 4.x'i hedefler; sürüme duyarlı değişiklikler resmi stable belgelerle doğrulanır. Son merkezi kontrol 2026-08-12 tarihinde Godot 4.7.1 için, Lesson 12 Debugger/Profiler/Monitors anlatımı ise aynı tarihte resmi stable belgelerle yapıldı.
 - Yeni guided lesson ancak açık bir görev kapsamıyla, `docs/GUIDED_LEARNING_SPEC.md` standardına göre eklenmeli.
 - Full crawlable lesson/term SEO mimarisi Türkçe guided curriculum tamamlandıktan sonra ayrı bir aşamada ele alınmalı.
 - Gerçek Brave kalite kapısı `file://` ve `/LearnGodot/` HTTP alt-yolunda; tüm route/term render'larını, search ve review durumlarını, normal/engelli/stale LocalStorage akışlarını, tema fallback'ini, mobil drawer odağını ve reduced-motion cevap akışlarını kapsar.

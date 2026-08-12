@@ -21,7 +21,7 @@
 
 ## Maintenance
 
-Sürüme duyarlı içerik resmi Godot stable belgeleriyle kontrol edilir. Son kontrol 2026-08-12 tarihinde [Godot 4.7.1 stable release](https://godotengine.org/article/maintenance-release-godot-4-7-1/), [TileMap](https://docs.godotengine.org/en/stable/classes/class_tilemap.html) ve [TileMapLayer](https://docs.godotengine.org/en/stable/classes/class_tilemaplayer.html) belgeleriyle yapıldı.
+Sürüme duyarlı içerik resmi Godot stable belgeleriyle kontrol edilir. Son kontroller 2026-08-12 tarihinde [Godot 4.7.1 stable release](https://godotengine.org/article/maintenance-release-godot-4-7-1/), [TileMap](https://docs.godotengine.org/en/stable/classes/class_tilemap.html), [TileMapLayer](https://docs.godotengine.org/en/stable/classes/class_tilemaplayer.html), [Debugger panel](https://docs.godotengine.org/en/stable/tutorials/scripting/debug/debugger_panel.html), [The Profiler](https://docs.godotengine.org/en/stable/tutorials/scripting/debug/the_profiler.html) ve [General optimization tips](https://docs.godotengine.org/en/stable/tutorials/performance/general_optimization.html) belgeleriyle yapıldı.
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\sync-content.ps1
