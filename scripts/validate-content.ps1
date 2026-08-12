@@ -342,16 +342,16 @@ if (-not $legacyPromptText.StartsWith("> **$legacyWarning**")) { $errors.Add("Le
 if (([regex]::Matches($legacyPromptText, [regex]::Escape($legacyWarning))).Count -ne 1) { $errors.Add("Legacy prompt uyarısı tekil değil.") }
 $guidedFiles = @(Get-ChildItem (Join-Path $projectRoot "src/data") -Filter "lesson-*-guided.js" | Sort-Object Name)
 $guideScriptPaths = @($guidedFiles | ForEach-Object { "src/data/$($_.Name)" })
-$expectedGuidedNames = @(1..10 | ForEach-Object { "lesson-{0:D2}-guided.js" -f $_ })
-if ((@($guidedFiles.Name) -join "|") -cne ($expectedGuidedNames -join "|")) { $errors.Add("Lesson 1-10 guided dosyaları eksiksiz ve sıralı keşfedilmedi.") }
+$expectedGuidedNames = @(1..11 | ForEach-Object { "lesson-{0:D2}-guided.js" -f $_ })
+if ((@($guidedFiles.Name) -join "|") -cne ($expectedGuidedNames -join "|")) { $errors.Add("Lesson 1-11 guided dosyaları eksiksiz ve sıralı keşfedilmedi.") }
 $expectedScriptOrder = @("src/js/site-config.js", "src/data/content.js", "src/data/locale.js", "src/data/curriculum.js") + $guideScriptPaths + @(
     "src/js/ui-copy.js", "src/js/data.js", "src/js/storage.js", "src/js/router.js", "src/js/components.js", "src/js/views.js", "src/js/app.js"
 )
 $actualScriptOrder = @([regex]::Matches($indexHtml, '<script\s+defer\s+src="([^"]+)"\s*></script>') | ForEach-Object { $_.Groups[1].Value })
 if (($actualScriptOrder -join "|") -ne ($expectedScriptOrder -join "|")) { $errors.Add("Klasik script yükleme sırası beklenen mimariyle eşleşmiyor.") }
-$lesson10ScriptIndex = [array]::IndexOf($actualScriptOrder, "src/data/lesson-10-guided.js")
+$lesson11ScriptIndex = [array]::IndexOf($actualScriptOrder, "src/data/lesson-11-guided.js")
 $uiCopyScriptIndex = [array]::IndexOf($actualScriptOrder, "src/js/ui-copy.js")
-if ($lesson10ScriptIndex -lt 0 -or $uiCopyScriptIndex -lt 0 -or $lesson10ScriptIndex -ge $uiCopyScriptIndex) { $errors.Add("Lesson 10 guided script UI/runtime scriptlerinden önce yüklenmiyor.") }
+if ($lesson11ScriptIndex -lt 0 -or $uiCopyScriptIndex -lt 0 -or $lesson11ScriptIndex -ge $uiCopyScriptIndex) { $errors.Add("Lesson 11 guided script UI/runtime scriptlerinden önce yüklenmiyor.") }
 
 $lesson7GuideText = [System.IO.File]::ReadAllText((Join-Path $projectRoot "src/data/lesson-07-guided.js"), $utf8)
 if (-not $lesson7GuideText.Contains('shortTitle: "Tile / TileMapLayer"') -or -not $lesson7GuideText.Contains("TileMap node'u deprecated")) {

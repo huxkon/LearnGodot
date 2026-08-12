@@ -7,7 +7,7 @@
 - Hash SPA bilinçli olarak korunur; hash lesson/term route'ları canonical veya sitemap URL'si yapılmaz.
 - Uygulama beginner curriculum sunumunu source taxonomy'den ayırır; 14 lesson beş bölümden oluşan kompakt course outline olarak görünür.
 - Lesson ID'leri, route'lar ve LocalStorage progress anahtarları değişmedi.
-- Lesson 1–10 guided; Lesson 11–14 klasik içerik sunumundadır.
+- Lesson 1–11 guided; Lesson 12–14 klasik içerik sunumundadır.
 - Canonical veri 346 terim içerir: 128 core, 218 recognize.
 - Lesson 3 core akışında Node'dan sonra `script`, ardından Scene bulunur.
 - Basic `signal` Lesson 4 core metadata'sında input/polling sonrasına konumlandı; ileri event-driven architecture Lesson 9'da ayrıdır.
