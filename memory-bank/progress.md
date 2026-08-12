@@ -7,7 +7,8 @@
 - Sidebar, boot screen ve favicon'lar tek canonical mavi `L` brand icon asset'ini kullanır; homepage application/site-name ve minimal WebSite sinyalleri taşır.
 - Dashboard, Learn, lesson/term detail, glossary, search, quiz, review ve favorites rotaları çalışır.
 - Learn ekranı beginner display metadata, section grouping, sıra, açıklama, technical topics, ilerleme ve bağlama uygun CTA gösterir.
-- Lesson 1–13 ortak guided registry/renderer kullanır; Lesson 13 version control ve commit'ten branch/merge akışına, `.gitignore`, debug/release build ve export preset üzerinden CI/CD ile tekrarlanabilir yayın hazırlığına ilerler.
+- Lesson 1–14 ortak guided registry/renderer kullanır; classic lesson kalmamıştır ve Türkçe guided curriculum içerik olarak 14/14 tamamlanmıştır.
+- Lesson 14 prototype, vertical slice ve MVP ayrımından scope, iteration/playtest ve balancing üzerinden game feel/juice ile feedback/affordance ilişkisine ilerler.
 - Lesson 2 operator prerequisite'i conditional içinde görünürdür; Collection quick-term'i Array/Dictionary bağımlılığını açıklar.
 - Guided CTA state'leri başlanmadı, kısmi, topic'ler bitti ve lesson tamamlandı durumlarını ayırır.
 - Review badge manual terimler ile review durumundaki quiz sorularını birlikte sayar.
@@ -35,16 +36,16 @@
 - Combined/split/runtime equality ve ilişkiler validator kapsamındadır.
 - Marka, legacy prompt başlangıcı, exact counts ve inline-code renderer bağlantısı validator kapsamındadır.
 - Guided/source exact sıra, flattened core-course sırası, global core zinciri ve 14/14 null completion bağlantısı validator kapsamındadır.
-- Guided dosyalar hard-code edilmeden keşfedilir; şu an Lesson 1–13 bulunur.
+- Guided dosyalar hard-code edilmeden keşfedilir; Lesson 1–14 eksiksiz bulunur.
 - Guided dosya syntax/registry kaydı ile landing/topic dispatch'in registry tabanlı kalması validator tarafından korunur.
 - Guided topic key/order eşitliği ve guide-local prerequisite lookup kontratı validator tarafından korunur.
 - SEO static validator ve `/LearnGodot/` HTTP path smoke testi homepage, robots, sitemap, CSS ve JS asset'leri için başarılıdır.
 - Canonical SVG ile 16/32/48 PNG ve ICO varyantları boyut, deterministik üretim, `file://` relative path ve `/LearnGodot/` HTTP erişimi açısından doğrulandı.
 - İzole gerçek Brave `file://` matrisi bütün JavaScript dosyalarını, normal/tam engelli/stale-okunabilir storage'ı, tema, search, dört review kombinasyonu, drawer/focus/breakpoint, reduced-motion cevap akışları ile bütün route ve term render'larını doğrular.
-- Lesson 13 kısa gerçek Brave `file://` smoke'u guided landing, Start → `version-control`, ilk ve son `ci-cd` topic route'ları, concept map ve completion eylemini fatal UI olmadan render eder.
+- Lesson 14 kısa gerçek Brave `file://` smoke'u guided landing, Start → `prototype`, ilk ve son `feedback-affordance` topic route'ları, concept map ve generic completion eylemini fatal UI olmadan render eder.
 
 ## Remaining
 
-- Lesson 14 için guided içerik yalnız gelecekte ayrı bir görevle üretilecek.
+- Türkçe guided curriculum tamamlandı; proje çapındaki mega denetim henüz yapılmadı.
 - İngilizce curriculum/guided içerik henüz yok; locale switcher bu nedenle gösterilmiyor.
 - Crawlable non-hash lesson/term URL'leri, expanded sitemap, TR/EN URL'leri, `hreflang` ve page-specific metadata Türkçe guided curriculum sonrasındaki Full SEO aşamasına bırakıldı.

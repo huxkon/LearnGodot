@@ -7,7 +7,7 @@
 - Hash SPA bilinçli olarak korunur; hash lesson/term route'ları canonical veya sitemap URL'si yapılmaz.
 - Uygulama beginner curriculum sunumunu source taxonomy'den ayırır; 14 lesson beş bölümden oluşan kompakt course outline olarak görünür.
 - Lesson ID'leri, route'lar ve LocalStorage progress anahtarları değişmedi.
-- Lesson 1–13 guided; Lesson 14 klasik içerik sunumundadır.
+- Lesson 1–14 ortak guided registry/renderer kullanır; classic lesson kalmamıştır ve Türkçe guided curriculum içerik olarak 14/14 tamamlanmıştır.
 - Canonical veri 346 terim içerir: 128 core, 218 recognize.
 - Lesson 3 core akışında Node'dan sonra `script`, ardından Scene bulunur.
 - Basic `signal` Lesson 4 core metadata'sında input/polling sonrasına konumlandı; ileri event-driven architecture Lesson 9'da ayrıdır.
@@ -17,6 +17,7 @@
 - Lesson 7 canonical/guided sırası Sprite/Texture → Atlas/Sprite Sheet → Tile/TileMapLayer → Camera → Viewport → Material/Shader → AnimationPlayer → Tween → Draw Call olarak korunur; eski TileMap node'u deprecated olarak açıklanır.
 - Lesson 8 canonical/guided sırası UI/GUI → Control → Container → Anchor/Offset → Resolution → Aspect Ratio → Scaling/Stretch → Theme → HUD olarak korunur; akış world/UI ayrımından responsive layout'a ilerler.
 - Lesson 9 canonical/guided sırası Data vs Logic → Resource → Serialization → Save/Load → State → FSM → Coupling → Cohesion → Encapsulation → Signal/Event-driven Architecture olarak korunur; runtime state, kalıcı save verisi ve Resource ayrı rollerdir.
+- Lesson 14 canonical/guided sırası Prototype → Vertical Slice → MVP → Project Scope → Iteration → Playtest → Balancing → Game Feel/Juice → Feedback/Affordance olarak korunur; genel oyun tasarımı ve üretim dili gereksiz Godot API zinciri olmadan öğretilir.
 - `scope` / `project-scope` ve `loop` / `audio-loop` farklı canonical kayıtlardır.
 - Combined source, split JSON dosyaları ve runtime veri aynı source-of-truth'un doğrulanan temsilleridir.
 - Locale altyapısı `tr` içerik ile aktiftir; `en` içerik tamamlanana kadar kullanıcıya yarım bir dil modu sunulmaz.
@@ -32,7 +33,7 @@
 ## Current Focus
 
 - İçerik güncel stable Godot 4.x'i hedefler; sürüme duyarlı değişiklikler resmi stable belgelerle doğrulanır. Son merkezi kontrol 2026-08-12 tarihinde Godot 4.7.1 için, Lesson 12 Debugger/Profiler/Monitors anlatımı ise aynı tarihte resmi stable belgelerle yapıldı.
-- Yeni guided lesson ancak açık bir görev kapsamıyla, `docs/GUIDED_LEARNING_SPEC.md` standardına göre eklenmeli.
+- Yeni locale guided içeriği ancak açık bir görev kapsamıyla, `docs/GUIDED_LEARNING_SPEC.md` standardına göre eklenmeli.
 - Full crawlable lesson/term SEO mimarisi Türkçe guided curriculum tamamlandıktan sonra ayrı bir aşamada ele alınmalı.
 - Gerçek Brave kalite kapısı `file://` ve `/LearnGodot/` HTTP alt-yolunda; tüm route/term render'larını, search ve review durumlarını, normal/engelli/stale LocalStorage akışlarını, tema fallback'ini, mobil drawer odağını ve reduced-motion cevap akışlarını kapsar.
 - Yeni içerik eklenince sync ve dynamic validator birlikte çalıştırılmalı.

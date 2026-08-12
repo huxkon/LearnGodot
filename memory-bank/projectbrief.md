@@ -14,11 +14,11 @@ LearnGodot; Godot'u, GDScript'in temelini ve oyun geliştirme kavramlarını Tü
 - 14 lesson'ın canonical ID/order değeri korunur; beginner başlık ve gruplama curriculum presentation katmanından gelir.
 - Dashboard, Learn, term detail, glossary, quiz, review, favorites ve global search bulunur.
 - Progress, favorites, manual review ve quiz state canonical ID'lerle LocalStorage'da saklanır.
-- Lesson 1–13 guided; Lesson 14 classic. Guided ilerleme topic ve lesson tamamlanmasını ayrı tutar.
+- Lesson 1–14 guided; classic lesson kalmamıştır. Guided ilerleme topic ve lesson tamamlanmasını ayrı tutar.
 - UI copy, curriculum metadata ve eğitim içeriği localization için ayrı katmanlardır.
 - `COPY.appName` kullanıcıya dönük tek reusable brand kaynağıdır; teknik namespace ve canonical ID'ler brand'den bağımsızdır.
 - Erişilebilir klavye/focus davranışı, responsive görünüm ve açık/koyu tema korunur.
-- Full crawlable SEO Lesson 14 guided tamamlandıktan sonra; İngilizce sürüm ise Türkçe 14/14 guided, QA ve Full SEO sonrasında ele alınır. Özel alan adı mevcut kapsamda değildir.
+- Full crawlable SEO Türkçe 14/14 guided curriculum sonrasındaki ayrı aşamadır; İngilizce sürüm ise QA ve Full SEO sonrasında ele alınır. Özel alan adı mevcut kapsamda değildir.
 
 ## Content Rules
 
