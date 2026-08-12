@@ -15,6 +15,46 @@ function Json-Shape($value) {
     $value | ConvertTo-Json -Compress -Depth 100
 }
 
+function Get-RelativeLuminance([string]$hexColor) {
+    $hex = $hexColor.TrimStart("#")
+    if ($hex -notmatch '^[0-9a-fA-F]{6}$') { throw "Geçersiz hex renk: $hexColor" }
+    $channels = @(0, 2, 4 | ForEach-Object {
+        $value = [Convert]::ToInt32($hex.Substring($_, 2), 16) / 255
+        if ($value -le 0.04045) { $value / 12.92 } else { [Math]::Pow(($value + 0.055) / 1.055, 2.4) }
+    })
+    return 0.2126 * $channels[0] + 0.7152 * $channels[1] + 0.0722 * $channels[2]
+}
+
+function Get-ContrastRatio([string]$foreground, [string]$background) {
+    $foregroundLuminance = Get-RelativeLuminance $foreground
+    $backgroundLuminance = Get-RelativeLuminance $background
+    $lighter = [Math]::Max($foregroundLuminance, $backgroundLuminance)
+    $darker = [Math]::Min($foregroundLuminance, $backgroundLuminance)
+    return ($lighter + 0.05) / ($darker + 0.05)
+}
+
+function Get-CompositeHex([string]$foreground, [string]$background, [double]$alpha) {
+    $foregroundHex = $foreground.TrimStart("#")
+    $backgroundHex = $background.TrimStart("#")
+    $channels = @(0, 2, 4 | ForEach-Object {
+        $foregroundChannel = [Convert]::ToInt32($foregroundHex.Substring($_, 2), 16)
+        $backgroundChannel = [Convert]::ToInt32($backgroundHex.Substring($_, 2), 16)
+        [Math]::Round($foregroundChannel * $alpha + $backgroundChannel * (1 - $alpha))
+    })
+    return "#" + (($channels | ForEach-Object { [Convert]::ToString([int]$_, 16).PadLeft(2, "0") }) -join "")
+}
+
+function Get-CssThemeTokens([string]$cssText, [string]$selector) {
+    $selectorPattern = if ($selector -eq ":root") { '(?m)^:root\s*\{(?<body>[\s\S]*?)^\}' } else { '(?m)^\[data-theme="dark"\]\s*\{(?<body>[\s\S]*?)^\}' }
+    $match = [regex]::Match($cssText, $selectorPattern)
+    if (-not $match.Success) { throw "CSS theme bloğu bulunamadı: $selector" }
+    $tokens = @{}
+    foreach ($tokenMatch in [regex]::Matches($match.Groups["body"].Value, '--(?<name>[a-z0-9-]+)\s*:\s*(?<value>#[0-9a-fA-F]{6})\s*;')) {
+        $tokens[$tokenMatch.Groups["name"].Value] = $tokenMatch.Groups["value"].Value.ToLowerInvariant()
+    }
+    return $tokens
+}
+
 function Get-GuidedStringSyntaxIssue([string]$text) {
     $inString = $false
     $escaped = $false
@@ -119,6 +159,29 @@ foreach ($term in $database.terms) {
             elseif ($next.previous_core_term_id -ne $term.id) { $errors.Add("$($term.id): next/previous zinciri karşılıklı değil.") }
         }
     }
+}
+
+$forbiddenRelatedPairs = @(
+    @{ Left = "rpc"; Right = "normal" },
+    @{ Left = "rpc"; Right = "remote" },
+    @{ Left = "repository"; Right = "control" },
+    @{ Left = "backup"; Right = "control" },
+    @{ Left = "ui-gui"; Right = "interface" },
+    @{ Left = "audio-bus"; Right = "client-server" },
+    @{ Left = "sfx-bgm"; Right = "client-server" },
+    @{ Left = "sfx-bgm"; Right = "peer" },
+    @{ Left = "spatial-audio"; Right = "packet" },
+    @{ Left = "spatial-audio"; Right = "bandwidth" }
+)
+foreach ($pair in $forbiddenRelatedPairs) {
+    if ($termMap[$pair.Left].related_term_ids -contains $pair.Right) { $errors.Add("Yanlış related-term bağlantısı sürüyor: $($pair.Left) -> $($pair.Right).") }
+    if ($termMap[$pair.Right].related_term_ids -contains $pair.Left) { $errors.Add("Yanlış related-term bağlantısı sürüyor: $($pair.Right) -> $($pair.Left).") }
+}
+
+$tileTerm = $termMap["tile-tilemap"]
+if (-not $tileTerm -or $tileTerm.tier -ne "core") { $errors.Add("Stable canonical ID 'tile-tilemap' core term olarak korunmadı.") }
+if (-not $tileTerm.name.Contains("TileMapLayer") -or -not $tileTerm.definition.Contains("TileSet") -or -not $tileTerm.definition.Contains("deprecated")) {
+    $errors.Add("tile-tilemap kullanıcı metni güncel Tile/TileSet/TileMapLayer ve deprecated TileMap ayrımını içermiyor.")
 }
 
 foreach ($lesson in $database.lessons) {
@@ -279,11 +342,29 @@ if (-not $legacyPromptText.StartsWith("> **$legacyWarning**")) { $errors.Add("Le
 if (([regex]::Matches($legacyPromptText, [regex]::Escape($legacyWarning))).Count -ne 1) { $errors.Add("Legacy prompt uyarısı tekil değil.") }
 $guidedFiles = @(Get-ChildItem (Join-Path $projectRoot "src/data") -Filter "lesson-*-guided.js" | Sort-Object Name)
 $guideScriptPaths = @($guidedFiles | ForEach-Object { "src/data/$($_.Name)" })
+$expectedGuidedNames = @(1..10 | ForEach-Object { "lesson-{0:D2}-guided.js" -f $_ })
+if ((@($guidedFiles.Name) -join "|") -cne ($expectedGuidedNames -join "|")) { $errors.Add("Lesson 1-10 guided dosyaları eksiksiz ve sıralı keşfedilmedi.") }
 $expectedScriptOrder = @("src/js/site-config.js", "src/data/content.js", "src/data/locale.js", "src/data/curriculum.js") + $guideScriptPaths + @(
     "src/js/ui-copy.js", "src/js/data.js", "src/js/storage.js", "src/js/router.js", "src/js/components.js", "src/js/views.js", "src/js/app.js"
 )
 $actualScriptOrder = @([regex]::Matches($indexHtml, '<script\s+defer\s+src="([^"]+)"\s*></script>') | ForEach-Object { $_.Groups[1].Value })
 if (($actualScriptOrder -join "|") -ne ($expectedScriptOrder -join "|")) { $errors.Add("Klasik script yükleme sırası beklenen mimariyle eşleşmiyor.") }
+$lesson10ScriptIndex = [array]::IndexOf($actualScriptOrder, "src/data/lesson-10-guided.js")
+$uiCopyScriptIndex = [array]::IndexOf($actualScriptOrder, "src/js/ui-copy.js")
+if ($lesson10ScriptIndex -lt 0 -or $uiCopyScriptIndex -lt 0 -or $lesson10ScriptIndex -ge $uiCopyScriptIndex) { $errors.Add("Lesson 10 guided script UI/runtime scriptlerinden önce yüklenmiyor.") }
+
+$lesson7GuideText = [System.IO.File]::ReadAllText((Join-Path $projectRoot "src/data/lesson-07-guided.js"), $utf8)
+if (-not $lesson7GuideText.Contains('shortTitle: "Tile / TileMapLayer"') -or -not $lesson7GuideText.Contains("TileMap node'u deprecated")) {
+    $errors.Add("Lesson 7 guided metni güncel TileMapLayer ve deprecated TileMap ayrımını içermiyor.")
+}
+
+$sourceReadmeText = [System.IO.File]::ReadAllText((Join-Path $sourceRoot "README.md"), $utf8)
+$staleGuidedReadmeText = "Lesson 1$([char]0x2013)3 guided enrichment"
+if ($sourceReadmeText.Contains($staleGuidedReadmeText)) { $errors.Add("Source README stale Lesson 1-3 guided bilgisini taşıyor.") }
+$dynamicDiscoveryText = "dinamik ke$([char]0x015F)fedilir"
+foreach ($readmeToken in @("lesson-*-guided.js", $dynamicDiscoveryText, "Memory Bank")) {
+    if (-not $sourceReadmeText.Contains($readmeToken)) { $errors.Add("Source README guided discovery açıklaması eksik: $readmeToken") }
+}
 
 $curriculumText = [System.IO.File]::ReadAllText((Join-Path $projectRoot "src/data/curriculum.js"), $utf8)
 foreach ($lessonId in $lessonIds) {
@@ -361,6 +442,70 @@ $dataText = [System.IO.File]::ReadAllText((Join-Path $projectRoot "src/js/data.j
 $uiCopyText = [System.IO.File]::ReadAllText((Join-Path $projectRoot "src/js/ui-copy.js"), $utf8)
 $routerText = [System.IO.File]::ReadAllText((Join-Path $projectRoot "src/js/router.js"), $utf8)
 $storageText = [System.IO.File]::ReadAllText((Join-Path $projectRoot "src/js/storage.js"), $utf8)
+$stylesText = [System.IO.File]::ReadAllText((Join-Path $projectRoot "src/styles.css"), $utf8)
+$lightTokens = Get-CssThemeTokens $stylesText ":root"
+$darkTokens = Get-CssThemeTokens $stylesText "dark"
+$contrastCases = @(
+    @{ Name = "light faint/surface-2"; Foreground = $lightTokens["faint"]; Background = $lightTokens["surface-2"]; Minimum = 4.5 },
+    @{ Name = "light faint/surface-3"; Foreground = $lightTokens["faint"]; Background = $lightTokens["surface-3"]; Minimum = 4.5 },
+    @{ Name = "light muted/violet-soft"; Foreground = $lightTokens["muted"]; Background = $lightTokens["violet-soft"]; Minimum = 4.5 },
+    @{ Name = "light violet/violet-soft"; Foreground = $lightTokens["violet"]; Background = $lightTokens["violet-soft"]; Minimum = 4.5 },
+    @{ Name = "light amber/amber-soft"; Foreground = $lightTokens["amber"]; Background = $lightTokens["amber-soft"]; Minimum = 4.5 },
+    @{ Name = "light primary text"; Foreground = "#ffffff"; Background = $lightTokens["accent-solid"]; Minimum = 4.5 },
+    @{ Name = "light primary text hover"; Foreground = "#ffffff"; Background = $lightTokens["accent-solid-hover"]; Minimum = 4.5 },
+    @{ Name = "light focus/bg"; Foreground = $lightTokens["focus-ring"]; Background = $lightTokens["bg"]; Minimum = 3.0 },
+    @{ Name = "light focus/surface"; Foreground = $lightTokens["focus-ring"]; Background = $lightTokens["surface"]; Minimum = 3.0 },
+    @{ Name = "light focus/surface-2"; Foreground = $lightTokens["focus-ring"]; Background = $lightTokens["surface-2"]; Minimum = 3.0 },
+    @{ Name = "light focus/surface-3"; Foreground = $lightTokens["focus-ring"]; Background = $lightTokens["surface-3"]; Minimum = 3.0 },
+    @{ Name = "light focus/primary"; Foreground = $lightTokens["focus-ring"]; Background = $lightTokens["accent-solid"]; Minimum = 3.0 },
+    @{ Name = "light focus/primary-hover"; Foreground = $lightTokens["focus-ring"]; Background = $lightTokens["accent-solid-hover"]; Minimum = 3.0 },
+    @{ Name = "dark faint/surface-2"; Foreground = $darkTokens["faint"]; Background = $darkTokens["surface-2"]; Minimum = 4.5 },
+    @{ Name = "dark faint/surface-3"; Foreground = $darkTokens["faint"]; Background = $darkTokens["surface-3"]; Minimum = 4.5 },
+    @{ Name = "dark muted/violet-soft"; Foreground = $darkTokens["muted"]; Background = $darkTokens["violet-soft"]; Minimum = 4.5 },
+    @{ Name = "dark violet/violet-soft"; Foreground = $darkTokens["violet"]; Background = $darkTokens["violet-soft"]; Minimum = 4.5 },
+    @{ Name = "dark amber/amber-soft"; Foreground = $darkTokens["amber"]; Background = $darkTokens["amber-soft"]; Minimum = 4.5 },
+    @{ Name = "dark primary text"; Foreground = "#ffffff"; Background = $darkTokens["accent-solid"]; Minimum = 4.5 },
+    @{ Name = "dark primary text hover"; Foreground = "#ffffff"; Background = $darkTokens["accent-solid-hover"]; Minimum = 4.5 },
+    @{ Name = "dark focus/bg"; Foreground = $darkTokens["focus-ring"]; Background = $darkTokens["bg"]; Minimum = 3.0 },
+    @{ Name = "dark focus/surface"; Foreground = $darkTokens["focus-ring"]; Background = $darkTokens["surface"]; Minimum = 3.0 },
+    @{ Name = "dark focus/surface-2"; Foreground = $darkTokens["focus-ring"]; Background = $darkTokens["surface-2"]; Minimum = 3.0 },
+    @{ Name = "dark focus/surface-3"; Foreground = $darkTokens["focus-ring"]; Background = $darkTokens["surface-3"]; Minimum = 3.0 },
+    @{ Name = "dark focus/primary"; Foreground = $darkTokens["focus-ring"]; Background = $darkTokens["accent-solid"]; Minimum = 3.0 },
+    @{ Name = "dark focus/primary-hover"; Foreground = $darkTokens["focus-ring"]; Background = $darkTokens["accent-solid-hover"]; Minimum = 3.0 }
+)
+foreach ($case in $contrastCases) {
+    if (-not $case.Foreground -or -not $case.Background) {
+        $errors.Add("Contrast token eksik: $($case.Name)")
+        continue
+    }
+    $ratio = Get-ContrastRatio $case.Foreground $case.Background
+    if ($ratio -lt $case.Minimum) { $errors.Add("Contrast yetersiz: $($case.Name) = $([Math]::Round($ratio, 3)):1") }
+}
+$guidedLabelMatch = [regex]::Match($stylesText, '\.guided-navigation\s+\.button\s*>\s*span\s*\{[^}]*opacity\s*:\s*(?<opacity>0?\.\d+)\s*;', [System.Text.RegularExpressions.RegexOptions]::Singleline)
+if (-not $guidedLabelMatch.Success) {
+    $errors.Add("Guided navigation üst etiket opacity değeri bulunamadı")
+} else {
+    $guidedLabelColor = Get-CompositeHex "#ffffff" $lightTokens["accent-solid"] ([double]::Parse($guidedLabelMatch.Groups["opacity"].Value, [System.Globalization.CultureInfo]::InvariantCulture))
+    $guidedLabelRatio = Get-ContrastRatio $guidedLabelColor $lightTokens["accent-solid"]
+    if ($guidedLabelRatio -lt 4.5) { $errors.Add("Guided primary üst etiket contrast yetersiz: $([Math]::Round($guidedLabelRatio, 3)):1") }
+    $guidedHoverLabelColor = Get-CompositeHex "#ffffff" $lightTokens["accent-solid-hover"] ([double]::Parse($guidedLabelMatch.Groups["opacity"].Value, [System.Globalization.CultureInfo]::InvariantCulture))
+    $guidedHoverLabelRatio = Get-ContrastRatio $guidedHoverLabelColor $lightTokens["accent-solid-hover"]
+    if ($guidedHoverLabelRatio -lt 4.5) { $errors.Add("Guided primary hover üst etiket contrast yetersiz: $([Math]::Round($guidedHoverLabelRatio, 3)):1") }
+}
+foreach ($storageGuard in @("Array.isArray(value)", "isPlainObject", 'typeof value === "string"', "memoryFallback")) {
+    if (-not $storageText.Contains($storageGuard)) { $errors.Add("Storage shape/access guard eksik: $storageGuard") }
+}
+$readFunctionMatch = [regex]::Match($storageText, 'function\s+read\s*\(\s*key\s*\)')
+if (-not $readFunctionMatch.Success) {
+    $errors.Add("Storage read function is missing")
+} else {
+    $readFunctionIndex = $readFunctionMatch.Index
+    $fallbackReadIndex = $storageText.IndexOf("memoryFallback.has(key)", $readFunctionIndex)
+    $persistentReadIndex = $storageText.IndexOf("localStorage.getItem(key)", $readFunctionIndex)
+    if ($fallbackReadIndex -lt 0 -or $persistentReadIndex -lt 0 -or $fallbackReadIndex -gt $persistentReadIndex) {
+        $errors.Add("Storage read must prefer the in-session fallback over persisted data")
+    }
+}
 foreach ($token in @("guidedTopicView", "inline-term", "guided-next", "guided-complete-lesson", "guided-complete-from-landing", "canonicalTitle", "quickTermIds")) {
     if (-not ($viewsText.Contains($token) -or $appText.Contains($token))) { $errors.Add("Guided akış bağlantısı eksik: $token") }
 }
@@ -382,6 +527,13 @@ if ($componentsText.Contains('<span class="brand-mark">') -or $indexHtml.Contain
 if (-not $indexHtml.Contains('<img class="brand-mark" src="assets/brand/learngodot-icon.svg"')) { $errors.Add("Başlangıç ekranı canonical brand icon'u kullanmıyor.") }
 if ($indexHtml -match '<div\s+id="app"[^>]*aria-live') { $errors.Add("SPA root gereksiz aria-live taşıyor.") }
 if ($componentsText -notmatch 'toast-region[^>]*aria-live="polite"') { $errors.Add("Toast için ayrı live region bulunamadı.") }
+if (-not $viewsText.Contains('class="mini-check__answer" tabindex="-1"') -or -not $viewsText.Contains('class="quiz-answer" tabindex="-1"')) { $errors.Add("Guided ve quiz cevapları programatik focus hedefi değil.") }
+if ($appText -notmatch 'answer\.hidden\s*=\s*false[\s\S]*answer\.focus\(') { $errors.Add("Cevap gösterildikten sonra görünür cevap alanına focus taşınmıyor.") }
+foreach ($searchAria in @('role="combobox"', 'aria-controls="global-search-results"', 'id="global-search-results" role="listbox"', 'role="option"', 'aria-selected=')) {
+    if (-not $componentsText.Contains($searchAria)) { $errors.Add("Search combobox/listbox ARIA bağlantısı eksik: $searchAria") }
+}
+if (-not $appText.Contains("aria-activedescendant") -or -not $appText.Contains('setAttribute("aria-expanded"')) { $errors.Add("Search aktif option ve expanded ARIA durumu runtime'da senkronlanmıyor.") }
+if (-not $appText.Contains('toggleAttribute("inert"') -or -not $appText.Contains('setAttribute("aria-hidden"')) { $errors.Add("Mobil sidebar inert/aria-hidden durumu runtime'da senkronlanmıyor.") }
 
 if ($errors.Count) {
     $errors | ForEach-Object { Write-Error $_ }

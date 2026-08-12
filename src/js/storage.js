@@ -17,20 +17,61 @@
     STORAGE_KEYS.reviewTermIds,
   ]);
 
+  const memoryFallback = new Map();
+  const VALID_QUIZ_STATUSES = new Set(["correct", "review"]);
+
+  function defaultValue(key) {
+    if (ARRAY_KEYS.has(key)) return [];
+    if (key === STORAGE_KEYS.quizResults) return {};
+    return null;
+  }
+
+  function isPlainObject(value) {
+    if (value === null || typeof value !== "object" || Array.isArray(value)) return false;
+    const prototype = Object.getPrototypeOf(value);
+    return prototype === Object.prototype || prototype === null;
+  }
+
+  function normalizeStringIds(value) {
+    if (!Array.isArray(value)) return [];
+    return [...new Set(value.filter((id) => typeof id === "string" && id.length > 0))];
+  }
+
+  function normalizeQuizResults(value) {
+    if (!isPlainObject(value)) return {};
+    return Object.fromEntries(Object.entries(value).filter(([questionId, result]) => (
+      questionId.length > 0
+      && isPlainObject(result)
+      && VALID_QUIZ_STATUSES.has(result.status)
+    )));
+  }
+
+  function normalize(key, value) {
+    if (ARRAY_KEYS.has(key)) return normalizeStringIds(value);
+    if (key === STORAGE_KEYS.quizResults) return normalizeQuizResults(value);
+    if (key === STORAGE_KEYS.lastVisitedLessonId) return typeof value === "string" ? value : null;
+    return value;
+  }
+
   function read(key) {
+    if (memoryFallback.has(key)) return normalize(key, memoryFallback.get(key));
+
     try {
       const raw = localStorage.getItem(key);
-      if (raw === null) return ARRAY_KEYS.has(key) ? [] : key === STORAGE_KEYS.quizResults ? {} : null;
-      return JSON.parse(raw);
+      if (raw === null) return defaultValue(key);
+      return normalize(key, JSON.parse(raw));
     } catch {
-      return ARRAY_KEYS.has(key) ? [] : key === STORAGE_KEYS.quizResults ? {} : null;
+      return defaultValue(key);
     }
   }
 
   function write(key, value) {
+    const normalized = normalize(key, value);
     try {
-      localStorage.setItem(key, JSON.stringify(value));
+      localStorage.setItem(key, JSON.stringify(normalized));
+      memoryFallback.delete(key);
     } catch (error) {
+      memoryFallback.set(key, normalized);
       console.warn("İlerleme tarayıcı depolamasına yazılamadı.", error);
     }
   }

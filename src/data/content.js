@@ -1044,8 +1044,7 @@ window.GODOT_LEARN_DATA = {
         "edition": "Godot 4.x / Ağustos 2026"
       },
       "related_term_ids": [
-        "sfx-bgm",
-        "client-server"
+        "sfx-bgm"
       ],
       "previous_core_term_id": "behavior-tree",
       "next_core_term_id": "sfx-bgm"
@@ -1291,7 +1290,6 @@ window.GODOT_LEARN_DATA = {
       },
       "related_term_ids": [
         "version-control",
-        "control",
         "patch",
         "hotfix"
       ],
@@ -1386,7 +1384,6 @@ window.GODOT_LEARN_DATA = {
         "edition": "Godot 4.x / Ağustos 2026"
       },
       "related_term_ids": [
-        "spatial-audio",
         "packet",
         "packet-loss",
         "jitter"
@@ -2241,8 +2238,6 @@ window.GODOT_LEARN_DATA = {
         "edition": "Godot 4.x / Ağustos 2026"
       },
       "related_term_ids": [
-        "audio-bus",
-        "sfx-bgm",
         "peer",
         "rpc"
       ],
@@ -7479,7 +7474,6 @@ window.GODOT_LEARN_DATA = {
         "edition": "Godot 4.x / Ağustos 2026"
       },
       "related_term_ids": [
-        "spatial-audio",
         "bandwidth",
         "packet-loss"
       ],
@@ -7748,7 +7742,6 @@ window.GODOT_LEARN_DATA = {
       },
       "related_term_ids": [
         "api",
-        "sfx-bgm",
         "client-server",
         "rpc",
         "authority"
@@ -8855,7 +8848,6 @@ window.GODOT_LEARN_DATA = {
       },
       "related_term_ids": [
         "version-control",
-        "control",
         "open-source",
         "license",
         "platform",
@@ -9260,8 +9252,6 @@ window.GODOT_LEARN_DATA = {
         "edition": "Godot 4.x / Ağustos 2026"
       },
       "related_term_ids": [
-        "normal",
-        "remote",
         "peer",
         "client-server",
         "authority",
@@ -9848,9 +9838,7 @@ window.GODOT_LEARN_DATA = {
         "edition": "Godot 4.x / Ağustos 2026"
       },
       "related_term_ids": [
-        "audio-bus",
-        "client-server",
-        "peer"
+        "audio-bus"
       ],
       "previous_core_term_id": "audio-bus",
       "next_core_term_id": "client-server"
@@ -10049,9 +10037,7 @@ window.GODOT_LEARN_DATA = {
       },
       "related_term_ids": [
         "audio-stream",
-        "audio-loop",
-        "packet",
-        "bandwidth"
+        "audio-loop"
       ],
       "previous_core_term_id": null,
       "next_core_term_id": null
@@ -10654,13 +10640,15 @@ window.GODOT_LEARN_DATA = {
     },
     {
       "id": "tile-tilemap",
-      "name": "Tile / TileMap",
+      "name": "Tile / TileMapLayer",
       "aliases": [
         "Tile",
+        "TileSet",
+        "TileMapLayer",
         "TileMap"
       ],
-      "definition": "Tile tekrar kullanılabilir parça; TileMap bu parçalarla grid tabanlı 2D dünya oluşturmaya yarayan sistemdir.",
-      "short_definition": "Tile tekrar kullanılabilir parça; TileMap bu parçalarla grid tabanlı 2D dünya oluşturmaya yarayan sistemdir.",
+      "definition": "Tile tekrar kullanılan görsel veya harita parçasıdır; TileSet kullanılabilir tile verisini tanımlar, TileMapLayer ise bu parçaları tek bir grid tabanlı 2D katmana yerleştirir. Eski eğitimlerde görebileceğin TileMap node'u deprecated durumdadır; güncel stable Godot 4.x'te ayrı katmanlar için birden fazla TileMapLayer kullanılır.",
+      "short_definition": "Tile tekrar kullanılan parça, TileSet tile verisi, TileMapLayer ise güncel tek harita katmanı node'udur; eski TileMap deprecated durumdadır.",
       "tier": "core",
       "priority": "TEMEL",
       "lesson_ids": [
@@ -10672,8 +10660,8 @@ window.GODOT_LEARN_DATA = {
       "category_names": [
         "Görsel, Kamera ve Animasyon"
       ],
-      "where_heard": "tileset, tilemap layer.",
-      "memory_hook": "Her duvarı ayrı Sprite yapmak yerine tile tabanlı üretim.",
+      "where_heard": "TileSet, TileMapLayer, eski TileMap eğitimleri.",
+      "memory_hook": "Tile parçadır; TileSet paleti tanımlar, her TileMapLayer haritanın tek katmanını kurar.",
       "code_example": null,
       "source": {
         "document": "Yeni Başlayanlar İçin Terimler El Kitabı - Godot + GDScript",
@@ -11050,7 +11038,6 @@ window.GODOT_LEARN_DATA = {
         "edition": "Godot 4.x / Ağustos 2026"
       },
       "related_term_ids": [
-        "interface",
         "hud",
         "control",
         "container"

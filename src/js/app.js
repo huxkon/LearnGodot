@@ -13,7 +13,26 @@ const app = document.querySelector("#app");
 let currentRoute;
 let searchIndex = 0;
 let glossaryTimer;
+let sessionTheme = null;
+const VALID_THEMES = new Set(["light", "dark"]);
+const sidebarMedia = safeMediaQuery("(max-width: 820px)");
 document.documentElement.lang = namespace.locale?.contentLocale ?? site.defaultLocale;
+
+function safeMediaQuery(query) {
+  try {
+    return typeof window.matchMedia === "function" ? window.matchMedia(query) : null;
+  } catch {
+    return null;
+  }
+}
+
+function isMobileSidebar() {
+  return sidebarMedia?.matches ?? window.innerWidth <= 820;
+}
+
+function systemTheme() {
+  return safeMediaQuery("(prefers-color-scheme: dark)")?.matches ? "dark" : "light";
+}
 
 function documentTitleFor(route) {
   if (route.name === "term") return getTermById(route.param)?.name ?? route.title;
@@ -23,18 +42,20 @@ function documentTitleFor(route) {
 }
 
 function preferredTheme() {
+  if (VALID_THEMES.has(sessionTheme)) return sessionTheme;
   try {
-    return localStorage.getItem("godotTheme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-  } catch {
-    return matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-  }
+    const storedTheme = localStorage.getItem("godotTheme");
+    if (VALID_THEMES.has(storedTheme)) sessionTheme = storedTheme;
+  } catch { /* Sistem tercihi güvenli fallback'tir. */ }
+  return sessionTheme ?? systemTheme();
 }
 
 function applyTheme(theme) {
-  document.documentElement.dataset.theme = theme;
-  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme === "dark" ? "#111410" : "#f6f7f2");
+  const resolvedTheme = VALID_THEMES.has(theme) ? theme : "light";
+  document.documentElement.dataset.theme = resolvedTheme;
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", resolvedTheme === "dark" ? "#111410" : "#f6f7f2");
   const button = document.querySelector('[data-action="toggle-theme"]');
-  if (button) button.innerHTML = icon(theme === "dark" ? "sun" : "moon");
+  if (button) button.innerHTML = icon(resolvedTheme === "dark" ? "sun" : "moon");
 }
 
 function render({ focus = false } = {}) {
@@ -43,6 +64,7 @@ function render({ focus = false } = {}) {
   app.innerHTML = appShell(currentRoute, renderView(currentRoute));
   applyTheme(preferredTheme());
   document.body.classList.remove("menu-open");
+  syncSidebarState();
   if (focus) document.querySelector("#main-content")?.focus({ preventScroll: true });
   window.scrollTo({ top: 0, behavior: "instant" });
 }
@@ -65,6 +87,7 @@ function openSearch() {
   const dialog = document.querySelector(".search-dialog");
   if (!dialog?.open) dialog?.showModal();
   searchIndex = 0;
+  setSearchIndex(0);
   requestAnimationFrame(() => document.querySelector("#global-search")?.focus());
 }
 
@@ -74,13 +97,101 @@ function selectedSearchLink() {
 
 function setSearchIndex(next) {
   const links = [...document.querySelectorAll(".search-result")];
-  if (!links.length) return;
+  const input = document.querySelector("#global-search");
+  if (!links.length) {
+    searchIndex = 0;
+    input?.setAttribute("aria-expanded", "false");
+    input?.removeAttribute("aria-activedescendant");
+    return;
+  }
   searchIndex = (next + links.length) % links.length;
   links.forEach((link, index) => {
     link.classList.toggle("is-selected", index === searchIndex);
     link.setAttribute("aria-selected", String(index === searchIndex));
   });
+  input?.setAttribute("aria-expanded", "true");
+  input?.setAttribute("aria-activedescendant", links[searchIndex].id);
   links[searchIndex].scrollIntoView({ block: "nearest" });
+}
+
+function collapseSearch() {
+  const input = document.querySelector("#global-search");
+  input?.setAttribute("aria-expanded", "false");
+  input?.removeAttribute("aria-activedescendant");
+}
+
+function syncSidebarState() {
+  const sidebar = document.querySelector("#sidebar");
+  const menuButton = document.querySelector('[data-action="open-menu"]');
+  const pageColumn = document.querySelector(".page-column");
+  const skipLink = document.querySelector(".skip-link");
+  if (!sidebar) return;
+  const mobile = isMobileSidebar();
+  const open = mobile && document.body.classList.contains("menu-open");
+  const hidden = mobile && !open;
+  sidebar.toggleAttribute("inert", hidden);
+  sidebar.setAttribute("aria-hidden", String(hidden));
+  if (open) {
+    sidebar.setAttribute("role", "dialog");
+    sidebar.setAttribute("aria-modal", "true");
+  } else {
+    sidebar.removeAttribute("role");
+    sidebar.removeAttribute("aria-modal");
+  }
+  pageColumn?.toggleAttribute("inert", open);
+  skipLink?.toggleAttribute("inert", open);
+  menuButton?.setAttribute("aria-expanded", String(open));
+}
+
+function openSidebar() {
+  if (!isMobileSidebar()) return;
+  document.body.classList.add("menu-open");
+  syncSidebarState();
+  requestAnimationFrame(() => document.querySelector("#sidebar .brand, #sidebar .nav-link")?.focus());
+}
+
+function closeSidebar({ restoreFocus = true } = {}) {
+  const wasOpen = document.body.classList.contains("menu-open");
+  document.body.classList.remove("menu-open");
+  syncSidebarState();
+  if (wasOpen && restoreFocus) requestAnimationFrame(() => document.querySelector('[data-action="open-menu"]')?.focus());
+}
+
+function sidebarFocusableElements() {
+  return [...document.querySelectorAll("#sidebar a[href], #sidebar button:not([disabled])")]
+    .filter((element) => !element.closest("[inert]") && element.getClientRects().length > 0);
+}
+
+function containSidebarFocus(event) {
+  const focusable = sidebarFocusableElements();
+  if (!focusable.length) return;
+  const sidebar = document.querySelector("#sidebar");
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  const focusInDrawer = sidebar?.contains(document.activeElement);
+  if (event.shiftKey && (document.activeElement === first || !focusInDrawer)) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && (document.activeElement === last || !focusInDrawer)) {
+    event.preventDefault();
+    first.focus();
+  }
+}
+
+function reducedMotionEnabled() {
+  const query = safeMediaQuery("(prefers-reduced-motion: reduce)");
+  return query?.matches ?? true;
+}
+
+function revealAndFocusAnswer(button, selector) {
+  const answer = button.closest(".quiz-card, .mini-check")?.querySelector(selector);
+  if (!answer) return;
+  answer.hidden = false;
+  button.hidden = true;
+  requestAnimationFrame(() => {
+    answer.focus({ preventScroll: true });
+    answer.scrollIntoView({ behavior: reducedMotionEnabled() ? "auto" : "smooth", block: "nearest" });
+  });
 }
 
 async function copyText(text) {
@@ -102,14 +213,27 @@ async function copyText(text) {
 
 document.addEventListener("click", async (event) => {
   const target = event.target.closest("[data-action]");
-  if (!target) return;
+  if (!target) {
+    const sidebarLink = event.target.closest("#sidebar a[href]");
+    if (isMobileSidebar() && document.body.classList.contains("menu-open") && sidebarLink) {
+      const selectsCurrentRoute = sidebarLink.hash === location.hash;
+      closeSidebar({ restoreFocus: false });
+      if (selectsCurrentRoute) requestAnimationFrame(() => document.querySelector("#main-content")?.focus({ preventScroll: true }));
+    }
+    return;
+  }
   const action = target.dataset.action;
 
-  if (action === "open-menu") document.body.classList.add("menu-open");
-  if (action === "close-menu") document.body.classList.remove("menu-open");
+  if (action === "open-menu") {
+    openSidebar();
+  }
+  if (action === "close-menu") {
+    closeSidebar({ restoreFocus: target.classList.contains("sidebar-scrim") });
+  }
   if (action === "open-search") openSearch();
   if (action === "toggle-theme") {
     const theme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    sessionTheme = theme;
     try { localStorage.setItem("godotTheme", theme); } catch { /* Tema yine bu oturumda uygulanır. */ }
     applyTheme(theme);
   }
@@ -138,16 +262,10 @@ document.addEventListener("click", async (event) => {
   if (action === "filter-letter") updateQuery("letter", target.dataset.letter);
   if (action === "clear-filters") navigate("/terms");
   if (action === "reveal-answer") {
-    const answer = target.closest(".quiz-card").querySelector(".quiz-answer");
-    answer.hidden = false;
-    target.hidden = true;
-    answer.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    revealAndFocusAnswer(target, ".quiz-answer");
   }
   if (action === "reveal-guided-answer") {
-    const answer = target.closest(".mini-check").querySelector(".mini-check__answer");
-    answer.hidden = false;
-    target.hidden = true;
-    answer.focus?.();
+    revealAndFocusAnswer(target, ".mini-check__answer");
   }
   if (action === "inline-term") {
     const dialog = document.querySelector(".quick-term-dialog");
@@ -212,7 +330,8 @@ document.addEventListener("click", async (event) => {
 document.addEventListener("input", (event) => {
   if (event.target.id === "global-search") {
     searchIndex = 0;
-    document.querySelector(".search-results").innerHTML = searchResults(searchTerms(event.target.value), event.target.value);
+    document.querySelector("#global-search-results").innerHTML = searchResults(searchTerms(event.target.value), event.target.value);
+    setSearchIndex(0);
   }
   if (event.target.id === "glossary-search") {
     clearTimeout(glossaryTimer);
@@ -228,6 +347,21 @@ document.addEventListener("change", (event) => {
 });
 
 document.addEventListener("keydown", (event) => {
+  if (isMobileSidebar() && document.body.classList.contains("menu-open")) {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeSidebar();
+      return;
+    }
+    if (event.key === "Tab") {
+      containSidebarFocus(event);
+      return;
+    }
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+      event.preventDefault();
+      return;
+    }
+  }
   if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
     event.preventDefault();
     openSearch();
@@ -242,11 +376,28 @@ document.addEventListener("keydown", (event) => {
 
 document.addEventListener("click", (event) => {
   const dialog = event.target.closest(".search-dialog");
-  if (event.target === dialog) dialog.close();
-  if (event.target.closest(".search-result")) dialog?.close();
+  if (event.target === dialog) { collapseSearch(); dialog.close(); }
+  if (event.target.closest(".search-result")) { collapseSearch(); dialog?.close(); }
   const quickDialog = event.target.closest(".quick-term-dialog");
   if (event.target === quickDialog) quickDialog.close();
 });
+
+document.addEventListener("close", (event) => {
+  if (event.target.matches?.(".search-dialog")) collapseSearch();
+}, true);
+
+function handleSidebarBreakpoint() {
+  const mobile = isMobileSidebar();
+  if (!mobile) document.body.classList.remove("menu-open");
+  if (mobile && document.querySelector("#sidebar")?.contains(document.activeElement)) {
+    document.querySelector('[data-action="open-menu"]')?.focus();
+  }
+  syncSidebarState();
+}
+
+if (sidebarMedia?.addEventListener) sidebarMedia.addEventListener("change", handleSidebarBreakpoint);
+else if (sidebarMedia?.addListener) sidebarMedia.addListener(handleSidebarBreakpoint);
+window.addEventListener("resize", handleSidebarBreakpoint);
 
 window.addEventListener("hashchange", () => render({ focus: true }));
 

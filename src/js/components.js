@@ -96,15 +96,15 @@ const navItems = [
 function appShell(route, content) {
   const activeName = route.name === "lesson" || route.name === "lesson-topic" ? "learn" : route.name === "term" ? "terms" : route.name;
   return `<div class="app-shell">
-    <aside class="sidebar" id="sidebar" aria-label="${escapeHtml(COPY.aria.mainNavigation)}">
+    <aside class="sidebar" id="sidebar" aria-label="${escapeHtml(COPY.aria.mainNavigation)}" aria-hidden="false">
       <a class="brand" href="#/dashboard"><img class="brand-mark" src="${escapeHtml(site.brandIconPath)}" alt="" width="38" height="38" /><span><strong>${escapeHtml(COPY.appName)}</strong><small>${escapeHtml(COPY.appTagline)}</small></span></a>
       <nav>${navItems.map(([name, path, iconName, label]) => `<a href="#${path}" class="nav-link ${activeName === name ? "is-active" : ""}" ${activeName === name ? 'aria-current="page"' : ""}>${icon(iconName)}<span>${label}</span>${name === "review" && progress.reviewCount ? `<b>${progress.reviewCount}</b>` : ""}</a>`).join("")}</nav>
       <div class="sidebar-foot"><div class="data-note"><span class="status-dot"></span><span><strong>${escapeHtml(COPY.status.localProgress)}</strong><small>${escapeHtml(COPY.saved)}</small></span></div></div>
     </aside>
-    <button class="sidebar-scrim" data-action="close-menu" aria-label="${escapeHtml(COPY.aria.closeMenu)}"></button>
+    <button class="sidebar-scrim" data-action="close-menu" aria-label="${escapeHtml(COPY.aria.closeMenu)}" tabindex="-1"></button>
     <div class="page-column">
       <header class="topbar">
-        <button class="icon-button mobile-menu" data-action="open-menu" aria-label="${escapeHtml(COPY.aria.openMenu)}">${icon("menu")}</button>
+        <button class="icon-button mobile-menu" data-action="open-menu" aria-label="${escapeHtml(COPY.aria.openMenu)}" aria-controls="sidebar" aria-expanded="false">${icon("menu")}</button>
         <button class="search-trigger" data-action="open-search">${icon("search", 18)}<span>${escapeHtml(COPY.actions.search)}</span><kbd>${escapeHtml(COPY.search.shortcut)}</kbd></button>
         <div class="topbar-actions"><a class="text-link topbar-learn" href="#/learn">${escapeHtml(COPY.actions.continueLearning)}</a><button class="icon-button" data-action="toggle-theme" aria-label="${escapeHtml(COPY.aria.changeTheme)}">${icon("moon")}</button></div>
       </header>
@@ -117,8 +117,8 @@ function appShell(route, content) {
 
 function searchDialog() {
   return `<dialog class="search-dialog" aria-labelledby="search-title">
-    <div class="search-dialog__head"><div class="search-field">${icon("search", 20)}<label class="sr-only" id="search-title" for="global-search">${escapeHtml(COPY.search.label)}</label><input id="global-search" type="search" autocomplete="off" placeholder="${escapeHtml(COPY.search.placeholder)}" /><kbd>ESC</kbd></div></div>
-    <div class="search-results" role="listbox"><div class="search-intro"><span>${icon("search", 24)}</span><p>${escapeHtml(COPY.search.intro)}</p></div></div>
+    <div class="search-dialog__head"><div class="search-field">${icon("search", 20)}<label class="sr-only" id="search-title" for="global-search">${escapeHtml(COPY.search.label)}</label><input id="global-search" type="search" role="combobox" autocomplete="off" aria-autocomplete="list" aria-controls="global-search-results" aria-expanded="false" placeholder="${escapeHtml(COPY.search.placeholder)}" /><kbd>ESC</kbd></div></div>
+    <div class="search-results" id="global-search-results" role="listbox"><div class="search-intro"><span>${icon("search", 24)}</span><p>${escapeHtml(COPY.search.intro)}</p></div></div>
     <div class="search-dialog__foot"><span><kbd>↑</kbd><kbd>↓</kbd> ${escapeHtml(COPY.search.navigate)}</span><span><kbd>↵</kbd> ${escapeHtml(COPY.search.open)}</span></div>
   </dialog>`;
 }
@@ -126,7 +126,7 @@ function searchDialog() {
 function searchResults(terms, query) {
   if (!query.trim()) return `<div class="search-intro"><span>${icon("search", 24)}</span><p>${escapeHtml(COPY.search.prompt)}</p></div>`;
   if (!terms.length) return `<div class="search-intro"><p>${escapeHtml(COPY.search.empty)}</p></div>`;
-  return `<div class="search-result-meta">${escapeHtml(COPY.search.results(terms.length))}</div>${terms.slice(0, 12).map((term, index) => `<a class="search-result ${index === 0 ? "is-selected" : ""}" role="option" aria-selected="${index === 0}" href="#/terms/${encodeURIComponent(term.id)}"><span class="search-result__icon">${term.name.slice(0, 1).toLocaleUpperCase(namespace.locale?.contentLocale ?? "tr")}</span><span><strong>${escapeHtml(term.name)}</strong><small>${escapeHtml(term.short_definition)}</small></span><em>${escapeHtml(term.tier === "core" ? COPY.status.core : COPY.status.recognize)}</em></a>`).join("")}`;
+  return `<div class="search-result-meta">${escapeHtml(COPY.search.results(terms.length))}</div>${terms.slice(0, 12).map((term, index) => `<a class="search-result ${index === 0 ? "is-selected" : ""}" id="global-search-option-${index}" role="option" aria-selected="${index === 0}" href="#/terms/${encodeURIComponent(term.id)}"><span class="search-result__icon">${escapeHtml(term.name.slice(0, 1).toLocaleUpperCase(namespace.locale?.contentLocale ?? "tr"))}</span><span><strong>${escapeHtml(term.name)}</strong><small>${escapeHtml(term.short_definition)}</small></span><em>${escapeHtml(term.tier === "core" ? COPY.status.core : COPY.status.recognize)}</em></a>`).join("")}`;
 }
 
 function toast(message) {

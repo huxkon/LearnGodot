@@ -35,6 +35,8 @@
 ## State
 
 - `completedLessonIds`, `learnedTermIds`, `favoriteTermIds`, `reviewTermIds`, `quizResults`, `lastVisitedLessonId` canonical ID tabanlıdır.
+- Array state string ID dizisine, quiz state plain object'e ve son lesson string/null değerine normalize edilir. Başarısız kalıcı yazma anahtar bazlı normalize edilmiş oturum fallback'i oluşturur; bu değer eski okunabilir LocalStorage değerinden önce gelir ve sonraki başarılı kalıcı yazmada temizlenir.
+- `godotTheme`, altı progress anahtarından ayrıdır; geçerli oturum seçimi → geçerli kalıcı `light`/`dark` → güvenli sistem/light sırasıyla çözülür.
 - `completeTerm` ve `completeLesson` ayrı işlemlerdir.
 - `reviewCount`, manual review term sayısı ile quiz `review` question sayısını toplar.
 - `completedLessonIds` getter'ı classic lesson flag'lerini olduğu gibi korur; guided lesson flag'ini mevcut guide topic kümesinin tamamlanmasına göre savunmacı biçimde filtreler.
@@ -53,5 +55,7 @@
 
 ## Accessibility
 
-- Keyboard routing/dialog davranışı korunur.
+- Klavye routing/dialog davranışı korunur; opak light/dark focus-ring tokenları ortak yüzeylerde ve primary normal/hover üzerinde en az 3:1 kontrast taşır, arama inputları da global `:focus-visible` ringini bastırmaz.
+- Kapalı mobil sidebar `inert` ve ARIA durumuyla klavye/erişilebilirlik ağacından çıkar. Açık drawer gerçek modal focus containment uygular; arka plan inert, scrim pointer-only, Escape/scrim focus dönüşlü, route seçimi main-focus'ludur ve breakpoint değişiminde stale modal/focus durumu temizlenir.
+- Global arama input-focus combobox/listbox modelini, guided ve quiz cevapları ise gösterildikten sonra programatik odak hedefini kullanır; reduced-motion açıkken veya media query kullanılamadığında scroll `auto` olur.
 - Tüm SPA container canlı bölge değildir; yalnız toast/status için ayrı polite live region kullanılır.

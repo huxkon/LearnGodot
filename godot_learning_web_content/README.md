@@ -30,7 +30,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\validate-content.ps1
 
 Beginner curriculum display title, description, section ve technical topic metadata'sı `../src/data/curriculum.js` içindedir. Bu presentation katmanı historical source lesson title'larını veya stable lesson ID'lerini değiştirmez.
 
-Lesson 1–3 guided enrichment verisi `../src/data/lesson-*-guided.js` dosyalarındadır. Guided açıklamalar canonical term kayıtlarını çoğaltmaz; ortak renderer tarafından source lesson/core ID'leriyle birleştirilir. Guided standardı `../docs/GUIDED_LEARNING_SPEC.md` içinde tanımlıdır.
+Guided enrichment verisi `../src/data/lesson-*-guided.js` kalıbındaki dosyalardadır. Mevcut guided dosyalar validator tarafından dinamik keşfedilir; güncel lesson kapsamı Memory Bank'te tutulur. Guided açıklamalar canonical term kayıtlarını çoğaltmaz; ortak renderer tarafından source lesson/core ID'leriyle birleştirilir. Guided standardı `../docs/GUIDED_LEARNING_SPEC.md` içinde tanımlıdır.
 
 ## Historical prompt
 

@@ -7,14 +7,14 @@
 - Hash SPA bilinçli olarak korunur; hash lesson/term route'ları canonical veya sitemap URL'si yapılmaz.
 - Uygulama beginner curriculum sunumunu source taxonomy'den ayırır; 14 lesson beş bölümden oluşan kompakt course outline olarak görünür.
 - Lesson ID'leri, route'lar ve LocalStorage progress anahtarları değişmedi.
-- Lesson 1–9 guided; Lesson 10–14 klasik içerik sunumundadır.
+- Lesson 1–10 guided; Lesson 11–14 klasik içerik sunumundadır.
 - Canonical veri 346 terim içerir: 128 core, 218 recognize.
 - Lesson 3 core akışında Node'dan sonra `script`, ardından Scene bulunur.
 - Basic `signal` Lesson 4 core metadata'sında input/polling sonrasına konumlandı; ileri event-driven architecture Lesson 9'da ayrıdır.
 - Lesson 4 canonical/guided sırası Game Loop → Frame/FPS → delta → `_process()` → `_physics_process()` → Input Action/Input Map → Polling/Event-driven Input → Signal → Timer/Cooldown olarak hizalıdır.
 - Lesson 5 canonical/guided sırası Coordinate System → Vector2/Vector3 → Magnitude/Length → Normalize → Local/Global Coordinates → Transform → Interpolation/Lerp → Distance/Direction olarak korunur.
 - Lesson 6 canonical/guided sırası Lesson 5'e doğal hareket köprüsü için Velocity/Acceleration → Collision → CollisionShape → CharacterBody → RigidBody → StaticBody → Area → Collision Layer/Mask → RayCast/ShapeCast olarak hizalıdır.
-- Lesson 7 canonical/guided sırası Sprite/Texture → Atlas/Sprite Sheet → Tile/TileMap → Camera → Viewport → Material/Shader → AnimationPlayer → Tween → Draw Call olarak korunur.
+- Lesson 7 canonical/guided sırası Sprite/Texture → Atlas/Sprite Sheet → Tile/TileMapLayer → Camera → Viewport → Material/Shader → AnimationPlayer → Tween → Draw Call olarak korunur; eski TileMap node'u deprecated olarak açıklanır.
 - Lesson 8 canonical/guided sırası UI/GUI → Control → Container → Anchor/Offset → Resolution → Aspect Ratio → Scaling/Stretch → Theme → HUD olarak korunur; akış world/UI ayrımından responsive layout'a ilerler.
 - Lesson 9 canonical/guided sırası Data vs Logic → Resource → Serialization → Save/Load → State → FSM → Coupling → Cohesion → Encapsulation → Signal/Event-driven Architecture olarak korunur; runtime state, kalıcı save verisi ve Resource ayrı rollerdir.
 - `scope` / `project-scope` ve `loop` / `audio-loop` farklı canonical kayıtlardır.
@@ -25,13 +25,16 @@
 - Course “Sıradaki ders” durumu ilk tamamlanmamış lesson'dır; `lastVisitedLessonId` bunu değiştirmez.
 - Bütün lesson'lar tamamlandığında next course lesson `null` olur; Dashboard course-complete state gösterir ve Learn ekranında sıradaki badge'i kalmaz.
 - Guided completion flag'i yalnız mevcut guide order'ın bütün topic'leri öğrenildiyse etkili kabul edilir.
+- Progress state, kalıcı yazma engellendiğinde anahtar bazlı oturum belleğini eski okunabilir LocalStorage değerinden önce kullanır; başarılı kalıcı yazma bu fallback'i temizler.
+- Tema seçimi progress storage'dan ayrı bir oturum fallback'i taşır; geçersiz/stale kalıcı tema kullanıcı seçimini geri alamaz.
 - Lesson 2 canonical/guided sırası Conditional → Array/Dictionary → Loop → Class/Object/Instance olarak hizalıdır.
 
 ## Current Focus
 
+- İçerik güncel stable Godot 4.x'i hedefler; sürüme duyarlı değişiklikler resmi stable belgelerle doğrulanır. Son merkezi kontrol 2026-08-12 tarihinde Godot 4.7.1 için yapıldı.
 - Yeni guided lesson ancak açık bir görev kapsamıyla, `docs/GUIDED_LEARNING_SPEC.md` standardına göre eklenmeli.
 - Full crawlable lesson/term SEO mimarisi Türkçe guided curriculum tamamlandıktan sonra ayrı bir aşamada ele alınmalı.
-- İlk gerçek tarayıcı QA turunda search, dört review kombinasyonu, guided inline code, responsive görünüm, dialog focus ve LocalStorage devamlılığı kontrol edilmeli.
+- Gerçek Brave kalite kapısı `file://` ve `/LearnGodot/` HTTP alt-yolunda; tüm route/term render'larını, search ve review durumlarını, normal/engelli/stale LocalStorage akışlarını, tema fallback'ini, mobil drawer odağını ve reduced-motion cevap akışlarını kapsar.
 - Yeni içerik eklenince sync ve dynamic validator birlikte çalıştırılmalı.
 
 ## Constraints
