@@ -11,7 +11,7 @@ LearnGodot mevcut 14 derslik yolda GDScript'in temel programlama düşüncesini,
 - Learn ekranı beş açık bölümde, 1–14 sıralı kompakt course outline sunar.
 - Public ana sayfa ürünün Türkçe Godot, GDScript temelleri ve oyun geliştirme kavramları odağını hem başlangıç HTML'sinde hem Dashboard onboarding copy'sinde açıkça anlatır.
 - Her satır sıra, beginner title, kısa açıklama, technical topics, progress ve doğru CTA'yı gösterir.
-- Lesson 1–12'de kullanıcı guided topic akışını izler; kavram köprüleri, quick-term açıklamaları ve contextual recognize kartları sessiz forward-reference sorunlarını azaltır.
+- Lesson 1–13'te kullanıcı guided topic akışını izler; kavram köprüleri, quick-term açıklamaları ve contextual recognize kartları sessiz forward-reference sorunlarını azaltır.
 - Sözlük hızlı referans; quiz ve review aktif hatırlama alanıdır.
 - Review sayısı manual review ile quiz review yükünün gerçek toplamıdır.
 - Kurulum, internet veya hesap gerekmez; state tarayıcı LocalStorage'ında kalır.
